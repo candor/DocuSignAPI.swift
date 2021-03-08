@@ -1,0 +1,52 @@
+# LocalePolicy
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**addressFormat** | **String** |  | [optional] 
+**addressFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**allowRegion** | **String** |  | [optional] 
+**calendarType** | **String** |  | [optional] 
+**calendarTypeMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**cultureName** | **String** |  | [optional] 
+**cultureNameMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**currencyCode** | **String** | The currency code for the account, based on the [ISO 4217 currency code](https://www.iso.org/iso-4217-currency-codes.html). | [optional] 
+**currencyCodeMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**currencyNegativeFormat** | **String** |  | [optional] 
+**currencyNegativeFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**currencyPositiveFormat** | **String** |  | [optional] 
+**currencyPositiveFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**customDateFormat** | **String** |  | [optional] 
+**customSignDateFormat** | **String** |  | [optional] 
+**customSignTimeFormat** | **String** |  | [optional] 
+**customTimeFormat** | **String** |  | [optional] 
+**dateFormat** | **String** |  | [optional] 
+**dateFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**effectiveAddressFormat** | **String** |  | [optional] 
+**effectiveCalendarType** | **String** |  | [optional] 
+**effectiveCurrencyCode** | **String** |  | [optional] 
+**effectiveCurrencyNegativeFormat** | **String** |  | [optional] 
+**effectiveCurrencyPositiveFormat** | **String** |  | [optional] 
+**effectiveCustomDateFormat** | **String** |  | [optional] 
+**effectiveCustomTimeFormat** | **String** |  | [optional] 
+**effectiveDateFormat** | **String** |  | [optional] 
+**effectiveInitialFormat** | **String** |  | [optional] 
+**effectiveNameFormat** | **String** |  | [optional] 
+**effectiveTimeFormat** | **String** |  | [optional] 
+**effectiveTimeZone** | **String** |  | [optional] 
+**initialFormat** | **String** |  | [optional] 
+**initialFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**nameFormat** | **String** |  | [optional] 
+**nameFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**signDateFormat** | **String** | The format for the signature date. Valid values are:  - &#x60;d/M/yyyy&#x60; - &#x60;dd-MM-yy&#x60; - &#x60;dd-MMM-yy&#x60; - &#x60;dd-MM-yyyy&#x60; - &#x60;dd.MM.yyyy&#x60; - &#x60;dd-MMM-yyyy&#x60; - &#x60;dd MMMM yyyy&#x60; - &#x60;M/d/yyyy&#x60; - &#x60;MM-dd-yyyy&#x60; - &#x60;MM/dd/yyyy&#x60; - &#x60;MM/dd/yy&#x60; - &#x60;MMM-dd-yyyy&#x60; - &#x60;MMM d, yyyy&#x60; - &#x60;MMMM d, yyyy&#x60; - &#x60;yyyy-MM-dd&#x60; - &#x60;yyyy-MMM-dd&#x60; - &#x60;yyyy/MM/dd&#x60; - &#x60;yyyy MMMM d&#x60;  **Note**: Only Admin users can change this setting.  | [optional] 
+**signDateFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**signTimeFormat** | **String** | The format for the signature time. Valid values are:  - &#x60;none&#x60; - &#x60;HH:mm&#x60; - &#x60;h:mm&#x60; - &#x60;HH:mm:ss&#x60; - &#x60;h:mm:ss&#x60;  | [optional] 
+**signTimeFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**timeFormat** | **String** |  | [optional] 
+**timeFormatMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+**timeZone** | **String** |  | [optional] 
+**timeZoneMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

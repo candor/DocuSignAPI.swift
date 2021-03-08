@@ -1,0 +1,19 @@
+name: CI
+on:
+  push:
+    branches:
+      - master
+env:
+  SPM_FLAGS: --enable-test-discovery -Xswiftc -suppress-warnings -Xswiftc -gnone
+jobs:
+  smoke:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: technote-space/auto-cancel-redundant-job@v1
+  build:
+    runs-on: ubuntu-18.04
+    needs: smoke
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: swift build $SPM_FLAGS

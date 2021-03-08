@@ -1,0 +1,50 @@
+# Users
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**activationAccessCode** | **String** | The activation code a new user must enter when activating their account. | [optional] 
+**company** | **String** | The name of the user&#39;s company. | [optional] 
+**connectConfigurations** | [[**ConnectUserObject**](ConnectUserObject.md)] | Object representing the user&#39;s custom Connect configuration. | [optional] 
+**countryCode** | **String** | The three-letter code for the user&#39;s country. | [optional] 
+**createdDateTime** | **String** | The UTC DateTime when the item was created. | [optional] 
+**customSettings** | [[**NameValue**](NameValue.md)] | The name/value pair information for the user custom setting. | [optional] 
+**defaultAccountId** | **String** | The default account ID associated with the user. | [optional] 
+**email** | **String** | The user&#39;s email address. | [optional] 
+**enableConnectForUser** | **String** | Boolean value that specifies whether the user is enabled for updates from DocuSign Connect. | [optional] 
+**errorDetails** | [**ErrorDetails**](ErrorDetails.md) |  | [optional] 
+**firstName** | **String** | The user&#39;s first name.  Maximum Length: 50 characters. | [optional] 
+**forgottenPasswordInfo** | [**ForgottenPasswordInformation**](ForgottenPasswordInformation.md) |  | [optional] 
+**groupList** | [[**Group**](Group.md)] | A list of the group information for groups to add the user to. Use [UserGroups::listGroups](https://developers.docusign.com/esign-rest-api/reference/UserGroups/Groups/list) to get information about groups.  When setting a user&#39;s group, only the &#x60;groupId&#x60; is required.  | [optional] 
+**homeAddress** | [**AddressInformation**](AddressInformation.md) |  | [optional] 
+**initialsImageUri** | **String** | The URI for retrieving the image of the user&#39;s initials. | [optional] 
+**isAdmin** | **String** | Determines if the feature set is actively set as part of the plan. | [optional] 
+**isNAREnabled** | **String** | When set to **true**, National Association of Realtors (NAR) signature logos are enabled for the user. | [optional] 
+**lastLogin** | **String** | The date and time when the user last logged in to the system. | [optional] 
+**lastName** | **String** | The user&#39;s last name.  Maximum Length: 50 characters. | [optional] 
+**loginStatus** | **String** | Shows the current status of the user&#39;s password. Possible values are:   * password_reset * password_active * password_expired * password_locked * password_reset_failed   | [optional] 
+**middleName** | **String** | The user&#39;s middle name.  Limit: 50 characters. | [optional] 
+**password** | **String** | The user&#39;s password. | [optional] 
+**passwordExpiration** | **String** | If password expiration is enabled, the date-time when the user&#39;s password expires. | [optional] 
+**permissionProfileId** | **String** | The id of the permission profile associated with the user. | [optional] 
+**permissionProfileName** | **String** | The name of the permission profile associated with the user. | [optional] 
+**profileImageUri** | **String** | The URL for retrieving the user&#39;s profile image. | [optional] 
+**sendActivationEmail** | **String** | When set to **true**, specifies that an activation email be sent to the user. | [optional] 
+**sendActivationOnInvalidLogin** | **String** | When set to **true**, specifies that an additional activation email be sent if user&#39;s log on fails before the account is activated. | [optional] 
+**signatureImageUri** | **String** | An endpoint URI that you can use to retrieve the user&#39;s signature image. | [optional] 
+**subscribe** | **String** |  | [optional] 
+**suffixName** | **String** | The suffix for the user&#39;s name, such as Jr, IV, PhD, etc.  Limit: 50 characters.  | [optional] 
+**title** | **String** | The salutation for the user, such as Ms, Dr, Capt., etc.  Limit: 10 characters. | [optional] 
+**uri** | **String** | A URI containing the user ID. | [optional] 
+**userAddedToAccountDateTime** | **String** | The date and time that the user was added to the account. | [optional] 
+**userId** | **String** | The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, &#x60;userId&#x60; can represent another user whom the Administrator is accessing.  | [optional] 
+**userName** | **String** | The user&#39;s full name. &lt;!-- &#x60;title&#x60; + &#x60;firstName&#x60; + &#x60;middleName&#x60; + &#x60;lastName&#x60; + &#x60;suffixName&#x60; --&gt; | [optional] 
+**userProfileLastModifiedDate** | **String** | The date and time that the user&#39;s profile was last modified. | [optional] 
+**userSettings** | [**UserSettingsInformation**](UserSettingsInformation.md) |  | [optional] 
+**userStatus** | **String** | Status of the user&#39;s account. One of:  - &#x60;ActivationRequired&#x60; - &#x60;ActivationSent&#x60; - &#x60;Active&#x60; - &#x60;Closed&#x60; - &#x60;Disabled&#x60;  | [optional] 
+**userType** | **String** | The type of user, for example &#x60;CompanyUser&#x60;. | [optional] 
+**workAddress** | [**AddressInformation**](AddressInformation.md) |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+

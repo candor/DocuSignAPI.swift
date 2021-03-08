@@ -1,0 +1,25 @@
+# PaymentDetails
+
+## Properties
+Name | Type | Description | Notes
+------------ | ------------- | ------------- | -------------
+**allowedPaymentMethods** | **[String]** | An array of accepted payment methods:  * &#x60;CreditCard&#x60; * &#x60;ApplePay&#x60; * &#x60;AndroidPay&#x60; * &#x60;BankAccount&#x60;  For example, if you only accept credit cards and ACH transfers, you would set this property to:  &#x60;&#39;[\&quot;BankAccount\&quot;, \&quot;CreditCard\&quot;]&#39;&#x60;  Do not specify &#x60;BankAccount&#x60; (ACH) if you are also using in-person signing.  | [optional] 
+**chargeId** | **String** | The GUID set by the payment gateway (such as Stripe) that identifies a transaction. The &#x60;chargeId&#x60; is created when authorizing a payment and must be referenced when completing a payment. | [optional] 
+**currencyCode** | **String** | Specifies the three-letter [ISO 4217][ISO4217] currency code for the payment.  Supported currencies are:  * AUD: Australian dollar * CAD: Canadian dollar * EUR: Euro * GBP: Great Britain pound * USD: United States dollar  Specifying any other ISO 4217 code for payments is an error.  [ISO4217]:          https://en.wikipedia.org/wiki/ISO_4217  | [optional] 
+**currencyCodeMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
+**customerId** | **String** | The customer ID. | [optional] 
+**customMetadata** | **String** | This is a sender-defined field that passes any extra metadata about the payment that will show up in the Authorize.net transaction under **Description** in the merchant gateway portal. The custom metadata will be recorded in downloaded Authorize.net reports.   The following example shows what the **Description** field of the transaction will look like:   &#x60;&lt;envelopeID&gt;, &lt;customMetadata&gt;&#x60; | [optional] 
+**customMetadataRequired** | **Bool** | A sender-defined field that specifies whether custom metadata is required for the transaction. When set to **true**, custom metadata is required. This property only applies if you are using an Authorize.net payment gateway account. | [optional] 
+**gatewayAccountId** | **String** | A GUID that identifies the payment gateway connected to the sender&#39;s DocuSign account.  There is no public API for connecting payment gateway accounts You must connect and manage payment gateway accounts through the DocuSign Admin console and through your chosen payment gateway.  You can get the gateway account ID in the Payments section of the DocuSign Admin console.   [paymentgateways]:  https://support.docusign.com/en/guides/managing-payment-gateways  | [optional] 
+**gatewayAccountIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
+**gatewayDisplayName** | **String** | Display name of the gateway connected to sender&#39;s Docusign account.  Possible values are: Stripe, Braintree, Authorize.Net. | [optional] 
+**gatewayName** | **String** | Name of the gateway connected to sender&#39;s DocuSign account.  Possible values are:  * &#x60;Stripe&#x60; * &#x60;Braintree&#x60; * &#x60;AuthorizeDotNet&#x60; | [optional] 
+**lineItems** | [[**PaymentLineItem**](PaymentLineItem.md)] | A payment formula can have one or more line items that provide detail about individual items in a payment request.  The list of line items are returned as metadata to the payment gateway.  | [optional] 
+**paymentOption** | **String** | This property specifies how the signer&#39;s collected payment details will be used.  Possible values:  - &#x60;authorize&#x60;: The payment details will be used to collect payment. This is the default value. - &#x60;save&#x60;: The signer&#39;s payment method (credit card or bank account) will be saved to the sender&#39;s payment gateway. - &#x60;save_and_authorize&#x60;: The signer&#39;s payment method (credit card or bank account) will be saved to the sender&#39;s payment gateway and will also be used to collect payment. | [optional] 
+**paymentSourceId** | **String** | The payment source ID. | [optional] 
+**status** | **String** | This read-only property describes the status of a payment.  * &#x60;new&#x60;&lt;br&gt;   This is a new payment request.   The envelope has been created,   but no payment authorizations have been made.  * &#x60;auth_complete&#x60;&lt;br&gt;   A recipient has entered their credit card information,   but the envelope has not been completed.   The card has not been charged.  * &#x60;payment_complete&#x60;&lt;br&gt;   The recipient&#39;s card has been charged.  * &#x60;payment_capture_failed&#x60;&lt;br&gt;   Final charge failed.   This can happen when too much time   passes between authorizing the payment   and completing the document.  * &#x60;future_payment_saved&#x60; &lt;br&gt; The recipient&#39;s payment method has been saved to the sender&#39;s payment gateway.  | [optional] 
+**total** | [**Money**](Money.md) |  | [optional] 
+
+[[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
+
+
