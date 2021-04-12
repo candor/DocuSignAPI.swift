@@ -61,7 +61,7 @@ Name | Type | Description | Notes
 **recipientIdGuid** | **String** | The globally-unique identifier (GUID) for a specific recipient on a specific envelope. If the same recipient is associated with multiple envelopes, they will have a different GUID for each one. Read only. | [optional] 
 **recipientIdGuidMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **recipientIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, the recipient must click the **View** button for the supporting document prior to completing the signing process. | [optional] 
+**`required`** | **String** | When set to **true**, the recipient must click the **View** button for the supporting document prior to completing the signing process. | [optional] 
 **requiredMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **requiredRead** | **String** | When set to **true**, the recipient must read through the document. | [optional] 
 **smartContractInformation** | [**SmartContractInformation**](SmartContractInformation.md) |  | [optional] 

@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**billingInvoices** | [[**BillingInvoice**](BillingInvoice.md)] | Reserved: TBD | [optional] 
+**billingInvoices** | [BillingInvoice] | Reserved: TBD | [optional] 
 **pastDueBalance** | **String** |  | [optional] 
 **paymentAllowed** | **String** |  | [optional] 
 

@@ -25,7 +25,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let userId = "userId_example" // String | The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing. 
-let customSettingsInformation = customSettingsInformation(customSettings: [nil]) // CustomSettingsInformation |  (optional)
+let customSettingsInformation = customSettingsInformation(customSettings: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")]) // CustomSettingsInformation |  (optional)
 
 // Deletes custom user settings for a specified user.
 UserCustomSettingsAPI.userCustomSettingsDeleteCustomSettings(accountId: accountId, userId: userId, customSettingsInformation: customSettingsInformation).whenComplete { result in
@@ -153,7 +153,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let userId = "userId_example" // String | The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing. 
-let customSettingsInformation = customSettingsInformation(customSettings: [nil]) // CustomSettingsInformation |  (optional)
+let customSettingsInformation = customSettingsInformation(customSettings: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")]) // CustomSettingsInformation |  (optional)
 
 // Adds or updates custom user settings for the specified user.
 UserCustomSettingsAPI.userCustomSettingsPutCustomSettings(accountId: accountId, userId: userId, customSettingsInformation: customSettingsInformation).whenComplete { result in

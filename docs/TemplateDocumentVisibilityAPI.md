@@ -91,7 +91,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let recipientId = "recipientId_example" // String | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
 let templateId = "templateId_example" // String | The id of the template.
-let templateDocumentVisibilityList = templateDocumentVisibilityList(documentVisibility: [nil]) // TemplateDocumentVisibilityList |  (optional)
+let templateDocumentVisibilityList = templateDocumentVisibilityList(documentVisibility: [documentVisibility(documentId: "documentId_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), recipientId: "recipientId_example", rights: "rights_example", visible: "visible_example")]) // TemplateDocumentVisibilityList |  (optional)
 
 // Updates document visibility for a template recipient
 TemplateDocumentVisibilityAPI.recipientsPutTemplateRecipientDocumentVisibility(accountId: accountId, recipientId: recipientId, templateId: templateId, templateDocumentVisibilityList: templateDocumentVisibilityList).whenComplete { result in
@@ -157,7 +157,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let templateId = "templateId_example" // String | The id of the template.
-let templateDocumentVisibilityList = templateDocumentVisibilityList(documentVisibility: [nil]) // TemplateDocumentVisibilityList |  (optional)
+let templateDocumentVisibilityList = templateDocumentVisibilityList(documentVisibility: [documentVisibility(documentId: "documentId_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), recipientId: "recipientId_example", rights: "rights_example", visible: "visible_example")]) // TemplateDocumentVisibilityList |  (optional)
 
 // Updates document visibility for template recipients
 TemplateDocumentVisibilityAPI.recipientsPutTemplateRecipientsDocumentVisibility(accountId: accountId, templateId: templateId, templateDocumentVisibilityList: templateDocumentVisibilityList).whenComplete { result in

@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**brands** | [[**Brand**](Brand.md)] | A list of brands. | [optional] 
+**brands** | [Brand] | A list of brands. | [optional] 
 **recipientBrandIdDefault** | **String** | The brand that envelope recipients see when a brand is not explicitly set. | [optional] 
 **senderBrandIdDefault** | **String** | The brand that envelope senders see when a brand is not explicitly set. | [optional] 
 

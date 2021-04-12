@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **created** | **String** | The UTC DateTime when the workspace user authorization was created. | [optional] 
 **createdById** | **String** | The id of the user who created the workspace item. | [optional] 
 **createdByInformation** | [**WorkspaceUser**](WorkspaceUser.md) |  | [optional] 
-**&#x60;extension&#x60;** | **String** | The file extension of a file item. | [optional] 
+**`extension`** | **String** | The file extension of a file item. | [optional] 
 **fileSize** | **String** | The size of the file in bytes. | [optional] 
 **fileUri** | **String** | The URI for retrieving the file. | [optional] 
 **id** | **String** | A unique ID for the Salesforce object. | [optional] 

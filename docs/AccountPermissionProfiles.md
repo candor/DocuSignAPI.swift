@@ -9,7 +9,7 @@ Name | Type | Description | Notes
 **permissionProfileName** | **String** | The name of the account permission profile.   Example: &#x60;Account Administrator&#x60; | [optional] 
 **settings** | [**AccountRoleSettings**](AccountRoleSettings.md) |  | [optional] 
 **userCount** | **String** | The total number of users in the group associated with the account permission profile. | [optional] 
-**users** | [[**UserInformation**](UserInformation.md)] | A list of user objects containing information about the users who are associated with the account permission profile. | [optional] 
+**users** | [UserInformation] | A list of user objects containing information about the users who are associated with the account permission profile. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

@@ -38,7 +38,7 @@ Name | Type | Description | Notes
 **lockedMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **pageNumber** | **String** | Specifies the page number on which the tab is located. Must be 1 for supplemental documents.  | [optional] 
 **pageNumberMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
+**`required`** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
 **requiredMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **selected** | **String** | When set to **true**, the radio button is selected. | [optional] 
 **selectedMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 

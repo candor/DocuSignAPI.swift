@@ -425,7 +425,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let brandId = "brandId_example" // String | The id of the brand.
-let brand = brand(brandCompany: "brandCompany_example", brandId: "brandId_example", brandLanguages: ["brandLanguages_example"], brandName: "brandName_example", colors: [nil], defaultBrandLanguage: "defaultBrandLanguage_example", emailContent: [nil], errorDetails: nil, isOverridingCompanyName: false, isSendingDefault: false, isSigningDefault: false, landingPages: [nil], links: [nil], logos: nil, resources: nil) // Brand |  (optional)
+let brand = brand(brandCompany: "brandCompany_example", brandId: "brandId_example", brandLanguages: ["brandLanguages_example"], brandName: "brandName_example", colors: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")], defaultBrandLanguage: "defaultBrandLanguage_example", emailContent: [brandEmailContent(content: "content_example", emailContentType: "emailContentType_example", emailToLink: "emailToLink_example", linkText: "linkText_example")], errorDetails: nil, isOverridingCompanyName: false, isSendingDefault: false, isSigningDefault: false, landingPages: [nil], links: [brandLink(linkText: "linkText_example", linkType: "linkType_example", showLink: "showLink_example", urlOrMailTo: "urlOrMailTo_example")], logos: brandLogos(email: "email_example", primary: "primary_example", secondary: "secondary_example"), resources: brandResourceUrls(email: "email_example", sending: "sending_example", signing: "signing_example", signingCaptive: "signingCaptive_example")) // Brand |  (optional)
 
 // Updates an existing brand.
 AccountBrandsAPI.brandPutBrand(accountId: accountId, brandId: brandId, brand: brand).whenComplete { result in
@@ -688,7 +688,7 @@ This method deletes one or more brand profiles from an account, based on the bra
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let brandsRequest = brandsRequest(brands: [nil]) // BrandsRequest |  (optional)
+let brandsRequest = brandsRequest(brands: [brandRequest(brandId: "brandId_example")]) // BrandsRequest |  (optional)
 
 // Deletes one or more brand profiles.
 AccountBrandsAPI.brandsDeleteBrands(accountId: accountId, brandsRequest: brandsRequest).whenComplete { result in
@@ -816,7 +816,7 @@ This method creates one or more brand profile files for an account.  If the `bra
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let brand = brand(brandCompany: "brandCompany_example", brandId: "brandId_example", brandLanguages: ["brandLanguages_example"], brandName: "brandName_example", colors: [nil], defaultBrandLanguage: "defaultBrandLanguage_example", emailContent: [nil], errorDetails: nil, isOverridingCompanyName: false, isSendingDefault: false, isSigningDefault: false, landingPages: [nil], links: [nil], logos: nil, resources: nil) // Brand |  (optional)
+let brand = brand(brandCompany: "brandCompany_example", brandId: "brandId_example", brandLanguages: ["brandLanguages_example"], brandName: "brandName_example", colors: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")], defaultBrandLanguage: "defaultBrandLanguage_example", emailContent: [brandEmailContent(content: "content_example", emailContentType: "emailContentType_example", emailToLink: "emailToLink_example", linkText: "linkText_example")], errorDetails: nil, isOverridingCompanyName: false, isSendingDefault: false, isSigningDefault: false, landingPages: [nil], links: [brandLink(linkText: "linkText_example", linkType: "linkType_example", showLink: "showLink_example", urlOrMailTo: "urlOrMailTo_example")], logos: brandLogos(email: "email_example", primary: "primary_example", secondary: "secondary_example"), resources: brandResourceUrls(email: "email_example", sending: "sending_example", signing: "signing_example", signingCaptive: "signingCaptive_example")) // Brand |  (optional)
 
 // Creates one or more brand profiles for an account.
 AccountBrandsAPI.brandsPostBrands(accountId: accountId, brand: brand).whenComplete { result in

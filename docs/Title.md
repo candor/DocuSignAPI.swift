@@ -71,7 +71,7 @@ Name | Type | Description | Notes
 **recipientIdGuid** | **String** | The globally-unique identifier (GUID) for a specific recipient on a specific envelope. If the same recipient is associated with multiple envelopes, they will have a different GUID for each one. Read only. | [optional] 
 **recipientIdGuidMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **recipientIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
+**`required`** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
 **requiredMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **smartContractInformation** | [**SmartContractInformation**](SmartContractInformation.md) |  | [optional] 
 **status** | **String** | The status of the tab. Possible values are:  - &#x60;active&#x60;: The tab is active, but the recipient has not yet interacted with it. - &#x60;signed&#x60;: The recipient signed the tab. - &#x60;declined&#x60;: The recipient declined the envelope. - &#x60;na&#x60;: Used when the &#x60;status&#x60; property is not applicable to the tab type. (For example, a tab that has the &#x60;tabType&#x60; &#x60;SignerAttachmentOptional&#x60;).  | [optional] 

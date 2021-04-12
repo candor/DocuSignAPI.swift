@@ -12,11 +12,11 @@ Name | Type | Description | Notes
 **nrdsLastName** | **String** | The realtor&#39;s last name. | [optional] 
 **phoneticName** | **String** | The phonetic spelling of the &#x60;signatureName&#x60;. | [optional] 
 **signatureFont** | **String** | The font type to use for the signature if the signature is not drawn. The following font styles  are supported. The quotes are to indicate that these values are strings, not &#x60;enums&#x60;.  - &#x60;\&quot;1_DocuSign\&quot;&#x60; - &#x60;\&quot;2_DocuSign\&quot;&#x60; - &#x60;\&quot;3_DocuSign\&quot;&#x60; - &#x60;\&quot;4_DocuSign\&quot;&#x60; - &#x60;\&quot;5_DocuSign\&quot;&#x60; - &#x60;\&quot;6_DocuSign\&quot;&#x60; - &#x60;\&quot;7_DocuSign\&quot;&#x60; - &#x60;\&quot;8_DocuSign\&quot;&#x60; - &#x60;\&quot;Mistral\&quot;&#x60; - &#x60;\&quot;Rage Italic\&quot;&#x60;  | [optional] 
-**signatureGroups** | [[**SignatureGroupDef**](SignatureGroupDef.md)] |  | [optional] 
+**signatureGroups** | [SignatureGroupDef] |  | [optional] 
 **signatureId** | **String** | The ID of the signature being accessed. | [optional] 
 **signatureInitials** | **String** | Specifies the user&#39;s signature in initials format. | [optional] 
 **signatureName** | **String** | Specifies the user&#39;s signature name. | [optional] 
-**signatureUsers** | [[**SignatureUserDef**](SignatureUserDef.md)] |  | [optional] 
+**signatureUsers** | [SignatureUserDef] |  | [optional] 
 **stampFormat** | **String** | The format of a stamp. Valid values are:  - &#x60;NameHanko&#x60;: The stamp represents only the signer&#39;s name. - &#x60;NameDateHanko&#x60;: The stamp represents the signer&#39;s name and the date.  | [optional] 
 **stampSizeMM** | **String** | The physical height of the stamp image (in millimeters) that the stamp vendor recommends for displaying the image in PDF documents. | [optional] 
 

@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **batchId** | **String** | Identifier used to query the status of an individual bulk recipient batch. | [optional] 
 **batchSize** | **String** | The total number of items in the batch being queried. | [optional] 
-**bulkEnvelopes** | [[**BulkEnvelope**](BulkEnvelope.md)] | A list of bulk envelope objects. | [optional] 
+**bulkEnvelopes** | [BulkEnvelope] | A list of bulk envelope objects. | [optional] 
 **bulkEnvelopesBatchUri** | **String** | URI at which you can retrieve the batch envelopes. | [optional] 
 **endPosition** | **String** | The last index position in the result set.  | [optional] 
 **failed** | **String** | The number of entries with a status of &#x60;failed&#x60;.  | [optional] 

@@ -80,7 +80,7 @@ No authorization required
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let favoriteTemplatesInfo = favoriteTemplatesInfo(errorDetails: nil, favoriteTemplates: [nil], templatesUpdatedCount: 123) // FavoriteTemplatesInfo |  (optional)
+let favoriteTemplatesInfo = favoriteTemplatesInfo(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), favoriteTemplates: [favoriteTemplatesContentItem(errorDetails: nil, favoritedDate: "favoritedDate_example", templateId: "templateId_example")], templatesUpdatedCount: 123) // FavoriteTemplatesInfo |  (optional)
 
 FavoriteTemplatesAPI.favoriteTemplatesPutFavoriteTemplate(accountId: accountId, favoriteTemplatesInfo: favoriteTemplatesInfo).whenComplete { result in
     switch result {
@@ -140,7 +140,7 @@ No authorization required
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let favoriteTemplatesInfo = favoriteTemplatesInfo(errorDetails: nil, favoriteTemplates: [nil], templatesUpdatedCount: 123) // FavoriteTemplatesInfo |  (optional)
+let favoriteTemplatesInfo = favoriteTemplatesInfo(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), favoriteTemplates: [favoriteTemplatesContentItem(errorDetails: nil, favoritedDate: "favoritedDate_example", templateId: "templateId_example")], templatesUpdatedCount: 123) // FavoriteTemplatesInfo |  (optional)
 
 FavoriteTemplatesAPI.favoriteTemplatesUnFavoriteTemplate(accountId: accountId, favoriteTemplatesInfo: favoriteTemplatesInfo).whenComplete { result in
     switch result {

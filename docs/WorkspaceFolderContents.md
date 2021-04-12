@@ -5,8 +5,8 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **endPosition** | **String** | The last index position in the result set.  | [optional] 
 **folder** | [**WorkspaceItem**](WorkspaceItem.md) |  | [optional] 
-**items** | [[**WorkspaceItem**](WorkspaceItem.md)] | A list of workspace items. | [optional] 
-**parentFolders** | [[**WorkspaceItem**](WorkspaceItem.md)] |  | [optional] 
+**items** | [WorkspaceItem] | A list of workspace items. | [optional] 
+**parentFolders** | [WorkspaceItem] |  | [optional] 
 **resultSetSize** | **String** | The number of results in this response. Because you can filter which entries are included in the response, this value is always less than or equal to the &#x60;totalSetSize&#x60;. | [optional] 
 **startPosition** | **String** | The starting index position of the current result set. | [optional] 
 **totalSetSize** | **String** | The total number of items in the result set. This value is always greater than or equal to the value of &#x60;resultSetSize&#x60;. | [optional] 

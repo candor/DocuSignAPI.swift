@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **displayAnchorPrefix** | **String** | Contains text that all display anchors must start with. Using at least 4 characters will improve anchor processing performance. | [optional] 
-**displayAnchors** | [[**DocumentHtmlDisplayAnchor**](DocumentHtmlDisplayAnchor.md)] | An object that defines how to handle a section of the HTML in signing. This property enables an incoming request to make a section of the HTML collapsible and expandable or hidden from view. A start anchor, end anchor, or both are required. If the anchors are not found, the display anchor will be ignored. For a list of the available types, see the &#x60;display&#x60; enum. | [optional] 
+**displayAnchors** | [DocumentHtmlDisplayAnchor] | An object that defines how to handle a section of the HTML in signing. This property enables an incoming request to make a section of the HTML collapsible and expandable or hidden from view. A start anchor, end anchor, or both are required. If the anchors are not found, the display anchor will be ignored. For a list of the available types, see the &#x60;display&#x60; enum. | [optional] 
 **displayOrder** | **String** | The position on the page where the display section appears. | [optional] 
 **displayPageNumber** | **String** | The number of the page on which the display section appears. | [optional] 
 **documentGuid** | **String** | The GUID of the document. | [optional] 

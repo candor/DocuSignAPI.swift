@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **comment** | **String** |  | [optional] 
-**credibleWitnesses** | [[**NotaryJournalCredibleWitness**](NotaryJournalCredibleWitness.md)] |  | [optional] 
+**credibleWitnesses** | [NotaryJournalCredibleWitness] |  | [optional] 
 **signatureImage** | **String** |  | [optional] 
 **signerIdType** | **String** |  | [optional] 
 

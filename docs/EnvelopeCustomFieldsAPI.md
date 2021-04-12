@@ -26,7 +26,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // EnvelopeCustomFields |  (optional)
+let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // EnvelopeCustomFields |  (optional)
 
 // Deletes envelope custom fields for draft and in-process envelopes.
 EnvelopeCustomFieldsAPI.customFieldsDeleteCustomFields(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields).whenComplete { result in
@@ -154,7 +154,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // EnvelopeCustomFields |  (optional)
+let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // EnvelopeCustomFields |  (optional)
 
 // Creates envelope custom fields for an envelope.
 EnvelopeCustomFieldsAPI.customFieldsPostCustomFields(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields).whenComplete { result in
@@ -219,7 +219,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // EnvelopeCustomFields |  (optional)
+let envelopeCustomFields = EnvelopeCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // EnvelopeCustomFields |  (optional)
 
 // Updates envelope custom fields in an envelope.
 EnvelopeCustomFieldsAPI.customFieldsPutCustomFields(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields).whenComplete { result in

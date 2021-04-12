@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **address** | [**AddressInformation**](AddressInformation.md) |  | [optional] 
-**authenticationMethods** | [[**AuthenticationMethod**](AuthenticationMethod.md)] | Indicates the authentication methods that the user uses. These properties cannot be modified by the PUT operation.  | [optional] 
+**authenticationMethods** | [AuthenticationMethod] | Indicates the authentication methods that the user uses. These properties cannot be modified by the PUT operation.  | [optional] 
 **companyName** | **String** | The name of the user&#39;s company. | [optional] 
 **displayOrganizationInfo** | **String** |  When set to **true**, the user&#39;s company and title information display on the ID card.  | [optional] 
 **displayPersonalInfo** | **String** | When set to **true**, the user&#39;s address and phone number display on the ID card. | [optional] 

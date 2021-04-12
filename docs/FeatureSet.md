@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**currencyFeatureSetPrices** | [[**CurrencyFeatureSetPrice**](CurrencyFeatureSetPrice.md)] | Reserved for DocuSign. | [optional] 
+**currencyFeatureSetPrices** | [CurrencyFeatureSetPrice] | Reserved for DocuSign. | [optional] 
 **envelopeFee** | **String** | Reserved for DocuSign. | [optional] 
 **featureSetId** | **String** | Reserved for DocuSign. | [optional] 
 **fixedFee** | **String** | Reserved for DocuSign. | [optional] 

@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **envelopeRecipientNameContainsFilter** | **String** |  | [optional] 
 **envelopeStatusFilter** | **String** |  | [optional] 
 **envelopeSubjectContainsFilter** | **String** |  | [optional] 
-**fields** | [[**ReportInProductField**](ReportInProductField.md)] |  | [optional] 
+**fields** | [ReportInProductField] |  | [optional] 
 **forDownload** | **String** |  | [optional] 
 **isDashboard** | **String** |  | [optional] 
 **newLine** | **String** |  | [optional] 

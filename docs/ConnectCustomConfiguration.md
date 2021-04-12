@@ -32,7 +32,7 @@ Name | Type | Description | Notes
 **salesforceDocumentsAsContentFiles** | **String** | When set to **true**, DocuSign can use documents in your Salesforce account for sending and signing. | [optional] 
 **senderOverride** | **String** |  | [optional] 
 **senderSelectableItems** | **[String]** | This property sets the items that are available for selection when adding or editing Connect objects.  | [optional] 
-**sfObjects** | [[**ConnectSalesforceObject**](ConnectSalesforceObject.md)] | An array of Salesforce objects. | [optional] 
+**sfObjects** | [ConnectSalesforceObject] | An array of Salesforce objects. | [optional] 
 **signMessageWithX509Certificate** | **String** | When set to **true**, Mutual TLS will be enabled for notifications. Mutual TLS must be initiated by the listener (the customer&#39;s web server) during the TLS handshake protocol.  | [optional] 
 **soapNamespace** | **String** | The namespace of the SOAP interface.  **Note**: If &#x60;useSoapInterface&#x60; is set to **true**, you must set this value. | [optional] 
 **urlToPublishTo** | **String** | This is the web address and name of your listener or Retrieving Service endpoint. You need to include HTTPS:// in the web address. | [optional] 

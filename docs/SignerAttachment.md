@@ -44,7 +44,7 @@ Name | Type | Description | Notes
 **mergeFieldXml** | **String** |  | [optional] 
 **name** | **String** | The name of the tab. For example, &#x60;Sign Here&#x60; or &#x60;Initial Here&#x60;. | [optional] 
 **nameMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;optional&#x60;** | **String** | When set to **true**, the recipient does not need to complete this tab to complete the signing process. | [optional] 
+**`optional`** | **String** | When set to **true**, the recipient does not need to complete this tab to complete the signing process. | [optional] 
 **optionalMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **pageNumber** | **String** | The page number on which the tab is located. For supplemental documents, this value must be &#x60;1&#x60;. | [optional] 
 **pageNumberMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 

@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **fieldId** | **String** | The id of the custom field. | [optional] 
 **listItems** | **[String]** | An array of strings that represents the options in a list.  Maximum length: 2048 characters, but each individual option string can only be a maximum of 100 characters. | [optional] 
 **name** | **String** | The name of the custom field. | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, senders are required to select an option from the list before they can send the envelope. | [optional] 
+**`required`** | **String** | When set to **true**, senders are required to select an option from the list before they can send the envelope. | [optional] 
 **show** | **String** | When set to **true**, the field displays in the **Envelope Custom Fields** section when a user creates or sends an envelope. | [optional] 
 **value** | **String** | The value of the custom field. This is the value that the user who creates or sends the envelope selects from the list. | [optional] 
 

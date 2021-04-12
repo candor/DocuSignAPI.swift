@@ -38,7 +38,7 @@ Name | Type | Description | Notes
 **paymentItemDescription** | **String** | If the custom tab is for a payment request, this is the description of the item associated with the charge.  Example: &#x60;The Danish play by Shakespeare&#x60;  Maximum Length: 100 characters. | [optional] 
 **paymentItemName** | **String** | If the custom tab is for a payment request, this is the name of the item associated with the charge.  Maximum Length: 100 characters.  Example: &#x60;Hamlet&#x60; | [optional] 
 **requireAll** | **String** | When set to **true** and shared is true, information must be entered in this field to complete the envelope.  | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
+**`required`** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
 **requireInitialOnSharedChange** | **String** | Optional element for field markup. When set to **true**, the signer is required to initial when they modify a shared field. | [optional] 
 **scaleValue** | **String** | Sets the size of the tab. This field accepts values from &#x60;0.5&#x60; to &#x60;1.0&#x60;, where &#x60;1.0&#x60; represents full size and &#x60;0.5&#x60; is 50% of full size. | [optional] 
 **selected** | **String** | When set to **true**, the radio button is selected. | [optional] 

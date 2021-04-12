@@ -84,7 +84,7 @@ Name | Type | Description | Notes
 **powerFormModeMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
 **recipientViewedNotification** | **String** | When **true**, this user receives notifications when envelopes are viewed. | [optional] 
 **recipientViewedNotificationMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
-**sealIdentifiers** | [[**SealIdentifier**](SealIdentifier.md)] | Information about the seals associated with this user. | [optional] 
+**sealIdentifiers** | [SealIdentifier] | Information about the seals associated with this user. | [optional] 
 **selfSignedRecipientEmailDocument** | **String** | Sets how self-signed documents are presented to the email recipients. Valid values are:  - &#x60;include_pdf&#x60;: A PDF of the completed document is attached to the email. - &#x60;include_link&#x60;: A secure link to the self-signed documents is included    in the email.  **Note**: Only Admin users can change this setting.  | [optional] 
 **selfSignedRecipientEmailDocumentMetadata** | [**SettingsMetadata**](SettingsMetadata.md) |  | [optional] 
 **senderEmailNotifications** | [**SenderEmailNotifications**](SenderEmailNotifications.md) |  | [optional] 

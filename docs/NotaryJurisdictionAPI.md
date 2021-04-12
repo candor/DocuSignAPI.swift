@@ -204,7 +204,7 @@ Creates a jurisdiction object.
 // The following code samples are still beta. For any issue, please report via http://github.com/OpenAPITools/openapi-generator/issues/new
 import DocuSignAPI
 
-let notaryJurisdiction = NotaryJurisdiction(commissionExpiration: "commissionExpiration_example", commissionId: "commissionId_example", county: "county_example", errorDetails: nil, jurisdiction: nil, registeredName: "registeredName_example", sealType: "sealType_example") // NotaryJurisdiction |  (optional)
+let notaryJurisdiction = NotaryJurisdiction(commissionExpiration: "commissionExpiration_example", commissionId: "commissionId_example", county: "county_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), jurisdiction: jurisdiction(allowSystemCreatedSeal: "allowSystemCreatedSeal_example", allowUserUploadedSeal: "allowUserUploadedSeal_example", commissionIdInSeal: "commissionIdInSeal_example", county: "county_example", countyInSeal: "countyInSeal_example", enabled: "enabled_example", jurisdictionId: "jurisdictionId_example", name: "name_example", notaryPublicInSeal: "notaryPublicInSeal_example", stateNameInSeal: "stateNameInSeal_example"), registeredName: "registeredName_example", sealType: "sealType_example") // NotaryJurisdiction |  (optional)
 
 // Creates a jurisdiction object.
 NotaryJurisdictionAPI.notaryJurisdictionsPostNotaryJurisdictions(notaryJurisdiction: notaryJurisdiction).whenComplete { result in
@@ -266,7 +266,7 @@ Updates the jurisdiction information about a notary.  The following restrictions
 import DocuSignAPI
 
 let jurisdictionId = "jurisdictionId_example" // String | The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds` 
-let notaryJurisdiction = NotaryJurisdiction(commissionExpiration: "commissionExpiration_example", commissionId: "commissionId_example", county: "county_example", errorDetails: nil, jurisdiction: nil, registeredName: "registeredName_example", sealType: "sealType_example") // NotaryJurisdiction |  (optional)
+let notaryJurisdiction = NotaryJurisdiction(commissionExpiration: "commissionExpiration_example", commissionId: "commissionId_example", county: "county_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), jurisdiction: jurisdiction(allowSystemCreatedSeal: "allowSystemCreatedSeal_example", allowUserUploadedSeal: "allowUserUploadedSeal_example", commissionIdInSeal: "commissionIdInSeal_example", county: "county_example", countyInSeal: "countyInSeal_example", enabled: "enabled_example", jurisdictionId: "jurisdictionId_example", name: "name_example", notaryPublicInSeal: "notaryPublicInSeal_example", stateNameInSeal: "stateNameInSeal_example"), registeredName: "registeredName_example", sealType: "sealType_example") // NotaryJurisdiction |  (optional)
 
 // Updates the jurisdiction information about a notary.
 NotaryJurisdictionAPI.notaryJurisdictionsPutNotaryJurisdiction(jurisdictionId: jurisdictionId, notaryJurisdiction: notaryJurisdiction).whenComplete { result in

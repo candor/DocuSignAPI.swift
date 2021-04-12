@@ -152,7 +152,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let emailSettings = emailSettings(bccEmailAddresses: [nil], replyEmailAddressOverride: "replyEmailAddressOverride_example", replyEmailNameOverride: "replyEmailNameOverride_example") // EmailSettings | A complex type that contains email settings. (optional)
+let emailSettings = emailSettings(bccEmailAddresses: [bccEmailAddress(bccEmailAddressId: "bccEmailAddressId_example", email: "email_example")], replyEmailAddressOverride: "replyEmailAddressOverride_example", replyEmailNameOverride: "replyEmailNameOverride_example") // EmailSettings | A complex type that contains email settings. (optional)
 
 // Adds email setting overrides to an envelope.
 EnvelopeEmailSettingsAPI.emailSettingsPostEmailSettings(accountId: accountId, envelopeId: envelopeId, emailSettings: emailSettings).whenComplete { result in
@@ -217,7 +217,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let emailSettings = emailSettings(bccEmailAddresses: [nil], replyEmailAddressOverride: "replyEmailAddressOverride_example", replyEmailNameOverride: "replyEmailNameOverride_example") // EmailSettings | A complex type that contains email settings. (optional)
+let emailSettings = emailSettings(bccEmailAddresses: [bccEmailAddress(bccEmailAddressId: "bccEmailAddressId_example", email: "email_example")], replyEmailAddressOverride: "replyEmailAddressOverride_example", replyEmailNameOverride: "replyEmailNameOverride_example") // EmailSettings | A complex type that contains email settings. (optional)
 
 // Updates the email setting overrides for an envelope.
 EnvelopeEmailSettingsAPI.emailSettingsPutEmailSettings(accountId: accountId, envelopeId: envelopeId, emailSettings: emailSettings).whenComplete { result in

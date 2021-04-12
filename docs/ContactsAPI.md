@@ -89,7 +89,7 @@ This method deletes multiple contacts associated with an account.
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let contactModRequest = contactModRequest(contactList: [nil]) // ContactModRequest |  (optional)
+let contactModRequest = contactModRequest(contactList: [contact(cloudProvider: "cloudProvider_example", cloudProviderContainerId: "cloudProviderContainerId_example", contactId: "contactId_example", contactPhoneNumbers: [contactPhoneNumber(phoneNumber: "phoneNumber_example", phoneType: "phoneType_example")], contactUri: "contactUri_example", emails: ["emails_example"], errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), isOwner: false, name: "name_example", organization: "organization_example", shared: "shared_example", signingGroup: "signingGroup_example", signingGroupName: "signingGroupName_example")]) // ContactModRequest |  (optional)
 
 // Deletes multiple contacts from an account.
 ContactsAPI.contactsDeleteContacts(accountId: accountId, contactModRequest: contactModRequest).whenComplete { result in
@@ -217,7 +217,7 @@ This method imports multiple new contacts into a contact list from a CSV, JSON, 
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let contactModRequest = contactModRequest(contactList: [nil]) // ContactModRequest |  (optional)
+let contactModRequest = contactModRequest(contactList: [contact(cloudProvider: "cloudProvider_example", cloudProviderContainerId: "cloudProviderContainerId_example", contactId: "contactId_example", contactPhoneNumbers: [contactPhoneNumber(phoneNumber: "phoneNumber_example", phoneType: "phoneType_example")], contactUri: "contactUri_example", emails: ["emails_example"], errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), isOwner: false, name: "name_example", organization: "organization_example", shared: "shared_example", signingGroup: "signingGroup_example", signingGroupName: "signingGroupName_example")]) // ContactModRequest |  (optional)
 
 // Imports new contacts into a contacts list.
 ContactsAPI.contactsPostContacts(accountId: accountId, contactModRequest: contactModRequest).whenComplete { result in
@@ -280,7 +280,7 @@ This method updates one or more contacts associated with an account.
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let contactModRequest = contactModRequest(contactList: [nil]) // ContactModRequest |  (optional)
+let contactModRequest = contactModRequest(contactList: [contact(cloudProvider: "cloudProvider_example", cloudProviderContainerId: "cloudProviderContainerId_example", contactId: "contactId_example", contactPhoneNumbers: [contactPhoneNumber(phoneNumber: "phoneNumber_example", phoneType: "phoneType_example")], contactUri: "contactUri_example", emails: ["emails_example"], errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), isOwner: false, name: "name_example", organization: "organization_example", shared: "shared_example", signingGroup: "signingGroup_example", signingGroupName: "signingGroupName_example")]) // ContactModRequest |  (optional)
 
 // Updates one or more contacts.
 ContactsAPI.contactsPutContacts(accountId: accountId, contactModRequest: contactModRequest).whenComplete { result in

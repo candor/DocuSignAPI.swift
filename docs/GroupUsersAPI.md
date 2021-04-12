@@ -25,7 +25,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let groupId = "groupId_example" // String | The ID of the group being accessed.
-let userInfoList = userInfoList(users: [nil]) // UserInfoList |  (optional)
+let userInfoList = userInfoList(users: [userInfo(accountId: "accountId_example", accountName: "accountName_example", activationAccessCode: "activationAccessCode_example", email: "email_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), loginStatus: "loginStatus_example", membershipId: "membershipId_example", sendActivationEmail: "sendActivationEmail_example", uri: "uri_example", userId: "userId_example", userName: "userName_example", userStatus: "userStatus_example", userType: "userType_example")]) // UserInfoList |  (optional)
 
 // Deletes one or more users from a group
 GroupUsersAPI.groupsDeleteGroupUsers(accountId: accountId, groupId: groupId, userInfoList: userInfoList).whenComplete { result in
@@ -157,7 +157,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let groupId = "groupId_example" // String | The ID of the group being accessed.
-let userInfoList = userInfoList(users: [nil]) // UserInfoList |  (optional)
+let userInfoList = userInfoList(users: [userInfo(accountId: "accountId_example", accountName: "accountName_example", activationAccessCode: "activationAccessCode_example", email: "email_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), loginStatus: "loginStatus_example", membershipId: "membershipId_example", sendActivationEmail: "sendActivationEmail_example", uri: "uri_example", userId: "userId_example", userName: "userName_example", userStatus: "userStatus_example", userType: "userType_example")]) // UserInfoList |  (optional)
 
 // Adds one or more users to an existing group.
 GroupUsersAPI.groupsPutGroupUsers(accountId: accountId, groupId: groupId, userInfoList: userInfoList).whenComplete { result in

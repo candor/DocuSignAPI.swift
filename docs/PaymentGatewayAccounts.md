@@ -15,7 +15,7 @@ Name | Type | Description | Notes
 **payPalLegacySettings** | [**PayPalLegacySettings**](PayPalLegacySettings.md) |  | [optional] 
 **supportedCurrencies** | **[String]** | A list of ISO 4217 currency codes for the currencies that the payment gateway account supports.  Examples:   - &#x60;USD&#x60; - &#x60;CAD&#x60; - &#x60;EUR&#x60; - &#x60;HKD&#x60; | [optional] 
 **supportedPaymentMethods** | **[String]** | An array of paymentMethodWithOptions objects that specify the payment methods that are available for the gateway. | [optional] 
-**supportedPaymentMethodsWithOptions** | [[**PaymentMethodWithOptions**](PaymentMethodWithOptions.md)] | An array of &#x60;paymentMethodWithOptions&#x60; objects that specify the payment methods that are available for the gateway, as well as the payment options that are compatible with each payment method. | [optional] 
+**supportedPaymentMethodsWithOptions** | [PaymentMethodWithOptions] | An array of &#x60;paymentMethodWithOptions&#x60; objects that specify the payment methods that are available for the gateway, as well as the payment options that are compatible with each payment method. | [optional] 
 **zeroDecimalCurrencies** | **[String]** |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)

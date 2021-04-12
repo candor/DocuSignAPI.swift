@@ -7,7 +7,7 @@ Name | Type | Description | Notes
 **balance** | **String** | Reserved: TBD | [optional] 
 **dueDate** | **String** | Reserved: TBD | [optional] 
 **invoiceId** | **String** | Reserved: TBD | [optional] 
-**invoiceItems** | [[**BillingInvoiceItem**](BillingInvoiceItem.md)] | Reserved: TBD | [optional] 
+**invoiceItems** | [BillingInvoiceItem] | Reserved: TBD | [optional] 
 **invoiceNumber** | **String** | Reserved: TBD | [optional] 
 **invoiceUri** | **String** | Contains a URI for an endpoint that you can use to retrieve invoice information. | [optional] 
 **nonTaxableAmount** | **String** |  | [optional] 

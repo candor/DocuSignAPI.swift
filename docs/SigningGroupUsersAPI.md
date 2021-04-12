@@ -25,7 +25,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let signingGroupId = "signingGroupId_example" // String | Optional. The ID of the [signing group](https://support.docusign.com/en/guides/ndse-user-guide-signing-groups).  **Note**: When you send an envelope to a signing group, anyone in the group can open it and sign it with their own signature. For this reason, we recommend that you do not include non-signer recipients (such as carbon copy recipients) in the same signing group as signer recipients. However, you could create a second signing group for the non-signer recipients and change the default action of Needs to Sign to a different value, such as Receives a Copy. 
-let signingGroupUsers = SigningGroupUsers(users: [nil]) // SigningGroupUsers | A complex type that contains information about users in the signing group. (optional)
+let signingGroupUsers = SigningGroupUsers(users: [signingGroupUser(email: "email_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), userName: "userName_example")]) // SigningGroupUsers | A complex type that contains information about users in the signing group. (optional)
 
 // Deletes  one or more members from a signing group.
 SigningGroupUsersAPI.signingGroupsDeleteSigningGroupUsers(accountId: accountId, signingGroupId: signingGroupId, signingGroupUsers: signingGroupUsers).whenComplete { result in
@@ -153,7 +153,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let signingGroupId = "signingGroupId_example" // String | Optional. The ID of the [signing group](https://support.docusign.com/en/guides/ndse-user-guide-signing-groups).  **Note**: When you send an envelope to a signing group, anyone in the group can open it and sign it with their own signature. For this reason, we recommend that you do not include non-signer recipients (such as carbon copy recipients) in the same signing group as signer recipients. However, you could create a second signing group for the non-signer recipients and change the default action of Needs to Sign to a different value, such as Receives a Copy. 
-let signingGroupUsers = SigningGroupUsers(users: [nil]) // SigningGroupUsers | A complex type that contains information about users in the signing group. (optional)
+let signingGroupUsers = SigningGroupUsers(users: [signingGroupUser(email: "email_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), userName: "userName_example")]) // SigningGroupUsers | A complex type that contains information about users in the signing group. (optional)
 
 // Adds members to a signing group. 
 SigningGroupUsersAPI.signingGroupsPutSigningGroupUsers(accountId: accountId, signingGroupId: signingGroupId, signingGroupUsers: signingGroupUsers).whenComplete { result in
