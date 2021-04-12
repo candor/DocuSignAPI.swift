@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **email** | **String** |  | [optional] 
-**formData** | [[**NameValue**](NameValue.md)] |  | [optional] 
+**formData** | [NameValue] |  | [optional] 
 **name** | **String** | The name of the recipient. | [optional] 
 **recipientId** | **String** | The unique id for the recipient. It is used by the tab element to indicate which recipient is to sign the document. | [optional] 
 

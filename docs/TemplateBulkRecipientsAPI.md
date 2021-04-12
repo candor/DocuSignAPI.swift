@@ -160,7 +160,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let recipientId = "recipientId_example" // String | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
 let templateId = "templateId_example" // String | The id of the template.
-let bulkRecipientsRequest = bulkRecipientsRequest(bulkRecipients: [nil]) // BulkRecipientsRequest |  (optional)
+let bulkRecipientsRequest = bulkRecipientsRequest(bulkRecipients: [bulkRecipient(accessCode: "accessCode_example", email: "email_example", errorDetails: [errorDetails(errorCode: "errorCode_example", message: "message_example")], identification: "identification_example", name: "name_example", note: "note_example", phoneNumber: "phoneNumber_example", recipientSignatureProviderInfo: [bulkRecipientSignatureProvider(name: "name_example", value: "value_example")], rowNumber: "rowNumber_example", tabLabels: [bulkRecipientTabLabel(name: "name_example", value: "value_example")])]) // BulkRecipientsRequest |  (optional)
 
 // Adds or replaces the bulk recipients list in a template.
 TemplateBulkRecipientsAPI.recipientsPutTemplateBulkRecipients(accountId: accountId, recipientId: recipientId, templateId: templateId, bulkRecipientsRequest: bulkRecipientsRequest).whenComplete { result in

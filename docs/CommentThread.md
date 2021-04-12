@@ -25,7 +25,7 @@ Name | Type | Description | Notes
 **anchorYOffsetMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **bold** | **String** | When set to **true**, the information in the tab is bold. | [optional] 
 **boldMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**comments** | [[**Comment**](Comment.md)] | An array of comment tabs that contain information about users&#39; comments on documents. | [optional] 
+**comments** | [Comment] | An array of comment tabs that contain information about users&#39; comments on documents. | [optional] 
 **conditionalParentLabel** | **String** | For conditional fields this is the &#x60;tabLabel&#x60; of the parent tab that controls this tab&#39;s visibility. | [optional] 
 **conditionalParentLabelMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **conditionalParentValue** | **String** | For conditional fields, this is the value of the parent tab that controls the tab&#39;s visibility.  If the parent tab is a Checkbox, Radio button, Optional Signature, or Optional Initial use \&quot;on\&quot; as the value to show that the parent tab is active.  | [optional] 

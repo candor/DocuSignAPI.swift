@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**filters** | [[**ConditionalRecipientRuleFilter**](ConditionalRecipientRuleFilter.md)] |  | [optional] 
+**filters** | [ConditionalRecipientRuleFilter] |  | [optional] 
 **order** | **String** | An integer that specifies the order in which rules are processed. Lower values are processed before higher values. | [optional] 
 **recipientLabel** | **String** |  | [optional] 
 

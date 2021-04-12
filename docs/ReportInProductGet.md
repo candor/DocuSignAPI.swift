@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **envelopeRecipientNameContainsFilter** | **String** |  | [optional] 
 **envelopeStatusFilter** | **String** |  | [optional] 
 **envelopeSubjectContainsFilter** | **String** |  | [optional] 
-**fields** | [[**ReportInProductField**](ReportInProductField.md)] |  | [optional] 
+**fields** | [ReportInProductField] |  | [optional] 
 **lastScheduledExecutionDate** | **String** |  | [optional] 
 **lastScheduledExecutionSuccessDate** | **String** |  | [optional] 
 **maxDownloadRows** | **String** |  | [optional] 

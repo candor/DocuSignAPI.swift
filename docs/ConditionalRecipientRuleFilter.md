@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**&#x60;operator&#x60;** | **String** |  | [optional] 
+**`operator`** | **String** |  | [optional] 
 **recipientId** | **String** | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each &#x60;recipientId&#x60; must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a &#x60;recipientId&#x60; of &#x60;1&#x60;. | [optional] 
 **scope** | **String** | Must be set to \&quot;api\&quot;. | [optional] 
 **tabId** | **String** | The unique identifier for the tab. | [optional] 

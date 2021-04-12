@@ -31,7 +31,7 @@ Name | Type | Description | Notes
 **planEndDate** | **String** | The date that the current plan will end. | [optional] 
 **planName** | **String** | The name of the billing plan used for the account.  Examples:   - &#x60;Personal - Annual&#x60; - &#x60;Unlimited Envelope Subscription - Annual Billing&#x60; | [optional] 
 **planStartDate** | **String** | The date that the Account started using the current plan. | [optional] 
-**recipientDomains** | [[**RecipientDomain**](RecipientDomain.md)] |  | [optional] 
+**recipientDomains** | [RecipientDomain] |  | [optional] 
 **seatsAllowed** | **String** | The number of active users the account can have at one time. | [optional] 
 **seatsInUse** | **String** | The number of users currently active on the account. | [optional] 
 **status21CFRPart11** | **String** | The status of the account content per (Title 21 CFR Part 11)[https://www.fda.gov/regulatory-information/search-fda-guidance-documents/part-11-electronic-records-electronic-signatures-scope-and-application]. This regulation defines the criteria under which electronic records and electronic signatures are considered trustworthy. | [optional] 

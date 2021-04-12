@@ -27,7 +27,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let documentId = "documentId_example" // String | The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
 let templateId = "templateId_example" // String | The id of the template.
-let documentFieldsInformation = documentFieldsInformation(documentFields: [nil]) // DocumentFieldsInformation |  (optional)
+let documentFieldsInformation = documentFieldsInformation(documentFields: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")]) // DocumentFieldsInformation |  (optional)
 
 // Deletes custom document fields from an existing template document.
 TemplateDocumentFieldsAPI.documentFieldsDeleteTemplateDocumentFields(accountId: accountId, documentId: documentId, templateId: templateId, documentFieldsInformation: documentFieldsInformation).whenComplete { result in
@@ -159,7 +159,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let documentId = "documentId_example" // String | The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
 let templateId = "templateId_example" // String | The id of the template.
-let documentFieldsInformation = documentFieldsInformation(documentFields: [nil]) // DocumentFieldsInformation |  (optional)
+let documentFieldsInformation = documentFieldsInformation(documentFields: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")]) // DocumentFieldsInformation |  (optional)
 
 // Creates custom document fields in an existing template document.
 TemplateDocumentFieldsAPI.documentFieldsPostTemplateDocumentFields(accountId: accountId, documentId: documentId, templateId: templateId, documentFieldsInformation: documentFieldsInformation).whenComplete { result in
@@ -226,7 +226,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let documentId = "documentId_example" // String | The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
 let templateId = "templateId_example" // String | The id of the template.
-let documentFieldsInformation = documentFieldsInformation(documentFields: [nil]) // DocumentFieldsInformation |  (optional)
+let documentFieldsInformation = documentFieldsInformation(documentFields: [nameValue(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), name: "name_example", originalValue: "originalValue_example", value: "value_example")]) // DocumentFieldsInformation |  (optional)
 
 // Updates existing custom document fields in an existing template document.
 TemplateDocumentFieldsAPI.documentFieldsPutTemplateDocumentFields(accountId: accountId, documentId: documentId, templateId: templateId, documentFieldsInformation: documentFieldsInformation).whenComplete { result in

@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **configurationType** | **String** | If you are using merge fields, this property specifies the type of the merge field. The only supported value is &#x60;salesforce&#x60;. | [optional] 
 **configurationTypeMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **path** | **String** | Sets the object associated with the custom tab. Currently this is the Salesforce Object. | [optional] 
-**pathExtended** | [[**PathExtendedElement**](PathExtendedElement.md)] | Reserved for DocuSign. | [optional] 
+**pathExtended** | [PathExtendedElement] | Reserved for DocuSign. | [optional] 
 **pathExtendedMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **pathMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **row** | **String** | Specifies the row number in a Salesforce table that the merge field value corresponds to. | [optional] 

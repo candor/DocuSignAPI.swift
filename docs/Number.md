@@ -77,7 +77,7 @@ Name | Type | Description | Notes
 **recipientIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **requireAll** | **String** | When set to **true** and shared is true, information must be entered in this field to complete the envelope.  | [optional] 
 **requireAllMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;required&#x60;** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
+**`required`** | **String** | When set to **true**, the signer is required to fill out this tab. | [optional] 
 **requiredMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **requireInitialOnSharedChange** | **String** | Optional element for field markup. When set to **true**, the signer is required to initial when they modify a shared field. | [optional] 
 **requireInitialOnSharedChangeMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 

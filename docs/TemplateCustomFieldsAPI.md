@@ -26,7 +26,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let templateId = "templateId_example" // String | The id of the template.
-let templateCustomFields = TemplateCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // TemplateCustomFields |  (optional)
+let templateCustomFields = TemplateCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // TemplateCustomFields |  (optional)
 
 // Deletes envelope custom fields in a template.
 TemplateCustomFieldsAPI.customFieldsDeleteTemplateCustomFields(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields).whenComplete { result in
@@ -154,7 +154,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let templateId = "templateId_example" // String | The id of the template.
-let templateCustomFields = TemplateCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // TemplateCustomFields |  (optional)
+let templateCustomFields = TemplateCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // TemplateCustomFields |  (optional)
 
 // Creates custom document fields in an existing template document.
 TemplateCustomFieldsAPI.customFieldsPostTemplateCustomFields(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields).whenComplete { result in
@@ -219,7 +219,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let templateId = "templateId_example" // String | The id of the template.
-let templateCustomFields = TemplateCustomFields(listCustomFields: [nil], textCustomFields: [nil]) // TemplateCustomFields |  (optional)
+let templateCustomFields = TemplateCustomFields(listCustomFields: [listCustomField(configurationType: "configurationType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")], textCustomFields: [textCustomField(configurationType: "configurationType_example", errorDetails: nil, fieldId: "fieldId_example", name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example")]) // TemplateCustomFields |  (optional)
 
 // Updates envelope custom fields in a template.
 TemplateCustomFieldsAPI.customFieldsPutTemplateCustomFields(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields).whenComplete { result in

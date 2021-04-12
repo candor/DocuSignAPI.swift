@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**contacts** | [[**Contact**](Contact.md)] | A list of contacts. | [optional] 
+**contacts** | [Contact] | A list of contacts. | [optional] 
 **endPosition** | **String** | The last index position in the result set.  | [optional] 
 **nextUri** | **String** | The URI for the next chunk of records based on the search request. It is &#x60;null&#x60; if this is the last set of results for the search.  | [optional] 
 **previousUri** | **String** | The URI for the prior chunk of records based on the search request. It is &#x60;null&#x60; if this is the first set of results for the search.  | [optional] 

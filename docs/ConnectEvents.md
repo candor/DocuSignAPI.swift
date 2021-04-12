@@ -3,8 +3,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**failures** | [[**ConnectLog**](ConnectLog.md)] | A list of Connect failure logs. | [optional] 
-**logs** | [[**ConnectLog**](ConnectLog.md)] | A list of Connect general logs. | [optional] 
+**failures** | [ConnectLog] | A list of Connect failure logs. | [optional] 
+**logs** | [ConnectLog] | A list of Connect general logs. | [optional] 
 **totalRecords** | **String** | The count of records in the log list. | [optional] 
 **type** | **String** |  | [optional] 
 

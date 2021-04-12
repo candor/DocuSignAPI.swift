@@ -8,7 +8,7 @@ Name | Type | Description | Notes
 **buildSHA** | **String** | Reserved: TBD | [optional] 
 **buildVersion** | **String** | Reserved: TBD | [optional] 
 **linkedSites** | **[String]** |  | [optional] 
-**serviceVersions** | [[**ServiceVersion**](ServiceVersion.md)] |  | [optional] 
+**serviceVersions** | [ServiceVersion] |  | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

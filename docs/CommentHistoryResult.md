@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**comments** | [[**Comment**](Comment.md)] | An array of comment tabs that contain information about users&#39; comments on documents. | [optional] 
+**comments** | [Comment] | An array of comment tabs that contain information about users&#39; comments on documents. | [optional] 
 **count** | **Int** | The maximum number of results to return. | [optional] 
 **endTimetoken** | **String** |  | [optional] 
 **startTimetoken** | **String** |  | [optional] 

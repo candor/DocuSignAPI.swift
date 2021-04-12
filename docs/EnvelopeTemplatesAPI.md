@@ -228,7 +228,7 @@ let accountId = "accountId_example" // String | The external account number (int
 let documentId = "documentId_example" // String | The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
 let preserveTemplateRecipient = "preserveTemplateRecipient_example" // String |  (optional)
-let documentTemplateList = documentTemplateList(documentTemplates: [nil]) // DocumentTemplateList |  (optional)
+let documentTemplateList = documentTemplateList(documentTemplates: [documentTemplate(documentEndPage: "documentEndPage_example", documentId: "documentId_example", documentStartPage: "documentStartPage_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), templateId: "templateId_example")]) // DocumentTemplateList |  (optional)
 
 // Adds templates to a document in an  envelope.
 EnvelopeTemplatesAPI.templatesPostDocumentTemplates(accountId: accountId, documentId: documentId, envelopeId: envelopeId, preserveTemplateRecipient: preserveTemplateRecipient, documentTemplateList: documentTemplateList).whenComplete { result in
@@ -296,7 +296,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
 let preserveTemplateRecipient = "preserveTemplateRecipient_example" // String |  (optional)
-let documentTemplateList = documentTemplateList(documentTemplates: [nil]) // DocumentTemplateList |  (optional)
+let documentTemplateList = documentTemplateList(documentTemplates: [documentTemplate(documentEndPage: "documentEndPage_example", documentId: "documentId_example", documentStartPage: "documentStartPage_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), templateId: "templateId_example")]) // DocumentTemplateList |  (optional)
 
 // Adds templates to an envelope.
 EnvelopeTemplatesAPI.templatesPostEnvelopeTemplates(accountId: accountId, envelopeId: envelopeId, preserveTemplateRecipient: preserveTemplateRecipient, documentTemplateList: documentTemplateList).whenComplete { result in

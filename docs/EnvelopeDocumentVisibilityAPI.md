@@ -91,7 +91,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
 let recipientId = "recipientId_example" // String | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
-let documentVisibilityList = documentVisibilityList(documentVisibility: [nil]) // DocumentVisibilityList |  (optional)
+let documentVisibilityList = documentVisibilityList(documentVisibility: [documentVisibility(documentId: "documentId_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), recipientId: "recipientId_example", rights: "rights_example", visible: "visible_example")]) // DocumentVisibilityList |  (optional)
 
 // Updates document visibility for a recipient
 EnvelopeDocumentVisibilityAPI.recipientsPutRecipientDocumentVisibility(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, documentVisibilityList: documentVisibilityList).whenComplete { result in
@@ -157,7 +157,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let documentVisibilityList = documentVisibilityList(documentVisibility: [nil]) // DocumentVisibilityList |  (optional)
+let documentVisibilityList = documentVisibilityList(documentVisibility: [documentVisibility(documentId: "documentId_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), recipientId: "recipientId_example", rights: "rights_example", visible: "visible_example")]) // DocumentVisibilityList |  (optional)
 
 // Updates document visibility for recipients
 EnvelopeDocumentVisibilityAPI.recipientsPutRecipientsDocumentVisibility(accountId: accountId, envelopeId: envelopeId, documentVisibilityList: documentVisibilityList).whenComplete { result in

@@ -25,7 +25,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let envelopeAttachmentsRequest = envelopeAttachmentsRequest(attachments: [nil]) // EnvelopeAttachmentsRequest |  (optional)
+let envelopeAttachmentsRequest = envelopeAttachmentsRequest(attachments: [attachment(accessControl: "accessControl_example", attachmentId: "attachmentId_example", attachmentType: "attachmentType_example", data: "data_example", label: "label_example", name: "name_example", remoteUrl: "remoteUrl_example")]) // EnvelopeAttachmentsRequest |  (optional)
 
 // Delete one or more attachments from a DRAFT envelope.
 EnvelopeAttachmentsAPI.attachmentsDeleteAttachments(accountId: accountId, envelopeId: envelopeId, envelopeAttachmentsRequest: envelopeAttachmentsRequest).whenComplete { result in
@@ -279,7 +279,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let envelopeId = "envelopeId_example" // String | The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec` 
-let envelopeAttachmentsRequest = envelopeAttachmentsRequest(attachments: [nil]) // EnvelopeAttachmentsRequest |  (optional)
+let envelopeAttachmentsRequest = envelopeAttachmentsRequest(attachments: [attachment(accessControl: "accessControl_example", attachmentId: "attachmentId_example", attachmentType: "attachmentType_example", data: "data_example", label: "label_example", name: "name_example", remoteUrl: "remoteUrl_example")]) // EnvelopeAttachmentsRequest |  (optional)
 
 // Add one or more attachments to a draft or in-process envelope.
 EnvelopeAttachmentsAPI.attachmentsPutAttachments(accountId: accountId, envelopeId: envelopeId, envelopeAttachmentsRequest: envelopeAttachmentsRequest).whenComplete { result in

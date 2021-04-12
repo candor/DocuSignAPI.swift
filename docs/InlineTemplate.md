@@ -4,7 +4,7 @@
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **customFields** | [**AccountCustomFields**](AccountCustomFields.md) |  | [optional] 
-**documents** | [[**Document**](Document.md)] | A complex element that contains details about the documents associated with the envelope. | [optional] 
+**documents** | [Document] | A complex element that contains details about the documents associated with the envelope. | [optional] 
 **envelope** | [**Envelope**](Envelope.md) |  | [optional] 
 **recipients** | [**EnvelopeRecipients**](EnvelopeRecipients.md) |  | [optional] 
 **sequence** | **String** | Specifies the order in which templates are overlaid. | [optional] 

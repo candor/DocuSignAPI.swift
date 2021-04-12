@@ -5,7 +5,7 @@ Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
 **checksum** | **String** | A 64-byte, Secure Hash Algorithm 256 (SHA256) checksum that the caller computes across the entirety of the original content that has been uploaded to the chunked upload. DocuSign compares this value to its own computation. If the two values are not equal, the original content and received content are not the same and the commit action is refused. | [optional] 
 **chunkedUploadId** | **String** | The id of the chunked upload.  | [optional] 
-**chunkedUploadParts** | [[**ChunkedUploadPart**](ChunkedUploadPart.md)] | A list of the parts that compose the chunked upload, including their byte sizes. The list must be contiguous before you can commit the chunked upload. | [optional] 
+**chunkedUploadParts** | [ChunkedUploadPart] | A list of the parts that compose the chunked upload, including their byte sizes. The list must be contiguous before you can commit the chunked upload. | [optional] 
 **chunkedUploadUri** | **String** | The URI that you use to reference the chunked upload in other API requests, such as envelope document and envelope attachment requests.  | [optional] 
 **committed** | **String** | When **true**, the chunked upload has been committed. A committed chunked upload can no longer receive any additional parts and is ready for use within other API requests.  | [optional] 
 **expirationDateTime** | **String** | The UTC time at which the chunked upload expires and is no longer addressable.   **Note**: You must fully upload and use a chunked upload within 20 minutes of initializing it.  | [optional] 

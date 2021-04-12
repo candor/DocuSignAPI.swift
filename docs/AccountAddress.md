@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **phone** | **String** | The phone number associated with the account. | [optional] 
 **postalCode** | **String** | The postal code associated with the address. Maximum length: 20 characters. | [optional] 
 **state** | **String** | The state or province associated with the address. Maximum length: 40 characters. | [optional] 
-**supportedCountries** | [[**Country**](Country.md)] | An array of supported countries associated with the account. | [optional] 
+**supportedCountries** | [Country] | An array of supported countries associated with the account. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

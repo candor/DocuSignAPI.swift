@@ -25,7 +25,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let groupId = "groupId_example" // String | The id of the group.
-let brandsRequest = brandsRequest(brands: [nil]) // BrandsRequest |  (optional)
+let brandsRequest = brandsRequest(brands: [brandRequest(brandId: "brandId_example")]) // BrandsRequest |  (optional)
 
 // Deletes brand information from a group.
 GroupBrandsAPI.brandsDeleteGroupBrands(accountId: accountId, groupId: groupId, brandsRequest: brandsRequest).whenComplete { result in
@@ -153,7 +153,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let groupId = "groupId_example" // String | The ID of the group being accessed.
-let brandsRequest = brandsRequest(brands: [nil]) // BrandsRequest |  (optional)
+let brandsRequest = brandsRequest(brands: [brandRequest(brandId: "brandId_example")]) // BrandsRequest |  (optional)
 
 // Adds an existing brand to a group.
 GroupBrandsAPI.brandsPutGroupBrands(accountId: accountId, groupId: groupId, brandsRequest: brandsRequest).whenComplete { result in

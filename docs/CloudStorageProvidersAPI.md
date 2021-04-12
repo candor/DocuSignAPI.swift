@@ -92,7 +92,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let userId = "userId_example" // String | The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing. 
-let cloudStorageProviders = CloudStorageProviders(storageProviders: [nil]) // CloudStorageProviders |  (optional)
+let cloudStorageProviders = CloudStorageProviders(storageProviders: [cloudStorageProvider(authenticationUrl: "authenticationUrl_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), redirectUrl: "redirectUrl_example", service: "service_example", serviceId: "serviceId_example")]) // CloudStorageProviders |  (optional)
 
 // Deletes the user authentication information for one or more cloud storage providers.
 CloudStorageProvidersAPI.cloudStorageDeleteCloudStorageProviders(accountId: accountId, userId: userId, cloudStorageProviders: cloudStorageProviders).whenComplete { result in
@@ -289,7 +289,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let userId = "userId_example" // String | The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing. 
-let cloudStorageProviders = CloudStorageProviders(storageProviders: [nil]) // CloudStorageProviders |  (optional)
+let cloudStorageProviders = CloudStorageProviders(storageProviders: [cloudStorageProvider(authenticationUrl: "authenticationUrl_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), redirectUrl: "redirectUrl_example", service: "service_example", serviceId: "serviceId_example")]) // CloudStorageProviders |  (optional)
 
 // Configures the redirect URL information  for one or more cloud storage providers for the specified user.
 CloudStorageProvidersAPI.cloudStoragePostCloudStorage(accountId: accountId, userId: userId, cloudStorageProviders: cloudStorageProviders).whenComplete { result in

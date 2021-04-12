@@ -11,7 +11,7 @@ Name | Type | Description | Notes
 **documentIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **groupName** | **String** | The name of the group. The search_text provided in the call automatically performs a wild card search on group_name. | [optional] 
 **groupNameMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**radios** | [[**Radio**](Radio.md)] | Specifies the locations and status for radio buttons that are grouped together. | [optional] 
+**radios** | [Radio] | Specifies the locations and status for radio buttons that are grouped together. | [optional] 
 **recipientId** | **String** | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each &#x60;recipientId&#x60; must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a &#x60;recipientId&#x60; of &#x60;1&#x60;. | [optional] 
 **recipientIdGuid** | **String** | The globally-unique identifier (GUID) for a specific recipient on a specific envelope. If the same recipient is associated with multiple envelopes, they will have a different GUID for each one. Read only. | [optional] 
 **recipientIdGuidMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 

@@ -152,7 +152,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let applyToTemplates = "applyToTemplates_example" // String | (Optional) When set to **true**, the new custom field is applied to all of the templates on the account. (optional)
-let customField = customField(customFieldType: "customFieldType_example", errorDetails: nil, fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example") // CustomField |  (optional)
+let customField = customField(customFieldType: "customFieldType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example") // CustomField |  (optional)
 
 // Creates an account custom field.
 AccountCustomFieldsAPI.accountCustomFieldsPostAccountCustomFields(accountId: accountId, applyToTemplates: applyToTemplates, customField: customField).whenComplete { result in
@@ -218,7 +218,7 @@ import DocuSignAPI
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let customFieldId = "customFieldId_example" // String | The id of the custom field.
 let applyToTemplates = "applyToTemplates_example" // String |  (optional)
-let customField = customField(customFieldType: "customFieldType_example", errorDetails: nil, fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example") // CustomField |  (optional)
+let customField = customField(customFieldType: "customFieldType_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), fieldId: "fieldId_example", listItems: ["listItems_example"], name: "name_example", `required`: "`required`_example", show: "show_example", value: "value_example") // CustomField |  (optional)
 
 // Updates an account custom field.
 AccountCustomFieldsAPI.accountCustomFieldsPutAccountCustomFields(accountId: accountId, customFieldId: customFieldId, applyToTemplates: applyToTemplates, customField: customField).whenComplete { result in

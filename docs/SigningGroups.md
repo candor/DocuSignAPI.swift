@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **modified** | **String** | The date and time that the signing group was last modified. | [optional] 
 **modifiedBy** | **String** | The user id (GUID) of the user who last modified this user record. | [optional] 
 **signingGroupId** | **String** | When set to **true** and the feature is enabled in the sender&#39;s account, the signing recipient is required to draw signatures and initials at each signature/initial tab ( instead of adopting a signature/initial style or only drawing a signature/initial once). | [optional] 
-**users** | [[**SigningGroupUser**](SigningGroupUser.md)] | User management information. | [optional] 
+**users** | [SigningGroupUser] | User management information. | [optional] 
 
 [[Back to Model list]](../README.md#documentation-for-models) [[Back to API list]](../README.md#documentation-for-api-endpoints) [[Back to README]](../README.md)
 

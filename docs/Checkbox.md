@@ -62,7 +62,7 @@ Name | Type | Description | Notes
 **recipientIdGuid** | **String** | The globally-unique identifier (GUID) for a specific recipient on a specific envelope. If the same recipient is associated with multiple envelopes, they will have a different GUID for each one. Read only. | [optional] 
 **recipientIdGuidMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **recipientIdMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**&#x60;required&#x60;** | **String** | This property does not apply to &#x60;checkbox&#x60; tabs. Check boxes are always optional. | [optional] 
+**`required`** | **String** | This property does not apply to &#x60;checkbox&#x60; tabs. Check boxes are always optional. | [optional] 
 **requiredMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **requireInitialOnSharedChange** | **String** | Optional element for field markup. When set to **true**, the signer is required to initial when they modify a shared field. | [optional] 
 **requireInitialOnSharedChangeMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 

@@ -10,8 +10,8 @@ Name | Type | Description | Notes
 **parentFolderId** | **String** | The id of the parent folder. | [optional] 
 **parentFolderUri** | **String** | The URI for the parent folder. | [optional] 
 **shared** | **String** | Indicates how the folder is shared. Valid values are:  - &#x60;not_shared&#x60; - &#x60;shared_to&#x60; | [optional] 
-**sharedGroups** | [[**MemberGroupSharedItem**](MemberGroupSharedItem.md)] | A list of groups that share the folder. | [optional] 
-**sharedUsers** | [[**UserSharedItem**](UserSharedItem.md)] | A list of users that share the folder. | [optional] 
+**sharedGroups** | [MemberGroupSharedItem] | A list of groups that share the folder. | [optional] 
+**sharedUsers** | [UserSharedItem] | A list of users that share the folder. | [optional] 
 **uri** | **String** | A URI containing the user ID. | [optional] 
 **user** | [**UserInfo**](UserInfo.md) |  | [optional] 
 

@@ -1,7 +1,7 @@
 additionalProperties:
   projectName: DocuSignAPI
-  swiftUseApiNamespace: false
   useVapor: true
-  useClassModels: true
-  objcCompatible: false
+  useClasses: true
   enablePostProcessFile: true
+  useSPMFileStructure: true
+  useBacktickEscapes: true

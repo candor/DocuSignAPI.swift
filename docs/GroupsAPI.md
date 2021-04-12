@@ -25,7 +25,7 @@ Deletes an existing user group.  When you delete a group, you include only the `
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [nil], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
+let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [group(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupId: "groupId_example", groupName: "groupName_example", groupType: "groupType_example", permissionProfileId: "permissionProfileId_example", users: [userInfo(accountId: "accountId_example", accountName: "accountName_example", activationAccessCode: "activationAccessCode_example", email: "email_example", errorDetails: nil, loginStatus: "loginStatus_example", membershipId: "membershipId_example", sendActivationEmail: "sendActivationEmail_example", uri: "uri_example", userId: "userId_example", userName: "userName_example", userStatus: "userStatus_example", userType: "userType_example")], usersCount: "usersCount_example")], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
 
 // Deletes an existing user group.
 GroupsAPI.groupsDeleteGroups(accountId: accountId, groupInformation: groupInformation).whenComplete { result in
@@ -159,7 +159,7 @@ Creates one or more groups for the account.  Groups can be used to help manage u
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [nil], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
+let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [group(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupId: "groupId_example", groupName: "groupName_example", groupType: "groupType_example", permissionProfileId: "permissionProfileId_example", users: [userInfo(accountId: "accountId_example", accountName: "accountName_example", activationAccessCode: "activationAccessCode_example", email: "email_example", errorDetails: nil, loginStatus: "loginStatus_example", membershipId: "membershipId_example", sendActivationEmail: "sendActivationEmail_example", uri: "uri_example", userId: "userId_example", userName: "userName_example", userStatus: "userStatus_example", userType: "userType_example")], usersCount: "usersCount_example")], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
 
 // Creates one or more groups for the account.
 GroupsAPI.groupsPostGroups(accountId: accountId, groupInformation: groupInformation).whenComplete { result in
@@ -222,7 +222,7 @@ Updates the group name and modifies, or sets, the permission profile for the gro
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [nil], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
+let groupInformation = groupInformation(endPosition: "endPosition_example", groups: [group(errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupId: "groupId_example", groupName: "groupName_example", groupType: "groupType_example", permissionProfileId: "permissionProfileId_example", users: [userInfo(accountId: "accountId_example", accountName: "accountName_example", activationAccessCode: "activationAccessCode_example", email: "email_example", errorDetails: nil, loginStatus: "loginStatus_example", membershipId: "membershipId_example", sendActivationEmail: "sendActivationEmail_example", uri: "uri_example", userId: "userId_example", userName: "userName_example", userStatus: "userStatus_example", userType: "userType_example")], usersCount: "usersCount_example")], nextUri: "nextUri_example", previousUri: "previousUri_example", resultSetSize: "resultSetSize_example", startPosition: "startPosition_example", totalSetSize: "totalSetSize_example") // GroupInformation |  (optional)
 
 // Updates the group information for a group.
 GroupsAPI.groupsPutGroups(accountId: accountId, groupInformation: groupInformation).whenComplete { result in

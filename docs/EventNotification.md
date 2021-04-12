@@ -3,7 +3,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**envelopeEvents** | [[**EnvelopeEvent**](EnvelopeEvent.md)] | A list of envelope-level event statuses that will trigger Connect to send updates to the endpoint specified in the &#x60;url&#x60; property.   To receive notifications, you must include either an &#x60;envelopeEvents&#x60; node or a &#x60;recipientEvents&#x60; node. You do not need to specify both. | [optional] 
+**envelopeEvents** | [EnvelopeEvent] | A list of envelope-level event statuses that will trigger Connect to send updates to the endpoint specified in the &#x60;url&#x60; property.   To receive notifications, you must include either an &#x60;envelopeEvents&#x60; node or a &#x60;recipientEvents&#x60; node. You do not need to specify both. | [optional] 
 **eventData** | [**ConnectEventData**](ConnectEventData.md) |  | [optional] 
 **includeCertificateOfCompletion** | **String** | When set to **true**, the Connect Service includes the Certificate of Completion with completed envelopes.  | [optional] 
 **includeCertificateWithSoap** | **String** | When set to **true**, the Connect service will digitally sign the XML data. The signature will be included in the XML message. | [optional] 
@@ -14,7 +14,7 @@ Name | Type | Description | Notes
 **includeSenderAccountAsCustomField** | **String** | When set to **true**, Connect will include the sender account as Custom Field in the data. | [optional] 
 **includeTimeZone** | **String** | When set to **true**, the envelope&#39;s time zone information is included in the webhook messages.  | [optional] 
 **loggingEnabled** | **String** | When set to **true**, the webhook messages are logged. They can be viewed on the DocuSign Administration Web Tool in the Connect section. Logged messages can also be downloaded via the [ConnectEvents resource](https://developers.docusign.com/esign-rest-api/reference/Connect/ConnectEvents). | [optional] 
-**recipientEvents** | [[**RecipientEvent**](RecipientEvent.md)] | An array of recipient event statuses that will trigger Connect to send notifications to your webhook listener at the url endpoint specified in the &#x60;url&#x60; property.   To receive notifications, you must include either an &#x60;envelopeEvents&#x60; node or a &#x60;recipientEvents&#x60; node. You do not need to specify both. | [optional] 
+**recipientEvents** | [RecipientEvent] | An array of recipient event statuses that will trigger Connect to send notifications to your webhook listener at the url endpoint specified in the &#x60;url&#x60; property.   To receive notifications, you must include either an &#x60;envelopeEvents&#x60; node or a &#x60;recipientEvents&#x60; node. You do not need to specify both. | [optional] 
 **requireAcknowledgment** | **String** | When set to **true**, the DocuSign Connect service checks that the message was received and retries on failures.  | [optional] 
 **signMessageWithX509Cert** | **String** | When set to **true**, Mutual TLS will be enabled for notifications. Mutual TLS must be initiated by the listener (the customer&#39;s web server) during the TLS handshake protocol.  | [optional] 
 **soapNameSpace** | **String** | The namespace of the SOAP interface.  The namespace value must be set if useSoapInterface is set to true. | [optional] 

@@ -27,7 +27,7 @@ Deletes one or more signing groups in the specified account.
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let signingGroupInformation = signingGroupInformation(groups: [nil]) // SigningGroupInformation |  (optional)
+let signingGroupInformation = signingGroupInformation(groups: [signingGroup(created: "created_example", createdBy: "createdBy_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupEmail: "groupEmail_example", groupName: "groupName_example", groupType: "groupType_example", modified: "modified_example", modifiedBy: "modifiedBy_example", signingGroupId: "signingGroupId_example", users: [signingGroupUser(email: "email_example", errorDetails: nil, userName: "userName_example")])]) // SigningGroupInformation |  (optional)
 
 // Deletes one or more signing groups.
 SigningGroupsAPI.signingGroupsDeleteSigningGroups(accountId: accountId, signingGroupInformation: signingGroupInformation).whenComplete { result in
@@ -218,7 +218,7 @@ Creates one or more signing groups.   Multiple signing groups can be created in 
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let signingGroupInformation = signingGroupInformation(groups: [nil]) // SigningGroupInformation |  (optional)
+let signingGroupInformation = signingGroupInformation(groups: [signingGroup(created: "created_example", createdBy: "createdBy_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupEmail: "groupEmail_example", groupName: "groupName_example", groupType: "groupType_example", modified: "modified_example", modifiedBy: "modifiedBy_example", signingGroupId: "signingGroupId_example", users: [signingGroupUser(email: "email_example", errorDetails: nil, userName: "userName_example")])]) // SigningGroupInformation |  (optional)
 
 // Creates a signing group. 
 SigningGroupsAPI.signingGroupsPostSigningGroups(accountId: accountId, signingGroupInformation: signingGroupInformation).whenComplete { result in
@@ -282,7 +282,7 @@ import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
 let signingGroupId = "signingGroupId_example" // String | Optional. The ID of the [signing group](https://support.docusign.com/en/guides/ndse-user-guide-signing-groups).  **Note**: When you send an envelope to a signing group, anyone in the group can open it and sign it with their own signature. For this reason, we recommend that you do not include non-signer recipients (such as carbon copy recipients) in the same signing group as signer recipients. However, you could create a second signing group for the non-signer recipients and change the default action of Needs to Sign to a different value, such as Receives a Copy. 
-let signingGroup = signingGroup(created: "created_example", createdBy: "createdBy_example", errorDetails: nil, groupEmail: "groupEmail_example", groupName: "groupName_example", groupType: "groupType_example", modified: "modified_example", modifiedBy: "modifiedBy_example", signingGroupId: "signingGroupId_example", users: [nil]) // SigningGroup |  (optional)
+let signingGroup = signingGroup(created: "created_example", createdBy: "createdBy_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupEmail: "groupEmail_example", groupName: "groupName_example", groupType: "groupType_example", modified: "modified_example", modifiedBy: "modifiedBy_example", signingGroupId: "signingGroupId_example", users: [signingGroupUser(email: "email_example", errorDetails: nil, userName: "userName_example")]) // SigningGroup |  (optional)
 
 // Updates a signing group. 
 SigningGroupsAPI.signingGroupsPutSigningGroup(accountId: accountId, signingGroupId: signingGroupId, signingGroup: signingGroup).whenComplete { result in
@@ -346,7 +346,7 @@ Updates the name of one or more existing signing groups.
 import DocuSignAPI
 
 let accountId = "accountId_example" // String | The external account number (int) or account ID GUID.
-let signingGroupInformation = signingGroupInformation(groups: [nil]) // SigningGroupInformation |  (optional)
+let signingGroupInformation = signingGroupInformation(groups: [signingGroup(created: "created_example", createdBy: "createdBy_example", errorDetails: errorDetails(errorCode: "errorCode_example", message: "message_example"), groupEmail: "groupEmail_example", groupName: "groupName_example", groupType: "groupType_example", modified: "modified_example", modifiedBy: "modifiedBy_example", signingGroupId: "signingGroupId_example", users: [signingGroupUser(email: "email_example", errorDetails: nil, userName: "userName_example")])]) // SigningGroupInformation |  (optional)
 
 // Updates signing group names.
 SigningGroupsAPI.signingGroupsPutSigningGroups(accountId: accountId, signingGroupInformation: signingGroupInformation).whenComplete { result in

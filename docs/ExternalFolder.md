@@ -6,7 +6,7 @@ Name | Type | Description | Notes
 **endPosition** | **String** | The last index position in the result set.  | [optional] 
 **errorDetails** | [**ExternalDocServiceErrorDetails**](ExternalDocServiceErrorDetails.md) |  | [optional] 
 **id** | **String** | A unique ID for the Salesforce object. | [optional] 
-**items** | [[**ExternalFile**](ExternalFile.md)] |  | [optional] 
+**items** | [ExternalFile] |  | [optional] 
 **name** | **String** |  | [optional] 
 **nextUri** | **String** | The URI for the next chunk of records based on the search request. It is &#x60;null&#x60; if this is the last set of results for the search.  | [optional] 
 **previousUri** | **String** | The URI for the prior chunk of records based on the search request. It is &#x60;null&#x60; if this is the first set of results for the search.  | [optional] 

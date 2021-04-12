@@ -49,7 +49,7 @@ Name | Type | Description | Notes
 **overlayTypeMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
 **pageNumber** | **String** | The page number being accessed. | [optional] 
 **pageNumberMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
-**polyLines** | [[**PolyLine**](PolyLine.md)] | An array of &#x60;polyLine&#x60; objects that contain x- and y-coordinates representing the locations of the lines. | [optional] 
+**polyLines** | [PolyLine] | An array of &#x60;polyLine&#x60; objects that contain x- and y-coordinates representing the locations of the lines. | [optional] 
 **recipientId** | **String** | A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each &#x60;recipientId&#x60; must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a &#x60;recipientId&#x60; of &#x60;1&#x60;. | [optional] 
 **recipientIdGuid** | **String** | The globally-unique identifier (GUID) for a specific recipient on a specific envelope. If the same recipient is associated with multiple envelopes, they will have a different GUID for each one. Read only. | [optional] 
 **recipientIdGuidMetadata** | [**PropertyMetadata**](PropertyMetadata.md) |  | [optional] 
