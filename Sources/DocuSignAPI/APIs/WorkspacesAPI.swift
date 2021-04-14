@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class WorkspacesAPI {
-    public enum WorkspaceDeleteWorkspace {
-        case http200(value: Workspace?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Workspace?, raw: ClientResponse)
-    }
-
     /**
      Delete Workspace
 
@@ -24,9 +18,9 @@ open class WorkspacesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter workspaceId: (path) The id of the workspace.
-     - returns: `EventLoopFuture` of `WorkspaceDeleteWorkspace`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceDeleteWorkspace(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceDeleteWorkspace> {
+    open class func workspaceDeleteWorkspaceRaw(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class WorkspacesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceDeleteWorkspace in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspaceGetWorkspace {
-        case http200(value: Workspace?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Workspace?, raw: ClientResponse)
+    public enum WorkspaceDeleteWorkspace {
+        case http200(value: Workspace, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Workspace, raw: ClientResponse)
+    }
+
+    /**
+     Delete Workspace
+
+     DELETE /v2.1/accounts/{accountId}/workspaces/{workspaceId}
+
+     Deletes an existing workspace (logically).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter workspaceId: (path) The id of the workspace.
+     - returns: `EventLoopFuture` of `WorkspaceDeleteWorkspace`
+     */
+    open class func workspaceDeleteWorkspace(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceDeleteWorkspace> {
+        return workspaceDeleteWorkspaceRaw(accountId: accountId, workspaceId: workspaceId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceDeleteWorkspace in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -71,9 +80,9 @@ open class WorkspacesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter workspaceId: (path) The id of the workspace.
-     - returns: `EventLoopFuture` of `WorkspaceGetWorkspace`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceGetWorkspace(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceGetWorkspace> {
+    open class func workspaceGetWorkspaceRaw(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -91,22 +100,37 @@ open class WorkspacesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceGetWorkspace in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspaceGetWorkspaces {
-        case http200(value: WorkspaceList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: WorkspaceList?, raw: ClientResponse)
+    public enum WorkspaceGetWorkspace {
+        case http200(value: Workspace, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Workspace, raw: ClientResponse)
+    }
+
+    /**
+     Get Workspace
+
+     GET /v2.1/accounts/{accountId}/workspaces/{workspaceId}
+
+     Retrives properties about a workspace given a unique workspaceId.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter workspaceId: (path) The id of the workspace.
+     - returns: `EventLoopFuture` of `WorkspaceGetWorkspace`
+     */
+    open class func workspaceGetWorkspace(accountId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceGetWorkspace> {
+        return workspaceGetWorkspaceRaw(accountId: accountId, workspaceId: workspaceId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceGetWorkspace in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -117,9 +141,9 @@ open class WorkspacesAPI {
      Gets information about the Workspaces that have been created.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `WorkspaceGetWorkspaces`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceGetWorkspaces(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceGetWorkspaces> {
+    open class func workspaceGetWorkspacesRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -134,22 +158,36 @@ open class WorkspacesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceGetWorkspaces in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(WorkspaceList.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(WorkspaceList.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspacePostWorkspace {
-        case http201(value: Workspace?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Workspace?, raw: ClientResponse)
+    public enum WorkspaceGetWorkspaces {
+        case http200(value: WorkspaceList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: WorkspaceList, raw: ClientResponse)
+    }
+
+    /**
+     List Workspaces
+
+     GET /v2.1/accounts/{accountId}/workspaces
+
+     Gets information about the Workspaces that have been created.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `WorkspaceGetWorkspaces`
+     */
+    open class func workspaceGetWorkspaces(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceGetWorkspaces> {
+        return workspaceGetWorkspacesRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceGetWorkspaces in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(WorkspaceList.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(WorkspaceList.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -161,9 +199,9 @@ open class WorkspacesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter workspace: (body)  (optional)
-     - returns: `EventLoopFuture` of `WorkspacePostWorkspace`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspacePostWorkspace(accountId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspacePostWorkspace> {
+    open class func workspacePostWorkspaceRaw(accountId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -182,22 +220,37 @@ open class WorkspacesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspacePostWorkspace in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspacePutWorkspace {
-        case http200(value: Workspace?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Workspace?, raw: ClientResponse)
+    public enum WorkspacePostWorkspace {
+        case http201(value: Workspace, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Workspace, raw: ClientResponse)
+    }
+
+    /**
+     Create a Workspace
+
+     POST /v2.1/accounts/{accountId}/workspaces
+
+     This method creates a new workspace.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter workspace: (body)  (optional)
+     - returns: `EventLoopFuture` of `WorkspacePostWorkspace`
+     */
+    open class func workspacePostWorkspace(accountId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspacePostWorkspace> {
+        return workspacePostWorkspaceRaw(accountId: accountId, workspace: workspace, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspacePostWorkspace in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -210,9 +263,9 @@ open class WorkspacesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter workspaceId: (path) The id of the workspace.
      - parameter workspace: (body)  (optional)
-     - returns: `EventLoopFuture` of `WorkspacePutWorkspace`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspacePutWorkspace(accountId: String, workspaceId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspacePutWorkspace> {
+    open class func workspacePutWorkspaceRaw(accountId: String, workspaceId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -234,14 +287,36 @@ open class WorkspacesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspacePutWorkspace in
+        }
+    }
+
+    public enum WorkspacePutWorkspace {
+        case http200(value: Workspace, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Workspace, raw: ClientResponse)
+    }
+
+    /**
+     Update Workspace
+
+     PUT /v2.1/accounts/{accountId}/workspaces/{workspaceId}
+
+     Updates information about a specific workspace.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter workspaceId: (path) The id of the workspace.
+     - parameter workspace: (body)  (optional)
+     - returns: `EventLoopFuture` of `WorkspacePutWorkspace`
+     */
+    open class func workspacePutWorkspace(accountId: String, workspaceId: String, workspace: Workspace? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspacePutWorkspace> {
+        return workspacePutWorkspaceRaw(accountId: accountId, workspaceId: workspaceId, workspace: workspace, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspacePutWorkspace in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(Workspace.self, using: Configuration.contentConfiguration.requireDecoder(for: Workspace.defaultContentType)), raw: response)
             }
         }
     }

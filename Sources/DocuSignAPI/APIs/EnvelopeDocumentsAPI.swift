@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeDocumentsAPI {
-    public enum DocumentsDeleteDocuments {
-        case http200(value: EnvelopeDocumentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentsResult?, raw: ClientResponse)
-    }
-
     /**
      Deletes documents from a draft envelope.
 
@@ -25,9 +19,9 @@ open class EnvelopeDocumentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeDefinition: (body)  (optional)
-     - returns: `EventLoopFuture` of `DocumentsDeleteDocuments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentsDeleteDocuments(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsDeleteDocuments> {
+    open class func documentsDeleteDocumentsRaw(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,22 +43,38 @@ open class EnvelopeDocumentsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentsDeleteDocuments in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentsGetDocument {
-        case http200(value: Data?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Data?, raw: ClientResponse)
+    public enum DocumentsDeleteDocuments {
+        case http200(value: EnvelopeDocumentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Deletes documents from a draft envelope.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents
+
+     Deletes one or more documents from an existing envelope that has not yet been completed.  To delete a document, use only the relevant parts of the [`envelopeDefinition`](#envelopeDefinition). For example, this request body specifies that you want to delete the document whose `documentId` is \"1\".   ```text {   \"documents\": [     {       \"documentId\": \"1\"     }   ] } ```  The envelope status must be one of:  - `created` - `sent` - `delivered`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeDefinition: (body)  (optional)
+     - returns: `EventLoopFuture` of `DocumentsDeleteDocuments`
+     */
+    open class func documentsDeleteDocuments(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsDeleteDocuments> {
+        return documentsDeleteDocumentsRaw(accountId: accountId, envelopeId: envelopeId, envelopeDefinition: envelopeDefinition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentsDeleteDocuments in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -86,9 +96,9 @@ open class EnvelopeDocumentsAPI {
      - parameter sharedUserId: (query) The ID of a shared user that you want to impersonate in order to retrieve their view of the list of documents. This parameter is used in the context of a shared inbox (i.e., when you share envelopes from one user to another through the RADmin console). (optional)
      - parameter showChanges: (query) When set to **true**, any changed fields for the returned PDF are highlighted in yellow and optional signatures or initials outlined in red.  (optional)
      - parameter watermark: (query) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
-     - returns: `EventLoopFuture` of `DocumentsGetDocument`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentsGetDocument(accountId: String, documentId: String, envelopeId: String, certificate: String? = nil, documentsByUserid: String? = nil, encoding: String? = nil, encrypt: String? = nil, language: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, showChanges: String? = nil, watermark: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsGetDocument> {
+    open class func documentsGetDocumentRaw(accountId: String, documentId: String, envelopeId: String, certificate: String? = nil, documentsByUserid: String? = nil, encoding: String? = nil, encrypt: String? = nil, language: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, showChanges: String? = nil, watermark: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -122,22 +132,47 @@ open class EnvelopeDocumentsAPI {
             try request.query.encode(QueryParams(certificate: certificate, documentsByUserid: documentsByUserid, encoding: encoding, encrypt: encrypt, language: language, recipientId: recipientId, sharedUserId: sharedUserId, showChanges: showChanges, watermark: watermark))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentsGetDocument in
+        }
+    }
+
+    public enum DocumentsGetDocument {
+        case http200(value: Data, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Data, raw: ClientResponse)
+    }
+
+    /**
+     Gets a document from an envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}
+
+     Retrieves the specified document from the envelope. If the account has the Highlight Data Changes feature enabled, there is an option to request that any changes in the envelope be highlighted.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) This parameter takes the following special keywords:  - `combined`: Retrieves a PDF file that contains the combined content of all of the documents. If the account option **Attach certification of completion to envelope** is on, then the Certificate of Completion is also included in the PDF file. You set this account option in the Admin tool on the **Signing Settings** screen, or by setting the `attachCompletedEnvelope` property in the `accountSettings` object to **true**. - `archive`: Retrieves a ZIP archive that contains all of the PDF documents and the Certificate of Completion.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter certificate: (query) When set to **false**, the envelope signing certificate is removed from the download. (optional)
+     - parameter documentsByUserid: (query) When set to **true**, allows recipients to get documents by their user id. For example, if a user is included in two different routing orders with different visibilities, using this parameter returns all of the documents from both routing orders. (optional)
+     - parameter encoding: (query) Reserved for DocuSign. (optional)
+     - parameter encrypt: (query) When set to **true**, the PDF bytes returned in the response are encrypted for all the key managers configured on your DocuSign account. You can decrypt the documents by using the Key Manager DecryptDocument API method. For more information about Key Manager, see the DocuSign Security Appliance Installation Guide that your organization received from DocuSign. (optional)
+     - parameter language: (query) Specifies the language for the Certificate of Completion in the response. The supported languages are: Chinese Simplified (zh_CN), Chinese Traditional (zh_TW), Dutch (nl), English US (en), French (fr), German (de), Italian (it), Japanese (ja), Korean (ko), Portuguese (pt), Portuguese (Brazil) (pt_BR), Russian (ru), Spanish (es).  (optional)
+     - parameter recipientId: (query) Allows the sender to retrieve the documents as one of the recipients that they control. The `documents_by_userid` parameter must be set to **false** for this functionality to work. (optional)
+     - parameter sharedUserId: (query) The ID of a shared user that you want to impersonate in order to retrieve their view of the list of documents. This parameter is used in the context of a shared inbox (i.e., when you share envelopes from one user to another through the RADmin console). (optional)
+     - parameter showChanges: (query) When set to **true**, any changed fields for the returned PDF are highlighted in yellow and optional signatures or initials outlined in red.  (optional)
+     - parameter watermark: (query) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
+     - returns: `EventLoopFuture` of `DocumentsGetDocument`
+     */
+    open class func documentsGetDocument(accountId: String, documentId: String, envelopeId: String, certificate: String? = nil, documentsByUserid: String? = nil, encoding: String? = nil, encrypt: String? = nil, language: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, showChanges: String? = nil, watermark: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsGetDocument> {
+        return documentsGetDocumentRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, certificate: certificate, documentsByUserid: documentsByUserid, encoding: encoding, encrypt: encrypt, language: language, recipientId: recipientId, sharedUserId: sharedUserId, showChanges: showChanges, watermark: watermark, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentsGetDocument in
             switch response.status.code {
             case 200:
                 return .http200(value: Data(buffer: response.body ?? ByteBuffer()), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: Data(buffer: response.body ?? ByteBuffer()), raw: response)
             }
         }
-    }
-
-    public enum DocumentsGetDocuments {
-        case http200(value: EnvelopeDocumentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentsResult?, raw: ClientResponse)
     }
 
     /**
@@ -155,9 +190,9 @@ open class EnvelopeDocumentsAPI {
      - parameter includeTabs: (query) When set to **true**, information about the tabs associated with the documents are included in the response. (optional)
      - parameter recipientId: (query) Allows the sender to retrieve the documents as one of the recipients that they control. The `documents_by_userid` parameter must be set to **false** for this to work. (optional)
      - parameter sharedUserId: (query) The ID of a shared user that you want to impersonate in order to retrieve their view of the list of documents. This parameter is used in the context of a shared inbox (i.e., when you share envelopes from one user to another through the RADmin console). (optional)
-     - returns: `EventLoopFuture` of `DocumentsGetDocuments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentsGetDocuments(accountId: String, envelopeId: String, documentsByUserid: String? = nil, includeDocumentSize: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsGetDocuments> {
+    open class func documentsGetDocumentsRaw(accountId: String, envelopeId: String, documentsByUserid: String? = nil, includeDocumentSize: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -185,22 +220,43 @@ open class EnvelopeDocumentsAPI {
             try request.query.encode(QueryParams(documentsByUserid: documentsByUserid, includeDocumentSize: includeDocumentSize, includeMetadata: includeMetadata, includeTabs: includeTabs, recipientId: recipientId, sharedUserId: sharedUserId))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentsGetDocuments in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentsPutDocument {
-        case http200(value: EnvelopeDocument?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocument?, raw: ClientResponse)
+    public enum DocumentsGetDocuments {
+        case http200(value: EnvelopeDocumentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Gets a list of envelope documents.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents
+
+     Retrieves a list of documents associated with the specified envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter documentsByUserid: (query) When set to **true**, allows recipients to get documents by their user id. For example, if a user is included in two different routing orders with different visibilities, using this parameter returns all of the documents from both routing orders. (optional)
+     - parameter includeDocumentSize: (query)  (optional)
+     - parameter includeMetadata: (query) When set to **true**, the response includes metadata that indicates which properties the sender can edit. (optional)
+     - parameter includeTabs: (query) When set to **true**, information about the tabs associated with the documents are included in the response. (optional)
+     - parameter recipientId: (query) Allows the sender to retrieve the documents as one of the recipients that they control. The `documents_by_userid` parameter must be set to **false** for this to work. (optional)
+     - parameter sharedUserId: (query) The ID of a shared user that you want to impersonate in order to retrieve their view of the list of documents. This parameter is used in the context of a shared inbox (i.e., when you share envelopes from one user to another through the RADmin console). (optional)
+     - returns: `EventLoopFuture` of `DocumentsGetDocuments`
+     */
+    open class func documentsGetDocuments(accountId: String, envelopeId: String, documentsByUserid: String? = nil, includeDocumentSize: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, recipientId: String? = nil, sharedUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsGetDocuments> {
+        return documentsGetDocumentsRaw(accountId: accountId, envelopeId: envelopeId, documentsByUserid: documentsByUserid, includeDocumentSize: includeDocumentSize, includeMetadata: includeMetadata, includeTabs: includeTabs, recipientId: recipientId, sharedUserId: sharedUserId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentsGetDocuments in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -213,9 +269,9 @@ open class EnvelopeDocumentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `DocumentsPutDocument`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentsPutDocument(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsPutDocument> {
+    open class func documentsPutDocumentRaw(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -236,22 +292,38 @@ open class EnvelopeDocumentsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentsPutDocument in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocument.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocument.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocument.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocument.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentsPutDocuments {
-        case http200(value: EnvelopeDocumentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentsResult?, raw: ClientResponse)
+    public enum DocumentsPutDocument {
+        case http200(value: EnvelopeDocument, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocument, raw: ClientResponse)
+    }
+
+    /**
+     Adds a document to an existing draft envelope.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}
+
+     Adds a document to an existing draft envelope. The bytes of the document make up the body of the request.     **Note**: When adding or modifying documents for an in-process envelope, DocuSign recommends locking the envelope prior to making any changes.     If the file name of the document contains unicode characters, you need to include a `Content-Disposition` header. Example:   **Header**: `Content-Disposition`   **Value**: `file; filename=\\\"name\\\";fileExtension=ext;documentId=1`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `DocumentsPutDocument`
+     */
+    open class func documentsPutDocument(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsPutDocument> {
+        return documentsPutDocumentRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentsPutDocument in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocument.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocument.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocument.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocument.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -264,9 +336,9 @@ open class EnvelopeDocumentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeDefinition: (body)  (optional)
-     - returns: `EventLoopFuture` of `DocumentsPutDocuments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentsPutDocuments(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsPutDocuments> {
+    open class func documentsPutDocumentsRaw(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -288,14 +360,36 @@ open class EnvelopeDocumentsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentsPutDocuments in
+        }
+    }
+
+    public enum DocumentsPutDocuments {
+        case http200(value: EnvelopeDocumentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Adds one or more documents to an existing envelope document.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents
+
+     Adds one or more documents to an existing envelope document. <p>**Note**: When adding or modifying documents for an in-process envelope, DocuSign recommends locking the envelope prior to making any changes.  If the file name of a document contains unicode characters, you need to include a `Content-Disposition` header. Example:   **Header**: `Content-Disposition`   **Value**: `file; filename=\\\"name\\\";fileExtension=ext;documentId=1`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeDefinition: (body)  (optional)
+     - returns: `EventLoopFuture` of `DocumentsPutDocuments`
+     */
+    open class func documentsPutDocuments(accountId: String, envelopeId: String, envelopeDefinition: EnvelopeDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentsPutDocuments> {
+        return documentsPutDocumentsRaw(accountId: accountId, envelopeId: envelopeId, envelopeDefinition: envelopeDefinition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentsPutDocuments in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeDocumentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentsResult.defaultContentType)), raw: response)
             }
         }
     }

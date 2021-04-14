@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class AccountsAPI {
-    public enum AccountsDeleteAccount {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes the specified account.
 
@@ -23,9 +17,9 @@ open class AccountsAPI {
      This closes the specified account. You must be an account admin to close your account. Once closed, an account must be reopened by DocuSign.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `AccountsDeleteAccount`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountsDeleteAccount(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsDeleteAccount> {
+    open class func accountsDeleteAccountRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,22 +34,36 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountsDeleteAccount in
+        }
+    }
+
+    public enum AccountsDeleteAccount {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the specified account.
+
+     DELETE /v2.1/accounts/{accountId}
+
+     This closes the specified account. You must be an account admin to close your account. Once closed, an account must be reopened by DocuSign.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `AccountsDeleteAccount`
+     */
+    open class func accountsDeleteAccount(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsDeleteAccount> {
+        return accountsDeleteAccountRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountsDeleteAccount in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum AccountsGetAccount {
-        case http200(value: AccountInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountInformation?, raw: ClientResponse)
     }
 
     /**
@@ -67,9 +75,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter includeAccountSettings: (query) When set to **true**, includes account settings (defined by the [`accountSettings`](https://developers.docusign.com/esign-rest-api/reference/Accounts/Accounts/create/#account-settings) property) in the response. If you omit this parameter, the default behavior is **false**. (optional)
-     - returns: `EventLoopFuture` of `AccountsGetAccount`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountsGetAccount(accountId: String, includeAccountSettings: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsGetAccount> {
+    open class func accountsGetAccountRaw(accountId: String, includeAccountSettings: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -89,22 +97,67 @@ open class AccountsAPI {
             try request.query.encode(QueryParams(includeAccountSettings: includeAccountSettings))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountsGetAccount in
+        }
+    }
+
+    public enum AccountsGetAccount {
+        case http200(value: AccountInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountInformation, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves the account information for the specified account.
+
+     GET /v2.1/accounts/{accountId}
+
+     Retrieves the account information for the specified account.  **Response** The `canUpgrade` property contains is a Boolean that indicates whether the account can be upgraded through the API.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter includeAccountSettings: (query) When set to **true**, includes account settings (defined by the [`accountSettings`](https://developers.docusign.com/esign-rest-api/reference/Accounts/Accounts/create/#account-settings) property) in the response. If you omit this parameter, the default behavior is **false**. (optional)
+     - returns: `EventLoopFuture` of `AccountsGetAccount`
+     */
+    open class func accountsGetAccount(accountId: String, includeAccountSettings: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsGetAccount> {
+        return accountsGetAccountRaw(accountId: accountId, includeAccountSettings: includeAccountSettings, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountsGetAccount in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(AccountInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(AccountInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(AccountInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(AccountInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountInformation.defaultContentType)), raw: response)
             }
         }
     }
 
+    /**
+     Retrieves the account provisioning information for the account.
+
+     GET /v2.1/accounts/provisioning
+
+     Retrieves the account provisioning information for the account.
+
+     - returns: `EventLoopFuture` of `ClientResponse`
+     */
+    open class func accountsGetProvisioningRaw(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
+        let path = "/v2.1/accounts/provisioning"
+        let URLString = DocuSignAPI.basePath + path
+
+        guard let apiClient = Configuration.apiClient else {
+            fatalError("Configuration.apiClient is not set.")
+        }
+
+        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
+            try Configuration.apiWrapper(&request)
+
+            try beforeSend(&request)
+        }
+    }
+
     public enum AccountsGetProvisioning {
-        case http200(value: ProvisioningInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ProvisioningInformation?, raw: ClientResponse)
+        case http200(value: ProvisioningInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ProvisioningInformation, raw: ClientResponse)
     }
 
     /**
@@ -117,33 +170,16 @@ open class AccountsAPI {
      - returns: `EventLoopFuture` of `AccountsGetProvisioning`
      */
     open class func accountsGetProvisioning(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsGetProvisioning> {
-        let path = "/v2.1/accounts/provisioning"
-        let URLString = DocuSignAPI.basePath + path
-
-        guard let apiClient = Configuration.apiClient else {
-            fatalError("Configuration.apiClient is not set.")
-        }
-
-        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
-            try Configuration.apiWrapper(&request)
-
-            try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountsGetProvisioning in
+        return accountsGetProvisioningRaw(headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountsGetProvisioning in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ProvisioningInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: ProvisioningInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ProvisioningInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: ProvisioningInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ProvisioningInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: ProvisioningInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ProvisioningInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: ProvisioningInformation.defaultContentType)), raw: response)
             }
         }
-    }
-
-    public enum AccountsPostAccounts {
-        case http201(value: NewAccountSummary?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NewAccountSummary?, raw: ClientResponse)
     }
 
     /**
@@ -154,9 +190,9 @@ open class AccountsAPI {
      Creates new DocuSign accounts. You can use this method to create a single account or up to 100 accounts at a time.  **Note**:  This method is restricted to partner integrations. You must work with DocuSign Professional Services or DocuSign Business Development, who will provide you with the Distributor Code and Distributor Password that you need to include in the request body.  You must include the `X-DocuSign-Authentication`  header.  Example:  `<DocuSignCredentials><IntegratorKey>{{integratorKey}}</IntegratorKey></DocuSignCredentials>`  When creating a single account, the body of the request is a [`newAccountRequest`][newAccountRequest] object.  Example:  ``` {  \"newAccountRequest\": [   {    \"accountName\":\"Test Account\",    \"distributorCode\":\"MY_DIST_CODE\",    \"distributorPassword\":\"MY_DIST_PWD\",    \"initialUser\":{     \"email\":\"user@emaildomain.com\",     \"firstName\":\"John\",     \"middleName\": \"Harry\",     \"lastName\":\"Doe\",     \"suffixName\": \"\",     \"userName\": \"John Doe\",     \"jobTitle\": \"Engineer\",     \"company\": \"Test Company\"    },    \"addressInformation\":{     \"address1\": \"1234 Main Street\",     \"address2\": \"Suite 100\",     \"city\": \"Seattle\",     \"state\": \"WA\",     \"postalCode\": \"98101\",     \"country\": \"US\",     \"phone\": \"1234567890\",     \"fax\": \"1234567891\"    },    \"planInformation\":{     \"planId\":\"37085696-xxxx-xxxx-xxxx-7ea067752959\"    },    \"referralInformation\":{     \"includedSeats\": \"1\",     \"referralCode\": \"code\",     \"referrerName\": \"name\"    }   }  ] }  ``` If the request succeeds, it returns a 201 (Created) HTTP response code. The response returns the new account ID, password, and the default user information for each newly created account.   When creating multiple accounts, the body of the request is a `newAccountRequests` object, which contains one or more  [`newAccountDefinition`][newAccountDefinition] objects. You can create up to 100 new accounts at a time this way.  The body for a multi-account creation request looks like this in JSON:  ``` {   \"newAccountRequests\": [     {       \"accountName\": \"accountone\",       . . .     },     {       \"accountName\": \"accounttwo\",       . . .     }   ] } ```  A multi-account request looks like this in XML:  ``` <newAccountsDefinition xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.docusign.com/restapi\">   <newAccountRequests>     <newAccountDefinition>       . . .     </newAccountDefinition>     <newAccountDefinition>       . . .     </newAccountDefinition>   </newAccountRequests> </newAccountsDefinition> ```  A multi-account creation request may succeed (report a 201 code) even if some accounts could not be created. In this case, the `errorDetails` property in the response contains specific information about the failure.    [newAccountDefinition]: #/definitions/newAccountDefinition [nameValue]: #/definitions/nameValue [newAccountRequest]: #/definitions/newAccountRequest
 
      - parameter newAccountDefinition: (body)  (optional)
-     - returns: `EventLoopFuture` of `AccountsPostAccounts`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountsPostAccounts(newAccountDefinition: NewAccountDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsPostAccounts> {
+    open class func accountsPostAccountsRaw(newAccountDefinition: NewAccountDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/accounts"
         let URLString = DocuSignAPI.basePath + path
 
@@ -172,22 +208,36 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountsPostAccounts in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(NewAccountSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: NewAccountSummary.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(NewAccountSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: NewAccountSummary.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingChargesGetAccountBillingCharges {
-        case http200(value: BillingChargeResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingChargeResponse?, raw: ClientResponse)
+    public enum AccountsPostAccounts {
+        case http201(value: NewAccountSummary, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NewAccountSummary, raw: ClientResponse)
+    }
+
+    /**
+     Creates new accounts.
+
+     POST /v2.1/accounts
+
+     Creates new DocuSign accounts. You can use this method to create a single account or up to 100 accounts at a time.  **Note**:  This method is restricted to partner integrations. You must work with DocuSign Professional Services or DocuSign Business Development, who will provide you with the Distributor Code and Distributor Password that you need to include in the request body.  You must include the `X-DocuSign-Authentication`  header.  Example:  `<DocuSignCredentials><IntegratorKey>{{integratorKey}}</IntegratorKey></DocuSignCredentials>`  When creating a single account, the body of the request is a [`newAccountRequest`][newAccountRequest] object.  Example:  ``` {  \"newAccountRequest\": [   {    \"accountName\":\"Test Account\",    \"distributorCode\":\"MY_DIST_CODE\",    \"distributorPassword\":\"MY_DIST_PWD\",    \"initialUser\":{     \"email\":\"user@emaildomain.com\",     \"firstName\":\"John\",     \"middleName\": \"Harry\",     \"lastName\":\"Doe\",     \"suffixName\": \"\",     \"userName\": \"John Doe\",     \"jobTitle\": \"Engineer\",     \"company\": \"Test Company\"    },    \"addressInformation\":{     \"address1\": \"1234 Main Street\",     \"address2\": \"Suite 100\",     \"city\": \"Seattle\",     \"state\": \"WA\",     \"postalCode\": \"98101\",     \"country\": \"US\",     \"phone\": \"1234567890\",     \"fax\": \"1234567891\"    },    \"planInformation\":{     \"planId\":\"37085696-xxxx-xxxx-xxxx-7ea067752959\"    },    \"referralInformation\":{     \"includedSeats\": \"1\",     \"referralCode\": \"code\",     \"referrerName\": \"name\"    }   }  ] }  ``` If the request succeeds, it returns a 201 (Created) HTTP response code. The response returns the new account ID, password, and the default user information for each newly created account.   When creating multiple accounts, the body of the request is a `newAccountRequests` object, which contains one or more  [`newAccountDefinition`][newAccountDefinition] objects. You can create up to 100 new accounts at a time this way.  The body for a multi-account creation request looks like this in JSON:  ``` {   \"newAccountRequests\": [     {       \"accountName\": \"accountone\",       . . .     },     {       \"accountName\": \"accounttwo\",       . . .     }   ] } ```  A multi-account request looks like this in XML:  ``` <newAccountsDefinition xmlns:i=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns=\"http://www.docusign.com/restapi\">   <newAccountRequests>     <newAccountDefinition>       . . .     </newAccountDefinition>     <newAccountDefinition>       . . .     </newAccountDefinition>   </newAccountRequests> </newAccountsDefinition> ```  A multi-account creation request may succeed (report a 201 code) even if some accounts could not be created. In this case, the `errorDetails` property in the response contains specific information about the failure.    [newAccountDefinition]: #/definitions/newAccountDefinition [nameValue]: #/definitions/nameValue [newAccountRequest]: #/definitions/newAccountRequest
+
+     - parameter newAccountDefinition: (body)  (optional)
+     - returns: `EventLoopFuture` of `AccountsPostAccounts`
+     */
+    open class func accountsPostAccounts(newAccountDefinition: NewAccountDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountsPostAccounts> {
+        return accountsPostAccountsRaw(newAccountDefinition: newAccountDefinition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountsPostAccounts in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(NewAccountSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: NewAccountSummary.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(NewAccountSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: NewAccountSummary.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -199,9 +249,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter includeCharges: (query) Specifies which billing charges to return. Valid values are:  * envelopes * seats  (optional)
-     - returns: `EventLoopFuture` of `BillingChargesGetAccountBillingCharges`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingChargesGetAccountBillingCharges(accountId: String, includeCharges: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingChargesGetAccountBillingCharges> {
+    open class func billingChargesGetAccountBillingChargesRaw(accountId: String, includeCharges: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_charges"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -221,22 +271,37 @@ open class AccountsAPI {
             try request.query.encode(QueryParams(includeCharges: includeCharges))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingChargesGetAccountBillingCharges in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BillingChargeResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingChargeResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BillingChargeResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingChargeResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CaptiveRecipientsDeleteCaptiveRecipientsPart {
-        case http200(value: CaptiveRecipientInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CaptiveRecipientInformation?, raw: ClientResponse)
+    public enum BillingChargesGetAccountBillingCharges {
+        case http200(value: BillingChargeResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingChargeResponse, raw: ClientResponse)
+    }
+
+    /**
+     Gets list of recurring and usage charges for the account.
+
+     GET /v2.1/accounts/{accountId}/billing_charges
+
+     Retrieves the list of recurring and usage charges for the account. This can be used to determine the charge structure and usage of charge plan items.   Privileges required: account administrator
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter includeCharges: (query) Specifies which billing charges to return. Valid values are:  * envelopes * seats  (optional)
+     - returns: `EventLoopFuture` of `BillingChargesGetAccountBillingCharges`
+     */
+    open class func billingChargesGetAccountBillingCharges(accountId: String, includeCharges: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingChargesGetAccountBillingCharges> {
+        return billingChargesGetAccountBillingChargesRaw(accountId: accountId, includeCharges: includeCharges, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingChargesGetAccountBillingCharges in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BillingChargeResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingChargeResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BillingChargeResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingChargeResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -249,9 +314,9 @@ open class AccountsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter recipientPart: (path) Signature is the only supported value.
      - parameter captiveRecipientInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `CaptiveRecipientsDeleteCaptiveRecipientsPart`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func captiveRecipientsDeleteCaptiveRecipientsPart(accountId: String, recipientPart: String, captiveRecipientInformation: CaptiveRecipientInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CaptiveRecipientsDeleteCaptiveRecipientsPart> {
+    open class func captiveRecipientsDeleteCaptiveRecipientsPartRaw(accountId: String, recipientPart: String, captiveRecipientInformation: CaptiveRecipientInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/captive_recipients/{recipientPart}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -273,22 +338,38 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CaptiveRecipientsDeleteCaptiveRecipientsPart in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CaptiveRecipientInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CaptiveRecipientInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CaptiveRecipientInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CaptiveRecipientInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration {
-        case http200(value: EnvelopePurgeConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopePurgeConfiguration?, raw: ClientResponse)
+    public enum CaptiveRecipientsDeleteCaptiveRecipientsPart {
+        case http200(value: CaptiveRecipientInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CaptiveRecipientInformation, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the signature for one or more captive recipient records.
+
+     DELETE /v2.1/accounts/{accountId}/captive_recipients/{recipientPart}
+
+     This method deletes the signature for one or more captive recipient records. It is primarily used for testing. This functionality provides a way to reset the signature associated with a client user ID so that a new signature can be created the next time the client user ID is used.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientPart: (path) Signature is the only supported value.
+     - parameter captiveRecipientInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `CaptiveRecipientsDeleteCaptiveRecipientsPart`
+     */
+    open class func captiveRecipientsDeleteCaptiveRecipientsPart(accountId: String, recipientPart: String, captiveRecipientInformation: CaptiveRecipientInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CaptiveRecipientsDeleteCaptiveRecipientsPart> {
+        return captiveRecipientsDeleteCaptiveRecipientsPartRaw(accountId: accountId, recipientPart: recipientPart, captiveRecipientInformation: captiveRecipientInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CaptiveRecipientsDeleteCaptiveRecipientsPart in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CaptiveRecipientInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CaptiveRecipientInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CaptiveRecipientInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CaptiveRecipientInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -299,9 +380,9 @@ open class AccountsAPI {
      An envelope purge configuration enables account administrators to permanently remove documents and their field data from completed and voided envelopes after a specified retention period (`retentionDays`). This method retrieves the current envelope purge configuration for your account.  **Note**: To use this method, you must be an account administrator.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopePurgeConfigurationGetEnvelopePurgeConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration> {
+    open class func envelopePurgeConfigurationGetEnvelopePurgeConfigurationRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/envelope_purge_configuration"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -316,22 +397,36 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration {
-        case http200(value: EnvelopePurgeConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopePurgeConfiguration?, raw: ClientResponse)
+    public enum EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration {
+        case http200(value: EnvelopePurgeConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopePurgeConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Gets the envelope purge configuration for an account.
+
+     GET /v2.1/accounts/{accountId}/settings/envelope_purge_configuration
+
+     An envelope purge configuration enables account administrators to permanently remove documents and their field data from completed and voided envelopes after a specified retention period (`retentionDays`). This method retrieves the current envelope purge configuration for your account.  **Note**: To use this method, you must be an account administrator.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration`
+     */
+    open class func envelopePurgeConfigurationGetEnvelopePurgeConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration> {
+        return envelopePurgeConfigurationGetEnvelopePurgeConfigurationRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopePurgeConfigurationGetEnvelopePurgeConfiguration in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -343,9 +438,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopePurgeConfiguration: (body)  (optional)
-     - returns: `EventLoopFuture` of `EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopePurgeConfigurationPutEnvelopePurgeConfiguration(accountId: String, envelopePurgeConfiguration: EnvelopePurgeConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration> {
+    open class func envelopePurgeConfigurationPutEnvelopePurgeConfigurationRaw(accountId: String, envelopePurgeConfiguration: EnvelopePurgeConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/envelope_purge_configuration"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -364,22 +459,37 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum NotificationDefaultsGetNotificationDefaults {
-        case http200(value: NotificationDefaults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotificationDefaults?, raw: ClientResponse)
+    public enum EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration {
+        case http200(value: EnvelopePurgeConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopePurgeConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Sets the envelope purge configuration for an account.
+
+     PUT /v2.1/accounts/{accountId}/settings/envelope_purge_configuration
+
+     An envelope purge configuration enables account administrators to permanently remove documents and their field data from completed and voided envelopes after a specified retention period (`retentionDays`). This method sets the envelope purge configuration for your account.  **Note**: To use this method, you must be an account administrator.  For more information, see [Purge Envelopes](https://support.docusign.com/en/guides/ndse-user-guide-purge-envelopes).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopePurgeConfiguration: (body)  (optional)
+     - returns: `EventLoopFuture` of `EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration`
+     */
+    open class func envelopePurgeConfigurationPutEnvelopePurgeConfiguration(accountId: String, envelopePurgeConfiguration: EnvelopePurgeConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration> {
+        return envelopePurgeConfigurationPutEnvelopePurgeConfigurationRaw(accountId: accountId, envelopePurgeConfiguration: envelopePurgeConfiguration, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopePurgeConfigurationPutEnvelopePurgeConfiguration in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopePurgeConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopePurgeConfiguration.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -390,9 +500,9 @@ open class AccountsAPI {
      This method returns the default settings for the email notifications that signers and senders receive about envelopes.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `NotificationDefaultsGetNotificationDefaults`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notificationDefaultsGetNotificationDefaults(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotificationDefaultsGetNotificationDefaults> {
+    open class func notificationDefaultsGetNotificationDefaultsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/notification_defaults"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -407,22 +517,36 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotificationDefaultsGetNotificationDefaults in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum NotificationDefaultsPutNotificationDefaults {
-        case http200(value: NotificationDefaults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotificationDefaults?, raw: ClientResponse)
+    public enum NotificationDefaultsGetNotificationDefaults {
+        case http200(value: NotificationDefaults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotificationDefaults, raw: ClientResponse)
+    }
+
+    /**
+     Gets envelope notification defaults.
+
+     GET /v2.1/accounts/{accountId}/settings/notification_defaults
+
+     This method returns the default settings for the email notifications that signers and senders receive about envelopes.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `NotificationDefaultsGetNotificationDefaults`
+     */
+    open class func notificationDefaultsGetNotificationDefaults(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotificationDefaultsGetNotificationDefaults> {
+        return notificationDefaultsGetNotificationDefaultsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotificationDefaultsGetNotificationDefaults in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -434,9 +558,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter notificationDefaults: (body)  (optional)
-     - returns: `EventLoopFuture` of `NotificationDefaultsPutNotificationDefaults`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notificationDefaultsPutNotificationDefaults(accountId: String, notificationDefaults: NotificationDefaults? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotificationDefaultsPutNotificationDefaults> {
+    open class func notificationDefaultsPutNotificationDefaultsRaw(accountId: String, notificationDefaults: NotificationDefaults? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/notification_defaults"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -455,22 +579,37 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotificationDefaultsPutNotificationDefaults in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientNamesGetRecipientNames {
-        case http200(value: RecipientNamesResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: RecipientNamesResponse?, raw: ClientResponse)
+    public enum NotificationDefaultsPutNotificationDefaults {
+        case http200(value: NotificationDefaults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotificationDefaults, raw: ClientResponse)
+    }
+
+    /**
+     Updates envelope notification default settings.
+
+     PUT /v2.1/accounts/{accountId}/settings/notification_defaults
+
+     This method changes the default settings for the email notifications that signers and senders receive about envelopes.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter notificationDefaults: (body)  (optional)
+     - returns: `EventLoopFuture` of `NotificationDefaultsPutNotificationDefaults`
+     */
+    open class func notificationDefaultsPutNotificationDefaults(accountId: String, notificationDefaults: NotificationDefaults? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotificationDefaultsPutNotificationDefaults> {
+        return notificationDefaultsPutNotificationDefaultsRaw(accountId: accountId, notificationDefaults: notificationDefaults, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotificationDefaultsPutNotificationDefaults in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(NotificationDefaults.self, using: Configuration.contentConfiguration.requireDecoder(for: NotificationDefaults.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -482,9 +621,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) (Required) The external account number (int) or account ID GUID.
      - parameter email: (query) The email address for which you want to retrieve recipient names. (optional)
-     - returns: `EventLoopFuture` of `RecipientNamesGetRecipientNames`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientNamesGetRecipientNames(accountId: String, email: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientNamesGetRecipientNames> {
+    open class func recipientNamesGetRecipientNamesRaw(accountId: String, email: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/recipient_names"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -504,22 +643,37 @@ open class AccountsAPI {
             try request.query.encode(QueryParams(email: email))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientNamesGetRecipientNames in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(RecipientNamesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientNamesResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(RecipientNamesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientNamesResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum SettingsGetSettings {
-        case http200(value: AccountSettingsInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountSettingsInformation?, raw: ClientResponse)
+    public enum RecipientNamesGetRecipientNames {
+        case http200(value: RecipientNamesResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: RecipientNamesResponse, raw: ClientResponse)
+    }
+
+    /**
+     Gets the recipient names associated with an email address.
+
+     GET /v2.1/accounts/{accountId}/recipient_names
+
+     Retrieves a list of all of the names associated with the email address that you pass in. This list can include variants of a single recipient's name that are used for signing, as well as the names of multiple different recipients.
+
+     - parameter accountId: (path) (Required) The external account number (int) or account ID GUID.
+     - parameter email: (query) The email address for which you want to retrieve recipient names. (optional)
+     - returns: `EventLoopFuture` of `RecipientNamesGetRecipientNames`
+     */
+    open class func recipientNamesGetRecipientNames(accountId: String, email: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientNamesGetRecipientNames> {
+        return recipientNamesGetRecipientNamesRaw(accountId: accountId, email: email, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientNamesGetRecipientNames in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(RecipientNamesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientNamesResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(RecipientNamesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientNamesResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -530,9 +684,9 @@ open class AccountsAPI {
      Retrieves the account settings information for the specified account.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `SettingsGetSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func settingsGetSettings(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SettingsGetSettings> {
+    open class func settingsGetSettingsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -547,22 +701,36 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> SettingsGetSettings in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSettingsInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSettingsInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum SettingsPutSettings {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
+    public enum SettingsGetSettings {
+        case http200(value: AccountSettingsInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountSettingsInformation, raw: ClientResponse)
+    }
+
+    /**
+     Gets account settings information.
+
+     GET /v2.1/accounts/{accountId}/settings
+
+     Retrieves the account settings information for the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `SettingsGetSettings`
+     */
+    open class func settingsGetSettings(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SettingsGetSettings> {
+        return settingsGetSettingsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> SettingsGetSettings in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSettingsInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSettingsInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -574,9 +742,9 @@ open class AccountsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter accountSettingsInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `SettingsPutSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func settingsPutSettings(accountId: String, accountSettingsInformation: AccountSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SettingsPutSettings> {
+    open class func settingsPutSettingsRaw(accountId: String, accountSettingsInformation: AccountSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -595,22 +763,37 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> SettingsPutSettings in
+        }
+    }
+
+    public enum SettingsPutSettings {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Updates the account settings for an account.
+
+     PUT /v2.1/accounts/{accountId}/settings
+
+     Updates the account settings for the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter accountSettingsInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `SettingsPutSettings`
+     */
+    open class func settingsPutSettings(accountId: String, accountSettingsInformation: AccountSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SettingsPutSettings> {
+        return settingsPutSettingsRaw(accountId: accountId, accountSettingsInformation: accountSettingsInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> SettingsPutSettings in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum SharedAccessGetSharedAccess {
-        case http200(value: AccountSharedAccess?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountSharedAccess?, raw: ClientResponse)
     }
 
     /**
@@ -629,9 +812,9 @@ open class AccountsAPI {
      - parameter shared: (query) A comma-separated list of sharing filters that specifies which users appear in the response.   - `not_shared`: The response lists users who do not share items of `item_type` with the current user.  - `shared_to`: The response lists users in `user_list` who are sharing items to current user.  - `shared_from`: The response lists users in `user_list` who are sharing items from the current user.  - `shared_to_and_from`: The response lists users in `user_list` who are sharing items to and from the current user.  If the current user does not have administrative privileges, only the `shared_to` option is valid. (optional)
      - parameter startPosition: (query) If the number of responses is greater than `count`, this specifies the number of responses to skip. Typically this value is a multiple of `count`. The default is 0. (optional)
      - parameter userIds: (query) A comma-separated list of user IDs for whom the shared item information is being requested. (optional)
-     - returns: `EventLoopFuture` of `SharedAccessGetSharedAccess`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func sharedAccessGetSharedAccess(accountId: String, count: String? = nil, envelopesNotSharedUserStatus: String? = nil, folderIds: String? = nil, itemType: String? = nil, searchText: String? = nil, shared: String? = nil, startPosition: String? = nil, userIds: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SharedAccessGetSharedAccess> {
+    open class func sharedAccessGetSharedAccessRaw(accountId: String, count: String? = nil, envelopesNotSharedUserStatus: String? = nil, folderIds: String? = nil, itemType: String? = nil, searchText: String? = nil, shared: String? = nil, startPosition: String? = nil, userIds: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/shared_access"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -658,22 +841,44 @@ open class AccountsAPI {
             try request.query.encode(QueryParams(count: count, envelopesNotSharedUserStatus: envelopesNotSharedUserStatus, folderIds: folderIds, itemType: itemType, searchText: searchText, shared: shared, startPosition: startPosition, userIds: userIds))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> SharedAccessGetSharedAccess in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum SharedAccessPutSharedAccess {
-        case http200(value: AccountSharedAccess?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountSharedAccess?, raw: ClientResponse)
+    public enum SharedAccessGetSharedAccess {
+        case http200(value: AccountSharedAccess, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountSharedAccess, raw: ClientResponse)
+    }
+
+    /**
+     Reserved: Gets the shared item status for one or more users.
+
+     GET /v2.1/accounts/{accountId}/shared_access
+
+     Retrieves shared item status for one or more users and types of items.  Users with account administration privileges can retrieve shared access information for all account users. Users without account administrator privileges can only retrieve shared access information for themselves, and the returned information is limited to retrieving the status of the members of the account that are sharing their folders to the user. This is equivalent to setting the `shared` parameter to `shared_from`.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter count: (query) Specifies the maximum number of results included in the response. If no value is specified, this defaults to 1000. (optional)
+     - parameter envelopesNotSharedUserStatus: (query) This query parameter works in conjunction with `user_ids`. When you specify one of the following user statuses, the query limits the results to only users that match the specified status: - `ActivationRequired`: Membership Activation required - `ActivationSent`: Membership activation sent to user - `Active`: User Membership is active - `Closed`: User Membership is closed - `Disabled`: User Membership is disabled (optional)
+     - parameter folderIds: (query) A comma-separated list of folder IDs for which to return shared item information. If `item_type` is set to `folders`, at least one folder ID is required. (optional)
+     - parameter itemType: (query) Specifies the type of shared item being requested. The possible values are:  - `envelopes`: Get information about envelope sharing between users. - `templates`: Get information about template sharing among users and groups. - `folders`: Get information about folder sharing among users and groups.  (optional)
+     - parameter searchText: (query) Filter user names based on the specified string. The wild-card '*' (asterisk) can be used in the string. (optional)
+     - parameter shared: (query) A comma-separated list of sharing filters that specifies which users appear in the response.   - `not_shared`: The response lists users who do not share items of `item_type` with the current user.  - `shared_to`: The response lists users in `user_list` who are sharing items to current user.  - `shared_from`: The response lists users in `user_list` who are sharing items from the current user.  - `shared_to_and_from`: The response lists users in `user_list` who are sharing items to and from the current user.  If the current user does not have administrative privileges, only the `shared_to` option is valid. (optional)
+     - parameter startPosition: (query) If the number of responses is greater than `count`, this specifies the number of responses to skip. Typically this value is a multiple of `count`. The default is 0. (optional)
+     - parameter userIds: (query) A comma-separated list of user IDs for whom the shared item information is being requested. (optional)
+     - returns: `EventLoopFuture` of `SharedAccessGetSharedAccess`
+     */
+    open class func sharedAccessGetSharedAccess(accountId: String, count: String? = nil, envelopesNotSharedUserStatus: String? = nil, folderIds: String? = nil, itemType: String? = nil, searchText: String? = nil, shared: String? = nil, startPosition: String? = nil, userIds: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SharedAccessGetSharedAccess> {
+        return sharedAccessGetSharedAccessRaw(accountId: accountId, count: count, envelopesNotSharedUserStatus: envelopesNotSharedUserStatus, folderIds: folderIds, itemType: itemType, searchText: searchText, shared: shared, startPosition: startPosition, userIds: userIds, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> SharedAccessGetSharedAccess in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -688,9 +893,9 @@ open class AccountsAPI {
      - parameter preserveExistingSharedAccess: (query) When **true**, preserve the existing shared access settings. (optional)
      - parameter userIds: (query) A comma-separated list of IDs for users whose shared item access is being set. (optional)
      - parameter accountSharedAccess: (body)  (optional)
-     - returns: `EventLoopFuture` of `SharedAccessPutSharedAccess`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func sharedAccessPutSharedAccess(accountId: String, itemType: String? = nil, preserveExistingSharedAccess: String? = nil, userIds: String? = nil, accountSharedAccess: AccountSharedAccess? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SharedAccessPutSharedAccess> {
+    open class func sharedAccessPutSharedAccessRaw(accountId: String, itemType: String? = nil, preserveExistingSharedAccess: String? = nil, userIds: String? = nil, accountSharedAccess: AccountSharedAccess? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/shared_access"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -715,22 +920,40 @@ open class AccountsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> SharedAccessPutSharedAccess in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum SupportedLanguagesGetSupportedLanguages {
-        case http200(value: SupportedLanguages?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: SupportedLanguages?, raw: ClientResponse)
+    public enum SharedAccessPutSharedAccess {
+        case http200(value: AccountSharedAccess, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountSharedAccess, raw: ClientResponse)
+    }
+
+    /**
+     Reserved: Sets the shared access information for users.
+
+     PUT /v2.1/accounts/{accountId}/shared_access
+
+     This sets the shared access status for one or more users or templates.  When setting user shared access, only users with account administration privileges can set shared access status for envelopes.  When setting template shared access, only users who own a template and have sharing permission or with account administration privileges can set shared access for templates.  Changes to the shared items status are not additive. The change always replaces the current status.  To change template shared access, add the query parameter `item_type` = `templates` to the request. When this is set, the user and envelopes properties are not required.  **Note**: This functionality is a newer version of the [Update Group Share](https://developers.docusign.com/esign-rest-api/reference/Templates/Templates/updateGroupShare) functionality.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter itemType: (query) Specifies the type of shared item being set: - `envelopes`: Set envelope sharing between users. - `templates`: Set information about template sharing among users and groups. - `folders`: Get information about folder sharing among users and groups.  (optional)
+     - parameter preserveExistingSharedAccess: (query) When **true**, preserve the existing shared access settings. (optional)
+     - parameter userIds: (query) A comma-separated list of IDs for users whose shared item access is being set. (optional)
+     - parameter accountSharedAccess: (body)  (optional)
+     - returns: `EventLoopFuture` of `SharedAccessPutSharedAccess`
+     */
+    open class func sharedAccessPutSharedAccess(accountId: String, itemType: String? = nil, preserveExistingSharedAccess: String? = nil, userIds: String? = nil, accountSharedAccess: AccountSharedAccess? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SharedAccessPutSharedAccess> {
+        return sharedAccessPutSharedAccessRaw(accountId: accountId, itemType: itemType, preserveExistingSharedAccess: preserveExistingSharedAccess, userIds: userIds, accountSharedAccess: accountSharedAccess, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> SharedAccessPutSharedAccess in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountSharedAccess.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSharedAccess.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -741,9 +964,9 @@ open class AccountsAPI {
      Retrieves a list of supported languages that you can set for an individual recipient when creating an envelope, as well as their simple type enumeration values. These are the languages that you can set for the standard email format and signing view for each recipient.  For example, in the recipient's email notification, this setting affects elements such as the standard introductory text describing the request to sign. It also determines the language used for buttons and tabs in both the email notification and the signing experience.  **Note**: Setting a language for a recipient affects only the DocuSign standard text. Any custom text that you enter for the `emailBody` and `emailSubject` of the notification is not translated, and appears exactly as you enter it.  For more information, see [Set Recipient Language and Specify Custom Email Messages](https://support.docusign.com/en/guides/ndse-user-guide-recipient-language).
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `SupportedLanguagesGetSupportedLanguages`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func supportedLanguagesGetSupportedLanguages(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SupportedLanguagesGetSupportedLanguages> {
+    open class func supportedLanguagesGetSupportedLanguagesRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/supported_languages"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -758,22 +981,36 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> SupportedLanguagesGetSupportedLanguages in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(SupportedLanguages.self, using: Configuration.contentConfiguration.requireDecoder(for: SupportedLanguages.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(SupportedLanguages.self, using: Configuration.contentConfiguration.requireDecoder(for: SupportedLanguages.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UnsupportedFileTypesGetUnsupportedFileTypes {
-        case http200(value: FileTypeList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: FileTypeList?, raw: ClientResponse)
+    public enum SupportedLanguagesGetSupportedLanguages {
+        case http200(value: SupportedLanguages, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: SupportedLanguages, raw: ClientResponse)
+    }
+
+    /**
+     Gets the supported languages for envelope recipients.
+
+     GET /v2.1/accounts/{accountId}/supported_languages
+
+     Retrieves a list of supported languages that you can set for an individual recipient when creating an envelope, as well as their simple type enumeration values. These are the languages that you can set for the standard email format and signing view for each recipient.  For example, in the recipient's email notification, this setting affects elements such as the standard introductory text describing the request to sign. It also determines the language used for buttons and tabs in both the email notification and the signing experience.  **Note**: Setting a language for a recipient affects only the DocuSign standard text. Any custom text that you enter for the `emailBody` and `emailSubject` of the notification is not translated, and appears exactly as you enter it.  For more information, see [Set Recipient Language and Specify Custom Email Messages](https://support.docusign.com/en/guides/ndse-user-guide-recipient-language).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `SupportedLanguagesGetSupportedLanguages`
+     */
+    open class func supportedLanguagesGetSupportedLanguages(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<SupportedLanguagesGetSupportedLanguages> {
+        return supportedLanguagesGetSupportedLanguagesRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> SupportedLanguagesGetSupportedLanguages in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(SupportedLanguages.self, using: Configuration.contentConfiguration.requireDecoder(for: SupportedLanguages.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(SupportedLanguages.self, using: Configuration.contentConfiguration.requireDecoder(for: SupportedLanguages.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -784,9 +1021,9 @@ open class AccountsAPI {
      Retrieves a list of file types (mime-types and file-extensions) that are not supported for upload through the DocuSign system.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `UnsupportedFileTypesGetUnsupportedFileTypes`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func unsupportedFileTypesGetUnsupportedFileTypes(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UnsupportedFileTypesGetUnsupportedFileTypes> {
+    open class func unsupportedFileTypesGetUnsupportedFileTypesRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/unsupported_file_types"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -801,14 +1038,34 @@ open class AccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UnsupportedFileTypesGetUnsupportedFileTypes in
+        }
+    }
+
+    public enum UnsupportedFileTypesGetUnsupportedFileTypes {
+        case http200(value: FileTypeList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: FileTypeList, raw: ClientResponse)
+    }
+
+    /**
+     Gets a list of unsupported file types.
+
+     GET /v2.1/accounts/{accountId}/unsupported_file_types
+
+     Retrieves a list of file types (mime-types and file-extensions) that are not supported for upload through the DocuSign system.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `UnsupportedFileTypesGetUnsupportedFileTypes`
+     */
+    open class func unsupportedFileTypesGetUnsupportedFileTypes(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UnsupportedFileTypesGetUnsupportedFileTypes> {
+        return unsupportedFileTypesGetUnsupportedFileTypesRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UnsupportedFileTypesGetUnsupportedFileTypes in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(FileTypeList.self, using: Configuration.contentConfiguration.requireDecoder(for: FileTypeList.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(FileTypeList.self, using: Configuration.contentConfiguration.requireDecoder(for: FileTypeList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(FileTypeList.self, using: Configuration.contentConfiguration.requireDecoder(for: FileTypeList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(FileTypeList.self, using: Configuration.contentConfiguration.requireDecoder(for: FileTypeList.defaultContentType)), raw: response)
             }
         }
     }

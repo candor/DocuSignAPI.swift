@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class BCCEmailArchiveAPI {
-    public enum BCCEmailArchiveDeleteBCCEmailArchive {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes a BCC email archive configuration.
 
@@ -24,9 +18,9 @@ open class BCCEmailArchiveAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter bccEmailArchiveId: (path) The id of the BCC email archive configuration.
-     - returns: `EventLoopFuture` of `BCCEmailArchiveDeleteBCCEmailArchive`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func bCCEmailArchiveDeleteBCCEmailArchive(accountId: String, bccEmailArchiveId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveDeleteBCCEmailArchive> {
+    open class func bCCEmailArchiveDeleteBCCEmailArchiveRaw(accountId: String, bccEmailArchiveId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/bcc_email_archives/{bccEmailArchiveId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class BCCEmailArchiveAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BCCEmailArchiveDeleteBCCEmailArchive in
+        }
+    }
+
+    public enum BCCEmailArchiveDeleteBCCEmailArchive {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a BCC email archive configuration.
+
+     DELETE /v2.1/accounts/{accountId}/settings/bcc_email_archives/{bccEmailArchiveId}
+
+     This method deletes a BCC email archive configuration from an account.  When you use this method, the status of the BCC email archive configuration switches to `closed` and the BCC email address is no longer used to archive DocuSign-generated email messages.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter bccEmailArchiveId: (path) The id of the BCC email archive configuration.
+     - returns: `EventLoopFuture` of `BCCEmailArchiveDeleteBCCEmailArchive`
+     */
+    open class func bCCEmailArchiveDeleteBCCEmailArchive(accountId: String, bccEmailArchiveId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveDeleteBCCEmailArchive> {
+        return bCCEmailArchiveDeleteBCCEmailArchiveRaw(accountId: accountId, bccEmailArchiveId: bccEmailArchiveId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BCCEmailArchiveDeleteBCCEmailArchive in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum BCCEmailArchiveGetBCCEmailArchiveHistoryList {
-        case http200(value: BccEmailArchiveHistoryList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BccEmailArchiveHistoryList?, raw: ClientResponse)
     }
 
     /**
@@ -73,9 +82,9 @@ open class BCCEmailArchiveAPI {
      - parameter bccEmailArchiveId: (path) The id of the BCC email archive configuration.
      - parameter count: (query) (Optional) The maximum number of results (changes) to return. (optional)
      - parameter startPosition: (query) (Optional) The index position within the total result set from which to start returning values. The default value is `0`. (optional)
-     - returns: `EventLoopFuture` of `BCCEmailArchiveGetBCCEmailArchiveHistoryList`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func bCCEmailArchiveGetBCCEmailArchiveHistoryList(accountId: String, bccEmailArchiveId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveGetBCCEmailArchiveHistoryList> {
+    open class func bCCEmailArchiveGetBCCEmailArchiveHistoryListRaw(accountId: String, bccEmailArchiveId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/bcc_email_archives/{bccEmailArchiveId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -99,22 +108,39 @@ open class BCCEmailArchiveAPI {
             try request.query.encode(QueryParams(count: count, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BCCEmailArchiveGetBCCEmailArchiveHistoryList in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BccEmailArchiveHistoryList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveHistoryList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BccEmailArchiveHistoryList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveHistoryList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BCCEmailArchiveGetBCCEmailArchiveList {
-        case http200(value: BccEmailArchiveList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BccEmailArchiveList?, raw: ClientResponse)
+    public enum BCCEmailArchiveGetBCCEmailArchiveHistoryList {
+        case http200(value: BccEmailArchiveHistoryList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BccEmailArchiveHistoryList, raw: ClientResponse)
+    }
+
+    /**
+     Gets a BCC email archive configuration and its history.
+
+     GET /v2.1/accounts/{accountId}/settings/bcc_email_archives/{bccEmailArchiveId}
+
+     This method returns a specific BCC email archive configuration for an account, as well as the history of changes to the email address.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter bccEmailArchiveId: (path) The id of the BCC email archive configuration.
+     - parameter count: (query) (Optional) The maximum number of results (changes) to return. (optional)
+     - parameter startPosition: (query) (Optional) The index position within the total result set from which to start returning values. The default value is `0`. (optional)
+     - returns: `EventLoopFuture` of `BCCEmailArchiveGetBCCEmailArchiveHistoryList`
+     */
+    open class func bCCEmailArchiveGetBCCEmailArchiveHistoryList(accountId: String, bccEmailArchiveId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveGetBCCEmailArchiveHistoryList> {
+        return bCCEmailArchiveGetBCCEmailArchiveHistoryListRaw(accountId: accountId, bccEmailArchiveId: bccEmailArchiveId, count: count, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BCCEmailArchiveGetBCCEmailArchiveHistoryList in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BccEmailArchiveHistoryList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveHistoryList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BccEmailArchiveHistoryList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveHistoryList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -127,9 +153,9 @@ open class BCCEmailArchiveAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter count: (query) (Optional) The maximum number of results to return. (optional)
      - parameter startPosition: (query) (Optional) The index position within the total result set from which to start returning values. The default value is `0`. (optional)
-     - returns: `EventLoopFuture` of `BCCEmailArchiveGetBCCEmailArchiveList`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func bCCEmailArchiveGetBCCEmailArchiveList(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveGetBCCEmailArchiveList> {
+    open class func bCCEmailArchiveGetBCCEmailArchiveListRaw(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/bcc_email_archives"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -150,22 +176,38 @@ open class BCCEmailArchiveAPI {
             try request.query.encode(QueryParams(count: count, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BCCEmailArchiveGetBCCEmailArchiveList in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BccEmailArchiveList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BccEmailArchiveList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BCCEmailArchivePostBCCEmailArchive {
-        case http201(value: BccEmailArchive?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BccEmailArchive?, raw: ClientResponse)
+    public enum BCCEmailArchiveGetBCCEmailArchiveList {
+        case http200(value: BccEmailArchiveList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BccEmailArchiveList, raw: ClientResponse)
+    }
+
+    /**
+     Gets the BCC email archive configurations for an account.
+
+     GET /v2.1/accounts/{accountId}/settings/bcc_email_archives
+
+     This method retrieves all of the BCC email archive configurations associated with an account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter count: (query) (Optional) The maximum number of results to return. (optional)
+     - parameter startPosition: (query) (Optional) The index position within the total result set from which to start returning values. The default value is `0`. (optional)
+     - returns: `EventLoopFuture` of `BCCEmailArchiveGetBCCEmailArchiveList`
+     */
+    open class func bCCEmailArchiveGetBCCEmailArchiveList(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchiveGetBCCEmailArchiveList> {
+        return bCCEmailArchiveGetBCCEmailArchiveListRaw(accountId: accountId, count: count, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BCCEmailArchiveGetBCCEmailArchiveList in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BccEmailArchiveList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BccEmailArchiveList.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchiveList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -177,9 +219,9 @@ open class BCCEmailArchiveAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter bccEmailArchive: (body) Boolean that specifies whether BCC for Email Archive is enabled for the account. BCC for Email Archive allows you to set up an archive email address so that a BCC copy of an envelope is sent only to that address. (optional)
-     - returns: `EventLoopFuture` of `BCCEmailArchivePostBCCEmailArchive`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func bCCEmailArchivePostBCCEmailArchive(accountId: String, bccEmailArchive: BccEmailArchive? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchivePostBCCEmailArchive> {
+    open class func bCCEmailArchivePostBCCEmailArchiveRaw(accountId: String, bccEmailArchive: BccEmailArchive? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/bcc_email_archives"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -198,14 +240,35 @@ open class BCCEmailArchiveAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BCCEmailArchivePostBCCEmailArchive in
+        }
+    }
+
+    public enum BCCEmailArchivePostBCCEmailArchive {
+        case http201(value: BccEmailArchive, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BccEmailArchive, raw: ClientResponse)
+    }
+
+    /**
+     Creates a BCC email archive configuration.
+
+     POST /v2.1/accounts/{accountId}/settings/bcc_email_archives
+
+     This method creates a BCC email archive configuration for an account (adds a BCC email address to the account for archiving the emails that DocuSign generates).  The only property that you must set in the request body is the BCC email address that you want to use.  **Note**: An account can have up to five active and pending email archive addresses combined, but you must use this method to add them to the account one at a time. Each email address is considered a separate BCC email archive configuration.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter bccEmailArchive: (body) Boolean that specifies whether BCC for Email Archive is enabled for the account. BCC for Email Archive allows you to set up an archive email address so that a BCC copy of an envelope is sent only to that address. (optional)
+     - returns: `EventLoopFuture` of `BCCEmailArchivePostBCCEmailArchive`
+     */
+    open class func bCCEmailArchivePostBCCEmailArchive(accountId: String, bccEmailArchive: BccEmailArchive? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BCCEmailArchivePostBCCEmailArchive> {
+        return bCCEmailArchivePostBCCEmailArchiveRaw(accountId: accountId, bccEmailArchive: bccEmailArchive, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BCCEmailArchivePostBCCEmailArchive in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(BccEmailArchive.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchive.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(BccEmailArchive.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchive.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(BccEmailArchive.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchive.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(BccEmailArchive.self, using: Configuration.contentConfiguration.requireDecoder(for: BccEmailArchive.defaultContentType)), raw: response)
             }
         }
     }

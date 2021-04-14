@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class BillingPlansAPI {
-    public enum BillingPlanGetBillingPlan {
-        case http200(value: AccountBillingPlanResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountBillingPlanResponse?, raw: ClientResponse)
-    }
-
     /**
      Get Account Billing Plan
 
@@ -26,9 +20,9 @@ open class BillingPlansAPI {
      - parameter includeCreditCardInformation: (query) When set to **true**, payment information including credit card information will show in the return. (optional)
      - parameter includeMetadata: (query) When set to **true**, the `canUpgrade` and `renewalStatus` properities are included the response and an array of `supportedCountries` is added to the `billingAddress` information.  (optional)
      - parameter includeSuccessorPlans: (query) When set to **true**, excludes successor information from the response. (optional)
-     - returns: `EventLoopFuture` of `BillingPlanGetBillingPlan`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlanGetBillingPlan(accountId: String, includeCreditCardInformation: String? = nil, includeMetadata: String? = nil, includeSuccessorPlans: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetBillingPlan> {
+    open class func billingPlanGetBillingPlanRaw(accountId: String, includeCreditCardInformation: String? = nil, includeMetadata: String? = nil, includeSuccessorPlans: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -50,22 +44,39 @@ open class BillingPlansAPI {
             try request.query.encode(QueryParams(includeCreditCardInformation: includeCreditCardInformation, includeMetadata: includeMetadata, includeSuccessorPlans: includeSuccessorPlans))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlanGetBillingPlan in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountBillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountBillingPlanResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountBillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountBillingPlanResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingPlanGetCreditCardInfo {
-        case http200(value: CreditCardInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CreditCardInformation?, raw: ClientResponse)
+    public enum BillingPlanGetBillingPlan {
+        case http200(value: AccountBillingPlanResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountBillingPlanResponse, raw: ClientResponse)
+    }
+
+    /**
+     Get Account Billing Plan
+
+     GET /v2.1/accounts/{accountId}/billing_plan
+
+     Retrieves the billing plan information for the specified account, including the current billing plan, successor plans, billing address, and billing credit card.  By default the successor plan and credit card information is included in the response. You can exclude this information from the response by adding the appropriate optional query string and setting it to **false**.  Response  The response returns the billing plan information, including the currency code, for the plan. The `billingPlan` and `succesorPlans` property values are the same as those shown in the [Billing::getBillingPlan](https://developers.docusign.com/esign-rest-api/reference/Billing/BillingPlans/get) reference. the `billingAddress` and `creditCardInformation` property values are the same as those shown in the [Billing::updatePlan](https://developers.docusign.com/esign-rest-api/reference/Billing/BillingPlans/update) reference.  **Note**: When credit card number information displays, a mask is applied to the response so that only the last 4 digits of the card number are visible.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter includeCreditCardInformation: (query) When set to **true**, payment information including credit card information will show in the return. (optional)
+     - parameter includeMetadata: (query) When set to **true**, the `canUpgrade` and `renewalStatus` properities are included the response and an array of `supportedCountries` is added to the `billingAddress` information.  (optional)
+     - parameter includeSuccessorPlans: (query) When set to **true**, excludes successor information from the response. (optional)
+     - returns: `EventLoopFuture` of `BillingPlanGetBillingPlan`
+     */
+    open class func billingPlanGetBillingPlan(accountId: String, includeCreditCardInformation: String? = nil, includeMetadata: String? = nil, includeSuccessorPlans: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetBillingPlan> {
+        return billingPlanGetBillingPlanRaw(accountId: accountId, includeCreditCardInformation: includeCreditCardInformation, includeMetadata: includeMetadata, includeSuccessorPlans: includeSuccessorPlans, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlanGetBillingPlan in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountBillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountBillingPlanResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountBillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountBillingPlanResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +87,9 @@ open class BillingPlansAPI {
      This method returns information about a credit card associated with an account.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `BillingPlanGetCreditCardInfo`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlanGetCreditCardInfo(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetCreditCardInfo> {
+    open class func billingPlanGetCreditCardInfoRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan/credit_card"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -93,22 +104,36 @@ open class BillingPlansAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlanGetCreditCardInfo in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CreditCardInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CreditCardInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CreditCardInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CreditCardInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingPlanGetDowngradeRequestBillingInfo {
-        case http200(value: DowngradRequestBillingInfoResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DowngradRequestBillingInfoResponse?, raw: ClientResponse)
+    public enum BillingPlanGetCreditCardInfo {
+        case http200(value: CreditCardInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CreditCardInformation, raw: ClientResponse)
+    }
+
+    /**
+     Get credit card information
+
+     GET /v2.1/accounts/{accountId}/billing_plan/credit_card
+
+     This method returns information about a credit card associated with an account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `BillingPlanGetCreditCardInfo`
+     */
+    open class func billingPlanGetCreditCardInfo(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetCreditCardInfo> {
+        return billingPlanGetCreditCardInfoRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlanGetCreditCardInfo in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CreditCardInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CreditCardInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CreditCardInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CreditCardInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -116,9 +141,9 @@ open class BillingPlansAPI {
      GET /v2.1/accounts/{accountId}/billing_plan/downgrade
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `BillingPlanGetDowngradeRequestBillingInfo`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlanGetDowngradeRequestBillingInfo(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetDowngradeRequestBillingInfo> {
+    open class func billingPlanGetDowngradeRequestBillingInfoRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan/downgrade"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -133,22 +158,33 @@ open class BillingPlansAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlanGetDowngradeRequestBillingInfo in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(DowngradRequestBillingInfoResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradRequestBillingInfoResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(DowngradRequestBillingInfoResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradRequestBillingInfoResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingPlanPutBillingPlan {
-        case http200(value: BillingPlanUpdateResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingPlanUpdateResponse?, raw: ClientResponse)
+    public enum BillingPlanGetDowngradeRequestBillingInfo {
+        case http200(value: DowngradRequestBillingInfoResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DowngradRequestBillingInfoResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/billing_plan/downgrade
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `BillingPlanGetDowngradeRequestBillingInfo`
+     */
+    open class func billingPlanGetDowngradeRequestBillingInfo(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanGetDowngradeRequestBillingInfo> {
+        return billingPlanGetDowngradeRequestBillingInfoRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlanGetDowngradeRequestBillingInfo in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(DowngradRequestBillingInfoResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradRequestBillingInfoResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(DowngradRequestBillingInfoResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradRequestBillingInfoResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -161,9 +197,9 @@ open class BillingPlansAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter previewBillingPlan: (query) When set to **true**, updates the account using a preview billing plan. (optional)
      - parameter billingPlanInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `BillingPlanPutBillingPlan`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlanPutBillingPlan(accountId: String, previewBillingPlan: String? = nil, billingPlanInformation: BillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanPutBillingPlan> {
+    open class func billingPlanPutBillingPlanRaw(accountId: String, previewBillingPlan: String? = nil, billingPlanInformation: BillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -186,22 +222,38 @@ open class BillingPlansAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlanPutBillingPlan in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BillingPlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanUpdateResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BillingPlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanUpdateResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingPlanPutDowngradeAccountBillingPlan {
-        case http200(value: DowngradePlanUpdateResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DowngradePlanUpdateResponse?, raw: ClientResponse)
+    public enum BillingPlanPutBillingPlan {
+        case http200(value: BillingPlanUpdateResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingPlanUpdateResponse, raw: ClientResponse)
+    }
+
+    /**
+     Updates an account billing plan.
+
+     PUT /v2.1/accounts/{accountId}/billing_plan
+
+     Updates the billing plan information, billing address, and credit card information for the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter previewBillingPlan: (query) When set to **true**, updates the account using a preview billing plan. (optional)
+     - parameter billingPlanInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `BillingPlanPutBillingPlan`
+     */
+    open class func billingPlanPutBillingPlan(accountId: String, previewBillingPlan: String? = nil, billingPlanInformation: BillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanPutBillingPlan> {
+        return billingPlanPutBillingPlanRaw(accountId: accountId, previewBillingPlan: previewBillingPlan, billingPlanInformation: billingPlanInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlanPutBillingPlan in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BillingPlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanUpdateResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BillingPlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanUpdateResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -210,9 +262,9 @@ open class BillingPlansAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter downgradeBillingPlanInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `BillingPlanPutDowngradeAccountBillingPlan`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlanPutDowngradeAccountBillingPlan(accountId: String, downgradeBillingPlanInformation: DowngradeBillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanPutDowngradeAccountBillingPlan> {
+    open class func billingPlanPutDowngradeAccountBillingPlanRaw(accountId: String, downgradeBillingPlanInformation: DowngradeBillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan/downgrade"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -231,22 +283,34 @@ open class BillingPlansAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlanPutDowngradeAccountBillingPlan in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(DowngradePlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradePlanUpdateResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(DowngradePlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradePlanUpdateResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingPlansGetBillingPlan {
-        case http200(value: BillingPlanResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingPlanResponse?, raw: ClientResponse)
+    public enum BillingPlanPutDowngradeAccountBillingPlan {
+        case http200(value: DowngradePlanUpdateResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DowngradePlanUpdateResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     PUT /v2.1/accounts/{accountId}/billing_plan/downgrade
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter downgradeBillingPlanInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `BillingPlanPutDowngradeAccountBillingPlan`
+     */
+    open class func billingPlanPutDowngradeAccountBillingPlan(accountId: String, downgradeBillingPlanInformation: DowngradeBillingPlanInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlanPutDowngradeAccountBillingPlan> {
+        return billingPlanPutDowngradeAccountBillingPlanRaw(accountId: accountId, downgradeBillingPlanInformation: downgradeBillingPlanInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlanPutDowngradeAccountBillingPlan in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(DowngradePlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradePlanUpdateResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(DowngradePlanUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: DowngradePlanUpdateResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -257,9 +321,9 @@ open class BillingPlansAPI {
      Retrieves the billing plan details for the specified billing plan ID.
 
      - parameter billingPlanId: (path) The ID of the billing plan being accessed.
-     - returns: `EventLoopFuture` of `BillingPlansGetBillingPlan`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingPlansGetBillingPlan(billingPlanId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlansGetBillingPlan> {
+    open class func billingPlansGetBillingPlanRaw(billingPlanId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/billing_plans/{billingPlanId}"
         let billingPlanIdPreEscape = String(describing: billingPlanId)
         let billingPlanIdPostEscape = billingPlanIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -274,22 +338,66 @@ open class BillingPlansAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlansGetBillingPlan in
+        }
+    }
+
+    public enum BillingPlansGetBillingPlan {
+        case http200(value: BillingPlanResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingPlanResponse, raw: ClientResponse)
+    }
+
+    /**
+     Gets billing plan details.
+
+     GET /v2.1/billing_plans/{billingPlanId}
+
+     Retrieves the billing plan details for the specified billing plan ID.
+
+     - parameter billingPlanId: (path) The ID of the billing plan being accessed.
+     - returns: `EventLoopFuture` of `BillingPlansGetBillingPlan`
+     */
+    open class func billingPlansGetBillingPlan(billingPlanId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlansGetBillingPlan> {
+        return billingPlansGetBillingPlanRaw(billingPlanId: billingPlanId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlansGetBillingPlan in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(BillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanResponse.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(BillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanResponse.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(BillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanResponse.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(BillingPlanResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlanResponse.defaultContentType)), raw: response)
             }
         }
     }
 
+    /**
+     Gets a list of available billing plans.
+
+     GET /v2.1/billing_plans
+
+     Retrieves a list of the billing plans associated with a distributor.
+
+     - returns: `EventLoopFuture` of `ClientResponse`
+     */
+    open class func billingPlansGetBillingPlansRaw(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
+        let path = "/v2.1/billing_plans"
+        let URLString = DocuSignAPI.basePath + path
+
+        guard let apiClient = Configuration.apiClient else {
+            fatalError("Configuration.apiClient is not set.")
+        }
+
+        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
+            try Configuration.apiWrapper(&request)
+
+            try beforeSend(&request)
+        }
+    }
+
     public enum BillingPlansGetBillingPlans {
-        case http200(value: BillingPlansResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingPlansResponse?, raw: ClientResponse)
+        case http200(value: BillingPlansResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingPlansResponse, raw: ClientResponse)
     }
 
     /**
@@ -302,33 +410,16 @@ open class BillingPlansAPI {
      - returns: `EventLoopFuture` of `BillingPlansGetBillingPlans`
      */
     open class func billingPlansGetBillingPlans(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingPlansGetBillingPlans> {
-        let path = "/v2.1/billing_plans"
-        let URLString = DocuSignAPI.basePath + path
-
-        guard let apiClient = Configuration.apiClient else {
-            fatalError("Configuration.apiClient is not set.")
-        }
-
-        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
-            try Configuration.apiWrapper(&request)
-
-            try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingPlansGetBillingPlans in
+        return billingPlansGetBillingPlansRaw(headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingPlansGetBillingPlans in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(BillingPlansResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlansResponse.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(BillingPlansResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlansResponse.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(BillingPlansResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlansResponse.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(BillingPlansResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingPlansResponse.defaultContentType)), raw: response)
             }
         }
-    }
-
-    public enum PurchasedEnvelopesPutPurchasedEnvelopes {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
     }
 
     /**
@@ -340,9 +431,9 @@ open class BillingPlansAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter purchasedEnvelopesInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `PurchasedEnvelopesPutPurchasedEnvelopes`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func purchasedEnvelopesPutPurchasedEnvelopes(accountId: String, purchasedEnvelopesInformation: PurchasedEnvelopesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PurchasedEnvelopesPutPurchasedEnvelopes> {
+    open class func purchasedEnvelopesPutPurchasedEnvelopesRaw(accountId: String, purchasedEnvelopesInformation: PurchasedEnvelopesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_plan/purchased_envelopes"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -361,12 +452,33 @@ open class BillingPlansAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> PurchasedEnvelopesPutPurchasedEnvelopes in
+        }
+    }
+
+    public enum PurchasedEnvelopesPutPurchasedEnvelopes {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Reserverd: Purchase additional envelopes.
+
+     PUT /v2.1/accounts/{accountId}/billing_plan/purchased_envelopes
+
+     Reserved: At this time, this endpoint is limited to DocuSign internal use only. Completes the purchase of envelopes for your account. The actual purchase is done as part of an internal workflow interaction with an envelope vendor.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter purchasedEnvelopesInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `PurchasedEnvelopesPutPurchasedEnvelopes`
+     */
+    open class func purchasedEnvelopesPutPurchasedEnvelopes(accountId: String, purchasedEnvelopesInformation: PurchasedEnvelopesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PurchasedEnvelopesPutPurchasedEnvelopes> {
+        return purchasedEnvelopesPutPurchasedEnvelopesRaw(accountId: accountId, purchasedEnvelopesInformation: purchasedEnvelopesInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> PurchasedEnvelopesPutPurchasedEnvelopes in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }

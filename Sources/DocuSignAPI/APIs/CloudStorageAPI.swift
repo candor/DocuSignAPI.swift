@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class CloudStorageAPI {
-    public enum CloudStorageFolderGetCloudStorageFolder {
-        case http200(value: ExternalFolder?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ExternalFolder?, raw: ClientResponse)
-    }
-
     /**
      Gets a list of items from a cloud storage provider.
 
@@ -33,9 +27,9 @@ open class CloudStorageAPI {
      - parameter orderBy: (query) (Optional) The file attribute to use to sort the results.  Valid values are:   * `modified` * `name` (optional)
      - parameter searchText: (query) Use this parameter to search for specific text. (optional)
      - parameter startPosition: (query) The starting index position in the result set from which to start returning values. The default setting is `0`. (optional)
-     - returns: `EventLoopFuture` of `CloudStorageFolderGetCloudStorageFolder`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageFolderGetCloudStorageFolder(accountId: String, folderId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, cloudStorageFolderidPlain: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageFolderGetCloudStorageFolder> {
+    open class func cloudStorageFolderGetCloudStorageFolderRaw(accountId: String, folderId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, cloudStorageFolderidPlain: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}/folders/{folderId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -70,22 +64,46 @@ open class CloudStorageAPI {
             try request.query.encode(QueryParams(cloudStorageFolderPath: cloudStorageFolderPath, cloudStorageFolderidPlain: cloudStorageFolderidPlain, count: count, order: order, orderBy: orderBy, searchText: searchText, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageFolderGetCloudStorageFolder in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CloudStorageFolderGetCloudStorageFolderAll {
-        case http200(value: ExternalFolder?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ExternalFolder?, raw: ClientResponse)
+    public enum CloudStorageFolderGetCloudStorageFolder {
+        case http200(value: ExternalFolder, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ExternalFolder, raw: ClientResponse)
+    }
+
+    /**
+     Gets a list of items from a cloud storage provider.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}/folders/{folderId}
+
+     Retrieves a list of the user's items from the specified cloud storage provider.   To limit the scope of the items returned, provide a comma-separated list of folder ids in the request.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter folderId: (path) The id of the folder.
+     - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter cloudStorageFolderPath: (query) The file path to a cloud storage folder. (optional)
+     - parameter cloudStorageFolderidPlain: (query) A plain-text folder id that you can use as an alternative to the existing folder id. This property is mainly used for rooms. Enter multiple folder ids as a comma-separated list. (optional)
+     - parameter count: (query) An optional value that sets how many items are included in the response.   The default setting for this is 25.  (optional)
+     - parameter order: (query) (Optional) The order in which to sort the results.  Valid values are:    * `asc`: Ascending order. * `desc`: Descending order.  (optional)
+     - parameter orderBy: (query) (Optional) The file attribute to use to sort the results.  Valid values are:   * `modified` * `name` (optional)
+     - parameter searchText: (query) Use this parameter to search for specific text. (optional)
+     - parameter startPosition: (query) The starting index position in the result set from which to start returning values. The default setting is `0`. (optional)
+     - returns: `EventLoopFuture` of `CloudStorageFolderGetCloudStorageFolder`
+     */
+    open class func cloudStorageFolderGetCloudStorageFolder(accountId: String, folderId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, cloudStorageFolderidPlain: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageFolderGetCloudStorageFolder> {
+        return cloudStorageFolderGetCloudStorageFolderRaw(accountId: accountId, folderId: folderId, serviceId: serviceId, userId: userId, cloudStorageFolderPath: cloudStorageFolderPath, cloudStorageFolderidPlain: cloudStorageFolderidPlain, count: count, order: order, orderBy: orderBy, searchText: searchText, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageFolderGetCloudStorageFolder in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -104,9 +122,9 @@ open class CloudStorageAPI {
      - parameter orderBy: (query) (Optional) The file attribute to use to sort the results.  Valid values are:   * `modified` * `name` (optional)
      - parameter searchText: (query) Use this parameter to search for specific text. (optional)
      - parameter startPosition: (query) Indicates the starting point of the first item included in the response set. It uses a 0-based index. The default setting for this is 0.   (optional)
-     - returns: `EventLoopFuture` of `CloudStorageFolderGetCloudStorageFolderAll`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageFolderGetCloudStorageFolderAll(accountId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageFolderGetCloudStorageFolderAll> {
+    open class func cloudStorageFolderGetCloudStorageFolderAllRaw(accountId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}/folders"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -137,14 +155,42 @@ open class CloudStorageAPI {
             try request.query.encode(QueryParams(cloudStorageFolderPath: cloudStorageFolderPath, count: count, order: order, orderBy: orderBy, searchText: searchText, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageFolderGetCloudStorageFolderAll in
+        }
+    }
+
+    public enum CloudStorageFolderGetCloudStorageFolderAll {
+        case http200(value: ExternalFolder, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ExternalFolder, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves a list of all the items in a specified folder from the specified cloud storage provider.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}/folders
+
+     Retrieves a list of all the items in a specified folder from the specified cloud storage provider.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter cloudStorageFolderPath: (query) A comma separated list of folder IDs included in the request.  (optional)
+     - parameter count: (query) An optional value that sets how many items are included in the response.   The default setting for this is 25.  (optional)
+     - parameter order: (query) (Optional) The order in which to sort the results.  Valid values are:    * `asc`: Ascending order. * `desc`: Descending order.  (optional)
+     - parameter orderBy: (query) (Optional) The file attribute to use to sort the results.  Valid values are:   * `modified` * `name` (optional)
+     - parameter searchText: (query) Use this parameter to search for specific text. (optional)
+     - parameter startPosition: (query) Indicates the starting point of the first item included in the response set. It uses a 0-based index. The default setting for this is 0.   (optional)
+     - returns: `EventLoopFuture` of `CloudStorageFolderGetCloudStorageFolderAll`
+     */
+    open class func cloudStorageFolderGetCloudStorageFolderAll(accountId: String, serviceId: String, userId: String, cloudStorageFolderPath: String? = nil, count: String? = nil, order: String? = nil, orderBy: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageFolderGetCloudStorageFolderAll> {
+        return cloudStorageFolderGetCloudStorageFolderAllRaw(accountId: accountId, serviceId: serviceId, userId: userId, cloudStorageFolderPath: cloudStorageFolderPath, count: count, order: order, orderBy: orderBy, searchText: searchText, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageFolderGetCloudStorageFolderAll in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ExternalFolder.self, using: Configuration.contentConfiguration.requireDecoder(for: ExternalFolder.defaultContentType)), raw: response)
             }
         }
     }

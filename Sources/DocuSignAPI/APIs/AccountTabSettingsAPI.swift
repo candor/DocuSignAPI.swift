@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class AccountTabSettingsAPI {
-    public enum TabSettingsGetTabSettings {
-        case http200(value: TabAccountSettings?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabAccountSettings?, raw: ClientResponse)
-    }
-
     /**
      Returns tab settings list for specified account
 
@@ -23,9 +17,9 @@ open class AccountTabSettingsAPI {
      This method returns information about the tab types and tab functionality that is currently enabled for an account.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `TabSettingsGetTabSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabSettingsGetTabSettings(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabSettingsGetTabSettings> {
+    open class func tabSettingsGetTabSettingsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,22 +34,36 @@ open class AccountTabSettingsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabSettingsGetTabSettings in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabSettingsPutSettings {
-        case http200(value: TabAccountSettings?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabAccountSettings?, raw: ClientResponse)
+    public enum TabSettingsGetTabSettings {
+        case http200(value: TabAccountSettings, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabAccountSettings, raw: ClientResponse)
+    }
+
+    /**
+     Returns tab settings list for specified account
+
+     GET /v2.1/accounts/{accountId}/settings/tabs
+
+     This method returns information about the tab types and tab functionality that is currently enabled for an account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `TabSettingsGetTabSettings`
+     */
+    open class func tabSettingsGetTabSettings(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabSettingsGetTabSettings> {
+        return tabSettingsGetTabSettingsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabSettingsGetTabSettings in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -67,9 +75,9 @@ open class AccountTabSettingsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter tabAccountSettings: (body) Account-wide tab settings. (optional)
-     - returns: `EventLoopFuture` of `TabSettingsPutSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabSettingsPutSettings(accountId: String, tabAccountSettings: TabAccountSettings? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabSettingsPutSettings> {
+    open class func tabSettingsPutSettingsRaw(accountId: String, tabAccountSettings: TabAccountSettings? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -88,14 +96,35 @@ open class AccountTabSettingsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabSettingsPutSettings in
+        }
+    }
+
+    public enum TabSettingsPutSettings {
+        case http200(value: TabAccountSettings, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabAccountSettings, raw: ClientResponse)
+    }
+
+    /**
+     Modifies tab settings for specified account
+
+     PUT /v2.1/accounts/{accountId}/settings/tabs
+
+     This method modifies the tab types and tab functionality that is enabled for an account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter tabAccountSettings: (body) Account-wide tab settings. (optional)
+     - returns: `EventLoopFuture` of `TabSettingsPutSettings`
+     */
+    open class func tabSettingsPutSettings(accountId: String, tabAccountSettings: TabAccountSettings? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabSettingsPutSettings> {
+        return tabSettingsPutSettingsRaw(accountId: accountId, tabAccountSettings: tabAccountSettings, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabSettingsPutSettings in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(TabAccountSettings.self, using: Configuration.contentConfiguration.requireDecoder(for: TabAccountSettings.defaultContentType)), raw: response)
             }
         }
     }

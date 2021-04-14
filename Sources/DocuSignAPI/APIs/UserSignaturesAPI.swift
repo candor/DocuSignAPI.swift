@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class UserSignaturesAPI {
-    public enum UserSignaturesDeleteUserSignature {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Removes removes signature information for the specified user.
 
@@ -25,9 +19,9 @@ open class UserSignaturesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter signatureId: (path) The ID of the signature being accessed.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
-     - returns: `EventLoopFuture` of `UserSignaturesDeleteUserSignature`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesDeleteUserSignature(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesDeleteUserSignature> {
+    open class func userSignaturesDeleteUserSignatureRaw(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -48,22 +42,38 @@ open class UserSignaturesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesDeleteUserSignature in
+        }
+    }
+
+    public enum UserSignaturesDeleteUserSignature {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Removes removes signature information for the specified user.
+
+     DELETE /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}
+
+     Removes the signature information for the user.  The userId parameter specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.   For example encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - returns: `EventLoopFuture` of `UserSignaturesDeleteUserSignature`
+     */
+    open class func userSignaturesDeleteUserSignature(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesDeleteUserSignature> {
+        return userSignaturesDeleteUserSignatureRaw(accountId: accountId, signatureId: signatureId, userId: userId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesDeleteUserSignature in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum UserSignaturesDeleteUserSignatureImage {
-        case http200(value: UserSignature?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignature?, raw: ClientResponse)
     }
 
     /**
@@ -77,9 +87,9 @@ open class UserSignaturesAPI {
      - parameter imageType: (path) Specificies the type of image. Valid values are:  - `signature_image` - `initials_image`
      - parameter signatureId: (path) The ID of the signature being accessed.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
-     - returns: `EventLoopFuture` of `UserSignaturesDeleteUserSignatureImage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesDeleteUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesDeleteUserSignatureImage> {
+    open class func userSignaturesDeleteUserSignatureImageRaw(accountId: String, imageType: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -103,22 +113,39 @@ open class UserSignaturesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesDeleteUserSignatureImage in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesGetUserSignature {
-        case http200(value: UserSignature?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignature?, raw: ClientResponse)
+    public enum UserSignaturesDeleteUserSignatureImage {
+        case http200(value: UserSignature, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignature, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the user initials image or the  user signature image for the specified user.
+
+     DELETE /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}
+
+     Deletes the specified initials image or signature image for the specified user.  The function deletes one or the other of the image types, to delete both the initials image and signature image you must call the endpoint twice.  The userId parameter specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.   For example encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter imageType: (path) Specificies the type of image. Valid values are:  - `signature_image` - `initials_image`
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - returns: `EventLoopFuture` of `UserSignaturesDeleteUserSignatureImage`
+     */
+    open class func userSignaturesDeleteUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesDeleteUserSignatureImage> {
+        return userSignaturesDeleteUserSignatureImageRaw(accountId: accountId, imageType: imageType, signatureId: signatureId, userId: userId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesDeleteUserSignatureImage in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -131,9 +158,9 @@ open class UserSignaturesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter signatureId: (path) The ID of the signature being accessed.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
-     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignature`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesGetUserSignature(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignature> {
+    open class func userSignaturesGetUserSignatureRaw(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -154,22 +181,38 @@ open class UserSignaturesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesGetUserSignature in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesGetUserSignatureImage {
-        case http200(value: Data?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Data?, raw: ClientResponse)
+    public enum UserSignaturesGetUserSignature {
+        case http200(value: UserSignature, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignature, raw: ClientResponse)
+    }
+
+    /**
+     Gets the user signature information for the specified user.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}
+
+     Retrieves the structure of a single signature with a known signature name.  The userId specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.   For example encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignature`
+     */
+    open class func userSignaturesGetUserSignature(accountId: String, signatureId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignature> {
+        return userSignaturesGetUserSignatureRaw(accountId: accountId, signatureId: signatureId, userId: userId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesGetUserSignature in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -184,9 +227,9 @@ open class UserSignaturesAPI {
      - parameter signatureId: (path) The ID of the signature being accessed.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter includeChrome: (query) When **true**, the chrome (or frame containing the added line and identifier) is included with the signature image. (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignatureImage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesGetUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, includeChrome: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignatureImage> {
+    open class func userSignaturesGetUserSignatureImageRaw(accountId: String, imageType: String, signatureId: String, userId: String, includeChrome: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -215,22 +258,40 @@ open class UserSignaturesAPI {
             try request.query.encode(QueryParams(includeChrome: includeChrome))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesGetUserSignatureImage in
+        }
+    }
+
+    public enum UserSignaturesGetUserSignatureImage {
+        case http200(value: Data, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Data, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves the user initials image or the  user signature image for the specified user.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}
+
+     Retrieves the specified initials image or signature image for the specified user. The image is returned in the same format in which it was uploaded. In the request you can specify if the chrome (the added line and identifier around the initial image) is returned with the image.  The userId property specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.  For example encode \"Bob Smith\" as \"Bob%20Smith\".  **Note**: Older envelopes might only have chromed images. If getting the non-chromed image fails, try getting the chromed image.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter imageType: (path) Specificies the type of image. Valid values are:  - `signature_image` - `initials_image`
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter includeChrome: (query) When **true**, the chrome (or frame containing the added line and identifier) is included with the signature image. (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignatureImage`
+     */
+    open class func userSignaturesGetUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, includeChrome: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignatureImage> {
+        return userSignaturesGetUserSignatureImageRaw(accountId: accountId, imageType: imageType, signatureId: signatureId, userId: userId, includeChrome: includeChrome, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesGetUserSignatureImage in
             switch response.status.code {
             case 200:
                 return .http200(value: Data(buffer: response.body ?? ByteBuffer()), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: Data(buffer: response.body ?? ByteBuffer()), raw: response)
             }
         }
-    }
-
-    public enum UserSignaturesGetUserSignatures {
-        case http200(value: UserSignaturesInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignaturesInformation?, raw: ClientResponse)
     }
 
     /**
@@ -243,9 +304,9 @@ open class UserSignaturesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter stampType: (query) The type of stamps to return. Valid values are:  - `signature`: Returns information about signature images only. This is the default value. - `stamp`: Returns information about eHanko and custom stamps only. - null (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignatures`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesGetUserSignatures(accountId: String, userId: String, stampType: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignatures> {
+    open class func userSignaturesGetUserSignaturesRaw(accountId: String, userId: String, stampType: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -268,22 +329,38 @@ open class UserSignaturesAPI {
             try request.query.encode(QueryParams(stampType: stampType))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesGetUserSignatures in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesPostUserSignatures {
-        case http201(value: UserSignaturesInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignaturesInformation?, raw: ClientResponse)
+    public enum UserSignaturesGetUserSignatures {
+        case http200(value: UserSignaturesInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignaturesInformation, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves a list of signature definitions for a user.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/signatures
+
+     This method retrieves the signature definitions for the user that you specify.  The `userId` parameter specified in the endpoint must match the authenticated user's user ID, and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.   For example, encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter stampType: (query) The type of stamps to return. Valid values are:  - `signature`: Returns information about signature images only. This is the default value. - `stamp`: Returns information about eHanko and custom stamps only. - null (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesGetUserSignatures`
+     */
+    open class func userSignaturesGetUserSignatures(accountId: String, userId: String, stampType: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesGetUserSignatures> {
+        return userSignaturesGetUserSignaturesRaw(accountId: accountId, userId: userId, stampType: stampType, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesGetUserSignatures in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -296,9 +373,9 @@ open class UserSignaturesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter userSignaturesInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesPostUserSignatures`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesPostUserSignatures(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPostUserSignatures> {
+    open class func userSignaturesPostUserSignaturesRaw(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -320,22 +397,38 @@ open class UserSignaturesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesPostUserSignatures in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesPutUserSignature {
-        case http200(value: UserSignaturesInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignaturesInformation?, raw: ClientResponse)
+    public enum UserSignaturesPostUserSignatures {
+        case http201(value: UserSignaturesInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignaturesInformation, raw: ClientResponse)
+    }
+
+    /**
+     Adds user Signature and initials images to a Signature.
+
+     POST /v2.1/accounts/{accountId}/users/{userId}/signatures
+
+     Adds a user signature image and/or user initials image to the specified user.   The userId property specified in the endpoint must match the authenticated user's `userId` and the user must be a member of the account.  The rules and processes associated with this are:  * If `Content-Type` is set to `application/json`, then the default behavior for creating a default signature image, based on the name and a DocuSign font, is used. * If `Content-Type` is set to `multipart/form-data`, then the request must contain a first part with the user signature information, followed by parts that contain the images.  For each Image part, the Content-Disposition header has a \"filename\" value that is used to map to the `signatureName` and/or `signatureInitials` properties in the JSON to the image.   For example:  `Content-Disposition: file; filename=\"Ron Test20121127083900\"`  If no matching image (by filename value) is found, then the image is not set. One, both, or neither of the signature and initials images can be set with this call.  The Content-Transfer-Encoding: base64 header, set in the header for the part containing the image, can be set to indicate that the images are formatted as base64 instead of as binary.  If successful, 200-OK is returned, and a JSON structure containing the signature information is provided, note that the signatureId can change with each API POST, PUT, or DELETE since the changes to the signature structure cause the current signature to be closed, and a new signature record to be created.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter userSignaturesInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesPostUserSignatures`
+     */
+    open class func userSignaturesPostUserSignatures(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPostUserSignatures> {
+        return userSignaturesPostUserSignaturesRaw(accountId: accountId, userId: userId, userSignaturesInformation: userSignaturesInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesPostUserSignatures in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -346,9 +439,9 @@ open class UserSignaturesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter userSignaturesInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignature`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesPutUserSignature(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignature> {
+    open class func userSignaturesPutUserSignatureRaw(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -370,22 +463,36 @@ open class UserSignaturesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesPutUserSignature in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesPutUserSignatureById {
-        case http200(value: UserSignature?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignature?, raw: ClientResponse)
+    public enum UserSignaturesPutUserSignature {
+        case http200(value: UserSignaturesInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignaturesInformation, raw: ClientResponse)
+    }
+
+    /**
+     Adds/updates a user signature.
+
+     PUT /v2.1/accounts/{accountId}/users/{userId}/signatures
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter userSignaturesInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignature`
+     */
+    open class func userSignaturesPutUserSignature(accountId: String, userId: String, userSignaturesInformation: UserSignaturesInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignature> {
+        return userSignaturesPutUserSignatureRaw(accountId: accountId, userId: userId, userSignaturesInformation: userSignaturesInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesPutUserSignature in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignaturesInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignaturesInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -400,9 +507,9 @@ open class UserSignaturesAPI {
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter closeExistingSignature: (query) When set to **true**, closes the current signature. (optional)
      - parameter userSignatureDefinition: (body)  (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignatureById`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesPutUserSignatureById(accountId: String, signatureId: String, userId: String, closeExistingSignature: String? = nil, userSignatureDefinition: UserSignatureDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignatureById> {
+    open class func userSignaturesPutUserSignatureByIdRaw(accountId: String, signatureId: String, userId: String, closeExistingSignature: String? = nil, userSignatureDefinition: UserSignatureDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -431,22 +538,40 @@ open class UserSignaturesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesPutUserSignatureById in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserSignaturesPutUserSignatureImage {
-        case http200(value: UserSignature?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserSignature?, raw: ClientResponse)
+    public enum UserSignaturesPutUserSignatureById {
+        case http200(value: UserSignature, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignature, raw: ClientResponse)
+    }
+
+    /**
+     Updates the user signature for a specified user.
+
+     PUT /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}
+
+     Creates, or updates, the signature font and initials for the specified user. When creating a signature, you use this resource to create the signature name and then add the signature and initials images into the signature.  **Note**: This will also create a default signature for the user when one does not exist.  The userId property specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.  For example encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter closeExistingSignature: (query) When set to **true**, closes the current signature. (optional)
+     - parameter userSignatureDefinition: (body)  (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignatureById`
+     */
+    open class func userSignaturesPutUserSignatureById(accountId: String, signatureId: String, userId: String, closeExistingSignature: String? = nil, userSignatureDefinition: UserSignatureDefinition? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignatureById> {
+        return userSignaturesPutUserSignatureByIdRaw(accountId: accountId, signatureId: signatureId, userId: userId, closeExistingSignature: closeExistingSignature, userSignatureDefinition: userSignatureDefinition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesPutUserSignatureById in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -461,9 +586,9 @@ open class UserSignaturesAPI {
      - parameter signatureId: (path) The ID of the signature being accessed.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter transparentPng: (query)  (optional)
-     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignatureImage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userSignaturesPutUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, transparentPng: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignatureImage> {
+    open class func userSignaturesPutUserSignatureImageRaw(accountId: String, imageType: String, signatureId: String, userId: String, transparentPng: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -492,14 +617,38 @@ open class UserSignaturesAPI {
             try request.query.encode(QueryParams(transparentPng: transparentPng))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserSignaturesPutUserSignatureImage in
+        }
+    }
+
+    public enum UserSignaturesPutUserSignatureImage {
+        case http200(value: UserSignature, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserSignature, raw: ClientResponse)
+    }
+
+    /**
+     Updates the user signature image or user initials image for the specified user.
+
+     PUT /v2.1/accounts/{accountId}/users/{userId}/signatures/{signatureId}/{imageType}
+
+     Updates the user signature image or user initials image for the specified user. The supported image formats for this file are: gif, png, jpeg, and bmp. The file must be less than 200K.  The userId property specified in the endpoint must match the authenticated user's user ID and the user must be a member of the account.  The `signatureId` parameter accepts a signature ID or a signature name. DocuSign recommends you use signature ID (`signatureId`), since some names contain characters that do not properly encode into a URL. If you use the user name, it is likely that the name includes spaces. In that case, URL encode the name before using it in the endpoint.   For example encode \"Bob Smith\" as \"Bob%20Smith\".
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter imageType: (path) Specificies the type of image. Valid values are:  - `signature_image` - `initials_image`
+     - parameter signatureId: (path) The ID of the signature being accessed.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter transparentPng: (query)  (optional)
+     - returns: `EventLoopFuture` of `UserSignaturesPutUserSignatureImage`
+     */
+    open class func userSignaturesPutUserSignatureImage(accountId: String, imageType: String, signatureId: String, userId: String, transparentPng: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserSignaturesPutUserSignatureImage> {
+        return userSignaturesPutUserSignatureImageRaw(accountId: accountId, imageType: imageType, signatureId: signatureId, userId: userId, transparentPng: transparentPng, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserSignaturesPutUserSignatureImage in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(UserSignature.self, using: Configuration.contentConfiguration.requireDecoder(for: UserSignature.defaultContentType)), raw: response)
             }
         }
     }

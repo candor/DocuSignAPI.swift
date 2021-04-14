@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeConsumerDisclosuresAPI {
-    public enum ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId {
-        case http200(value: ConsumerDisclosure?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConsumerDisclosure?, raw: ClientResponse)
-    }
-
     /**
      Gets the default Electronic Record and Signature Disclosure for an envelope.
 
@@ -26,9 +20,9 @@ open class EnvelopeConsumerDisclosuresAPI {
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter langCode: (query) (Optional) The code for the signer language version of the disclosure that you want to retrieve. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`. (optional)
-     - returns: `EventLoopFuture` of `ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId(accountId: String, envelopeId: String, recipientId: String, langCode: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId> {
+    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdRaw(accountId: String, envelopeId: String, recipientId: String, langCode: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/consumer_disclosure"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -54,22 +48,39 @@ open class EnvelopeConsumerDisclosuresAPI {
             try request.query.encode(QueryParams(langCode: langCode))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode {
-        case http200(value: ConsumerDisclosure?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConsumerDisclosure?, raw: ClientResponse)
+    public enum ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId {
+        case http200(value: ConsumerDisclosure, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConsumerDisclosure, raw: ClientResponse)
+    }
+
+    /**
+     Gets the default Electronic Record and Signature Disclosure for an envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/consumer_disclosure
+
+     Retrieves the default, HTML-formatted Electronic Record and Signature Disclosure (ERSD) for the envelope that you specify.   This is the default ERSD disclosure that DocuSign provides for the convenience of U.S.-based customers only. This default disclosure is only valid for transactions between U.S.-based parties.  To set the language of the disclosure that you want to retrieve, use the optional `langCode` query parameter.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter langCode: (query) (Optional) The code for the signer language version of the disclosure that you want to retrieve. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`. (optional)
+     - returns: `EventLoopFuture` of `ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId`
+     */
+    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId(accountId: String, envelopeId: String, recipientId: String, langCode: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId> {
+        return consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdRaw(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, langCode: langCode, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientId in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -84,9 +95,9 @@ open class EnvelopeConsumerDisclosuresAPI {
      - parameter langCode: (path) (Optional) The code for the signer language version of the disclosure that you want to retrieve, as a path parameter. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`.
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter langCode2: (query) (Optional) The code for the signer language version of the disclosure that you want to retrieve, as a query parameter. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`. (optional)
-     - returns: `EventLoopFuture` of `ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode(accountId: String, envelopeId: String, langCode: String, recipientId: String, langCode2: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode> {
+    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCodeRaw(accountId: String, envelopeId: String, langCode: String, recipientId: String, langCode2: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/consumer_disclosure/{langCode}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -115,14 +126,38 @@ open class EnvelopeConsumerDisclosuresAPI {
             try request.query.encode(QueryParams(langCode2: langCode2))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode in
+        }
+    }
+
+    public enum ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode {
+        case http200(value: ConsumerDisclosure, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConsumerDisclosure, raw: ClientResponse)
+    }
+
+    /**
+     Gets the Electronic Record and Signature Disclosure for a specific envelope recipient.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/consumer_disclosure/{langCode}
+
+     Retrieves the HTML-formatted Electronic Record and Signature Disclosure (ERSD) for the envelope recipient that you specify. This disclosure might differ from the account-level disclosure, based on the signing brand applied to the envelope and the recipient's language settings.  To set the language of the disclosure that you want to retrieve, specify the `langCode` as either a path or query parameter.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter langCode: (path) (Optional) The code for the signer language version of the disclosure that you want to retrieve, as a path parameter. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter langCode2: (query) (Optional) The code for the signer language version of the disclosure that you want to retrieve, as a query parameter. The following languages are supported:  - Arabic (`ar`) - Bulgarian (`bg`) - Czech (`cs`) - Chinese Simplified (`zh_CN`) - Chinese Traditional (`zh_TW`) - Croatian (`hr`) - Danish (`da`) - Dutch (`nl`) - English US (`en`) - English UK (`en_GB`) - Estonian (`et`) - Farsi (`fa`) - Finnish (`fi`) - French (`fr`) - French Canadian (`fr_CA`) - German (`de`) - Greek (`el`) - Hebrew (`he`) - Hindi (`hi`) - Hungarian (`hu`) - Bahasa Indonesian (`id`) - Italian (`it`) - Japanese (`ja`) - Korean (`ko`) - Latvian (`lv`) - Lithuanian (`lt`) - Bahasa Melayu (`ms`) - Norwegian (`no`) - Polish (`pl`) - Portuguese (`pt`) - Portuguese Brazil (`pt_BR`) - Romanian (`ro`) - Russian (`ru`) - Serbian (`sr`) - Slovak (`sk`) - Slovenian (`sl`) - Spanish (`es`) - Spanish Latin America (`es_MX`) - Swedish (`sv`) - Thai (`th`) - Turkish (`tr`) - Ukrainian (`uk`)  - Vietnamese (`vi`)  Additionally, you can automatically detect the browser language being used by the viewer and display the disclosure in that language by setting the value to `browser`. (optional)
+     - returns: `EventLoopFuture` of `ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode`
+     */
+    open class func consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode(accountId: String, envelopeId: String, langCode: String, recipientId: String, langCode2: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode> {
+        return consumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCodeRaw(accountId: accountId, envelopeId: envelopeId, langCode: langCode, recipientId: recipientId, langCode2: langCode2, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConsumerDisclosureGetConsumerDisclosureEnvelopeIdRecipientIdLangCode in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ConsumerDisclosure.self, using: Configuration.contentConfiguration.requireDecoder(for: ConsumerDisclosure.defaultContentType)), raw: response)
             }
         }
     }

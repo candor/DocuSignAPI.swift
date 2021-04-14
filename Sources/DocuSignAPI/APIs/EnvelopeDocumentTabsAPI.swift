@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeDocumentTabsAPI {
-    public enum TabsDeleteDocumentTabs {
-        case http200(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
-    }
-
     /**
 
      DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs
@@ -23,9 +17,9 @@ open class EnvelopeDocumentTabsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
-     - returns: `EventLoopFuture` of `TabsDeleteDocumentTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsDeleteDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsDeleteDocumentTabs> {
+    open class func tabsDeleteDocumentTabsRaw(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -50,22 +44,36 @@ open class EnvelopeDocumentTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsDeleteDocumentTabs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsGetDocumentTabs {
-        case http200(value: EnvelopeDocumentTabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentTabs?, raw: ClientResponse)
+    public enum TabsDeleteDocumentTabs {
+        case http200(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
+     - returns: `EventLoopFuture` of `TabsDeleteDocumentTabs`
+     */
+    open class func tabsDeleteDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsDeleteDocumentTabs> {
+        return tabsDeleteDocumentTabsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, tabs: tabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsDeleteDocumentTabs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -79,9 +87,9 @@ open class EnvelopeDocumentTabsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter pageNumbers: (query) Filters for tabs that occur on the pages that you specify. Enter as a comma-separated list of page GUIDs.  Example: `page_numbers=2,6`  Note: You can only enter individual page numbers, and not a page range. (optional)
-     - returns: `EventLoopFuture` of `TabsGetDocumentTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsGetDocumentTabs(accountId: String, documentId: String, envelopeId: String, pageNumbers: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetDocumentTabs> {
+    open class func tabsGetDocumentTabsRaw(accountId: String, documentId: String, envelopeId: String, pageNumbers: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -107,22 +115,39 @@ open class EnvelopeDocumentTabsAPI {
             try request.query.encode(QueryParams(pageNumbers: pageNumbers))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsGetDocumentTabs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsGetPageTabs {
-        case http200(value: EnvelopeDocumentTabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentTabs?, raw: ClientResponse)
+    public enum TabsGetDocumentTabs {
+        case http200(value: EnvelopeDocumentTabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentTabs, raw: ClientResponse)
+    }
+
+    /**
+     Returns the tabs on a document.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs
+
+     This method returns the tabs associated with a document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter pageNumbers: (query) Filters for tabs that occur on the pages that you specify. Enter as a comma-separated list of page GUIDs.  Example: `page_numbers=2,6`  Note: You can only enter individual page numbers, and not a page range. (optional)
+     - returns: `EventLoopFuture` of `TabsGetDocumentTabs`
+     */
+    open class func tabsGetDocumentTabs(accountId: String, documentId: String, envelopeId: String, pageNumbers: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetDocumentTabs> {
+        return tabsGetDocumentTabsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, pageNumbers: pageNumbers, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsGetDocumentTabs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -134,9 +159,9 @@ open class EnvelopeDocumentTabsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter pageNumber: (path) The page number being accessed.
-     - returns: `EventLoopFuture` of `TabsGetPageTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsGetPageTabs(accountId: String, documentId: String, envelopeId: String, pageNumber: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetPageTabs> {
+    open class func tabsGetPageTabsRaw(accountId: String, documentId: String, envelopeId: String, pageNumber: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/pages/{pageNumber}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -160,22 +185,37 @@ open class EnvelopeDocumentTabsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsGetPageTabs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsPostDocumentTabs {
-        case http201(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
+    public enum TabsGetPageTabs {
+        case http200(value: EnvelopeDocumentTabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentTabs, raw: ClientResponse)
+    }
+
+    /**
+     Returns tabs on the specified page.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/pages/{pageNumber}/tabs
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter pageNumber: (path) The page number being accessed.
+     - returns: `EventLoopFuture` of `TabsGetPageTabs`
+     */
+    open class func tabsGetPageTabs(accountId: String, documentId: String, envelopeId: String, pageNumber: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetPageTabs> {
+        return tabsGetPageTabsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, pageNumber: pageNumber, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsGetPageTabs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentTabs.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentTabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -186,9 +226,9 @@ open class EnvelopeDocumentTabsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
-     - returns: `EventLoopFuture` of `TabsPostDocumentTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsPostDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPostDocumentTabs> {
+    open class func tabsPostDocumentTabsRaw(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -213,22 +253,36 @@ open class EnvelopeDocumentTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsPostDocumentTabs in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsPutDocumentTabs {
-        case http200(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
+    public enum TabsPostDocumentTabs {
+        case http201(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
+     - returns: `EventLoopFuture` of `TabsPostDocumentTabs`
+     */
+    open class func tabsPostDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPostDocumentTabs> {
+        return tabsPostDocumentTabsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, tabs: tabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsPostDocumentTabs in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -239,9 +293,9 @@ open class EnvelopeDocumentTabsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
-     - returns: `EventLoopFuture` of `TabsPutDocumentTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsPutDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPutDocumentTabs> {
+    open class func tabsPutDocumentTabsRaw(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -266,14 +320,34 @@ open class EnvelopeDocumentTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsPutDocumentTabs in
+        }
+    }
+
+    public enum TabsPutDocumentTabs {
+        case http200(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/tabs
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter tabs: (body) A list of tabs, which are represented graphically as symbols on documents at the time of signing. Tabs show recipients where to sign, initial, or enter data. They may also display data to the recipients. (optional)
+     - returns: `EventLoopFuture` of `TabsPutDocumentTabs`
+     */
+    open class func tabsPutDocumentTabs(accountId: String, documentId: String, envelopeId: String, tabs: Tabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPutDocumentTabs> {
+        return tabsPutDocumentTabsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, tabs: tabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsPutDocumentTabs in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
             }
         }
     }

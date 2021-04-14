@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class WorkspaceItemsAPI {
-    public enum WorkspaceFileGetWorkspaceFile {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Gets a workspace file
 
@@ -28,9 +22,9 @@ open class WorkspaceItemsAPI {
      - parameter workspaceId: (path) The id of the workspace.
      - parameter isDownload: (query) When set to **true**, the `Content-Disposition` header is set in the response. The value of the header provides the filename of the file. The default is **false**. (optional)
      - parameter pdfVersion: (query) When set to **true** the file is returned in PDF format. (optional)
-     - returns: `EventLoopFuture` of `WorkspaceFileGetWorkspaceFile`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFileGetWorkspaceFile(accountId: String, fileId: String, folderId: String, workspaceId: String, isDownload: String? = nil, pdfVersion: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFileGetWorkspaceFile> {
+    open class func workspaceFileGetWorkspaceFileRaw(accountId: String, fileId: String, folderId: String, workspaceId: String, isDownload: String? = nil, pdfVersion: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -60,22 +54,41 @@ open class WorkspaceItemsAPI {
             try request.query.encode(QueryParams(isDownload: isDownload, pdfVersion: pdfVersion))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFileGetWorkspaceFile in
+        }
+    }
+
+    public enum WorkspaceFileGetWorkspaceFile {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Gets a workspace file
+
+     GET /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}
+
+     This method returns a binary version of a file in a workspace.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fileId: (path) The id of the file.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - parameter isDownload: (query) When set to **true**, the `Content-Disposition` header is set in the response. The value of the header provides the filename of the file. The default is **false**. (optional)
+     - parameter pdfVersion: (query) When set to **true** the file is returned in PDF format. (optional)
+     - returns: `EventLoopFuture` of `WorkspaceFileGetWorkspaceFile`
+     */
+    open class func workspaceFileGetWorkspaceFile(accountId: String, fileId: String, folderId: String, workspaceId: String, isDownload: String? = nil, pdfVersion: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFileGetWorkspaceFile> {
+        return workspaceFileGetWorkspaceFileRaw(accountId: accountId, fileId: fileId, folderId: folderId, workspaceId: workspaceId, isDownload: isDownload, pdfVersion: pdfVersion, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFileGetWorkspaceFile in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum WorkspaceFilePagesGetWorkspaceFilePages {
-        case http200(value: PageImages?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: PageImages?, raw: ClientResponse)
     }
 
     /**
@@ -94,9 +107,9 @@ open class WorkspaceItemsAPI {
      - parameter maxHeight: (query) Sets the maximum height of the returned images in pixels. (optional)
      - parameter maxWidth: (query) Sets the maximum width of the returned images in pixels. (optional)
      - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
-     - returns: `EventLoopFuture` of `WorkspaceFilePagesGetWorkspaceFilePages`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFilePagesGetWorkspaceFilePages(accountId: String, fileId: String, folderId: String, workspaceId: String, count: String? = nil, dpi: String? = nil, maxHeight: String? = nil, maxWidth: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePagesGetWorkspaceFilePages> {
+    open class func workspaceFilePagesGetWorkspaceFilePagesRaw(accountId: String, fileId: String, folderId: String, workspaceId: String, count: String? = nil, dpi: String? = nil, maxHeight: String? = nil, maxWidth: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}/pages"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -129,22 +142,44 @@ open class WorkspaceItemsAPI {
             try request.query.encode(QueryParams(count: count, dpi: dpi, maxHeight: maxHeight, maxWidth: maxWidth, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFilePagesGetWorkspaceFilePages in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(PageImages.self, using: Configuration.contentConfiguration.requireDecoder(for: PageImages.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(PageImages.self, using: Configuration.contentConfiguration.requireDecoder(for: PageImages.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspaceFilePostWorkspaceFiles {
-        case http201(value: WorkspaceItem?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: WorkspaceItem?, raw: ClientResponse)
+    public enum WorkspaceFilePagesGetWorkspaceFilePages {
+        case http200(value: PageImages, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: PageImages, raw: ClientResponse)
+    }
+
+    /**
+     List File Pages
+
+     GET /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}/pages
+
+     This method returns a workspace file as rasterized pages.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fileId: (path) The id of the file.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - parameter count: (query) The maximum number of results to return. (optional)
+     - parameter dpi: (query) The number of dots per inch (DPI) for the resulting images. Valid values are 1-310 DPI. The default value is 94. (optional)
+     - parameter maxHeight: (query) Sets the maximum height of the returned images in pixels. (optional)
+     - parameter maxWidth: (query) Sets the maximum width of the returned images in pixels. (optional)
+     - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
+     - returns: `EventLoopFuture` of `WorkspaceFilePagesGetWorkspaceFilePages`
+     */
+    open class func workspaceFilePagesGetWorkspaceFilePages(accountId: String, fileId: String, folderId: String, workspaceId: String, count: String? = nil, dpi: String? = nil, maxHeight: String? = nil, maxWidth: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePagesGetWorkspaceFilePages> {
+        return workspaceFilePagesGetWorkspaceFilePagesRaw(accountId: accountId, fileId: fileId, folderId: folderId, workspaceId: workspaceId, count: count, dpi: dpi, maxHeight: maxHeight, maxWidth: maxWidth, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFilePagesGetWorkspaceFilePages in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(PageImages.self, using: Configuration.contentConfiguration.requireDecoder(for: PageImages.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(PageImages.self, using: Configuration.contentConfiguration.requireDecoder(for: PageImages.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -157,9 +192,9 @@ open class WorkspaceItemsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter folderId: (path) The id of the folder.
      - parameter workspaceId: (path) The id of the workspace.
-     - returns: `EventLoopFuture` of `WorkspaceFilePostWorkspaceFiles`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFilePostWorkspaceFiles(accountId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePostWorkspaceFiles> {
+    open class func workspaceFilePostWorkspaceFilesRaw(accountId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -180,22 +215,38 @@ open class WorkspaceItemsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFilePostWorkspaceFiles in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspaceFilePutWorkspaceFile {
-        case http200(value: WorkspaceItem?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: WorkspaceItem?, raw: ClientResponse)
+    public enum WorkspaceFilePostWorkspaceFiles {
+        case http201(value: WorkspaceItem, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: WorkspaceItem, raw: ClientResponse)
+    }
+
+    /**
+     Creates a workspace file.
+
+     POST /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files
+
+     This method adds a file to a workspace.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - returns: `EventLoopFuture` of `WorkspaceFilePostWorkspaceFiles`
+     */
+    open class func workspaceFilePostWorkspaceFiles(accountId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePostWorkspaceFiles> {
+        return workspaceFilePostWorkspaceFilesRaw(accountId: accountId, folderId: folderId, workspaceId: workspaceId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFilePostWorkspaceFiles in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -209,9 +260,9 @@ open class WorkspaceItemsAPI {
      - parameter fileId: (path) The id of the file.
      - parameter folderId: (path) The id of the folder.
      - parameter workspaceId: (path) The id of the workspace.
-     - returns: `EventLoopFuture` of `WorkspaceFilePutWorkspaceFile`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFilePutWorkspaceFile(accountId: String, fileId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePutWorkspaceFile> {
+    open class func workspaceFilePutWorkspaceFileRaw(accountId: String, fileId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -235,22 +286,39 @@ open class WorkspaceItemsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFilePutWorkspaceFile in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WorkspaceFolderDeleteWorkspaceItems {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
+    public enum WorkspaceFilePutWorkspaceFile {
+        case http200(value: WorkspaceItem, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: WorkspaceItem, raw: ClientResponse)
+    }
+
+    /**
+     Update workspace file or folder metadata
+
+     PUT /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}/files/{fileId}
+
+     This method updates the metadata for one or more specific files or folders in a workspace.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fileId: (path) The id of the file.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - returns: `EventLoopFuture` of `WorkspaceFilePutWorkspaceFile`
+     */
+    open class func workspaceFilePutWorkspaceFile(accountId: String, fileId: String, folderId: String, workspaceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFilePutWorkspaceFile> {
+        return workspaceFilePutWorkspaceFileRaw(accountId: accountId, fileId: fileId, folderId: folderId, workspaceId: workspaceId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFilePutWorkspaceFile in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(WorkspaceItem.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceItem.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -264,9 +332,9 @@ open class WorkspaceItemsAPI {
      - parameter folderId: (path) The id of the folder.
      - parameter workspaceId: (path) The id of the workspace.
      - parameter workspaceItemList: (body)  (optional)
-     - returns: `EventLoopFuture` of `WorkspaceFolderDeleteWorkspaceItems`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFolderDeleteWorkspaceItems(accountId: String, folderId: String, workspaceId: String, workspaceItemList: WorkspaceItemList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFolderDeleteWorkspaceItems> {
+    open class func workspaceFolderDeleteWorkspaceItemsRaw(accountId: String, folderId: String, workspaceId: String, workspaceItemList: WorkspaceItemList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -291,22 +359,39 @@ open class WorkspaceItemsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFolderDeleteWorkspaceItems in
+        }
+    }
+
+    public enum WorkspaceFolderDeleteWorkspaceItems {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes files or sub-folders from a workspace.
+
+     DELETE /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}
+
+     This method deletes one or more files or sub-folders from a workspace folder or root.  Note: To delete items from a workspace, the `status` of the workspace must be `active`.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - parameter workspaceItemList: (body)  (optional)
+     - returns: `EventLoopFuture` of `WorkspaceFolderDeleteWorkspaceItems`
+     */
+    open class func workspaceFolderDeleteWorkspaceItems(accountId: String, folderId: String, workspaceId: String, workspaceItemList: WorkspaceItemList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFolderDeleteWorkspaceItems> {
+        return workspaceFolderDeleteWorkspaceItemsRaw(accountId: accountId, folderId: folderId, workspaceId: workspaceId, workspaceItemList: workspaceItemList, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFolderDeleteWorkspaceItems in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum WorkspaceFolderGetWorkspaceFolder {
-        case http200(value: WorkspaceFolderContents?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: WorkspaceFolderContents?, raw: ClientResponse)
     }
 
     /**
@@ -326,9 +411,9 @@ open class WorkspaceItemsAPI {
      - parameter includeUserDetail: (query) When set to **true**, the response includes extended details about the user. The default is **false**. (optional)
      - parameter startPosition: (query) The position within the total result set from which to start returning values. (optional)
      - parameter workspaceUserId: (query) If set, the response only includes results associated with the `userId` that you specify. (optional)
-     - returns: `EventLoopFuture` of `WorkspaceFolderGetWorkspaceFolder`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func workspaceFolderGetWorkspaceFolder(accountId: String, folderId: String, workspaceId: String, count: String? = nil, includeFiles: String? = nil, includeSubFolders: String? = nil, includeThumbnails: String? = nil, includeUserDetail: String? = nil, startPosition: String? = nil, workspaceUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFolderGetWorkspaceFolder> {
+    open class func workspaceFolderGetWorkspaceFolderRaw(accountId: String, folderId: String, workspaceId: String, count: String? = nil, includeFiles: String? = nil, includeSubFolders: String? = nil, includeThumbnails: String? = nil, includeUserDetail: String? = nil, startPosition: String? = nil, workspaceUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -360,14 +445,43 @@ open class WorkspaceItemsAPI {
             try request.query.encode(QueryParams(count: count, includeFiles: includeFiles, includeSubFolders: includeSubFolders, includeThumbnails: includeThumbnails, includeUserDetail: includeUserDetail, startPosition: startPosition, workspaceUserId: workspaceUserId))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WorkspaceFolderGetWorkspaceFolder in
+        }
+    }
+
+    public enum WorkspaceFolderGetWorkspaceFolder {
+        case http200(value: WorkspaceFolderContents, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: WorkspaceFolderContents, raw: ClientResponse)
+    }
+
+    /**
+     List workspace folder contents
+
+     GET /v2.1/accounts/{accountId}/workspaces/{workspaceId}/folders/{folderId}
+
+     This method returns the contents of a workspace folder, which can include sub-folders and files.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter folderId: (path) The id of the folder.
+     - parameter workspaceId: (path) The id of the workspace.
+     - parameter count: (query) The maximum number of results to return. (optional)
+     - parameter includeFiles: (query) When set to **true**, the response includes file information (in addition to folder information). The default is **false**. (optional)
+     - parameter includeSubFolders: (query) When set to **true**, the response includes information about the sub-folders of the current folder. The default is **false**. (optional)
+     - parameter includeThumbnails: (query) When set to **true**, the response returns thumbnails.  The default is **false**. (optional)
+     - parameter includeUserDetail: (query) When set to **true**, the response includes extended details about the user. The default is **false**. (optional)
+     - parameter startPosition: (query) The position within the total result set from which to start returning values. (optional)
+     - parameter workspaceUserId: (query) If set, the response only includes results associated with the `userId` that you specify. (optional)
+     - returns: `EventLoopFuture` of `WorkspaceFolderGetWorkspaceFolder`
+     */
+    open class func workspaceFolderGetWorkspaceFolder(accountId: String, folderId: String, workspaceId: String, count: String? = nil, includeFiles: String? = nil, includeSubFolders: String? = nil, includeThumbnails: String? = nil, includeUserDetail: String? = nil, startPosition: String? = nil, workspaceUserId: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WorkspaceFolderGetWorkspaceFolder> {
+        return workspaceFolderGetWorkspaceFolderRaw(accountId: accountId, folderId: folderId, workspaceId: workspaceId, count: count, includeFiles: includeFiles, includeSubFolders: includeSubFolders, includeThumbnails: includeThumbnails, includeUserDetail: includeUserDetail, startPosition: startPosition, workspaceUserId: workspaceUserId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WorkspaceFolderGetWorkspaceFolder in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(WorkspaceFolderContents.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceFolderContents.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(WorkspaceFolderContents.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceFolderContents.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(WorkspaceFolderContents.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceFolderContents.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(WorkspaceFolderContents.self, using: Configuration.contentConfiguration.requireDecoder(for: WorkspaceFolderContents.defaultContentType)), raw: response)
             }
         }
     }

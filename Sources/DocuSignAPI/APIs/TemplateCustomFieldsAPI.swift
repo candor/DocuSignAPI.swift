@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class TemplateCustomFieldsAPI {
-    public enum CustomFieldsDeleteTemplateCustomFields {
-        case http200(value: CustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomFields?, raw: ClientResponse)
-    }
-
     /**
      Deletes envelope custom fields in a template.
 
@@ -25,9 +19,9 @@ open class TemplateCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter templateCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsDeleteTemplateCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsDeleteTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsDeleteTemplateCustomFields> {
+    open class func customFieldsDeleteTemplateCustomFieldsRaw(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,22 +43,38 @@ open class TemplateCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsDeleteTemplateCustomFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsGetTemplateCustomFields {
-        case http200(value: CustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomFields?, raw: ClientResponse)
+    public enum CustomFieldsDeleteTemplateCustomFields {
+        case http200(value: CustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Deletes envelope custom fields in a template.
+
+     DELETE /v2.1/accounts/{accountId}/templates/{templateId}/custom_fields
+
+     Deletes envelope custom fields in a template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsDeleteTemplateCustomFields`
+     */
+    open class func customFieldsDeleteTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsDeleteTemplateCustomFields> {
+        return customFieldsDeleteTemplateCustomFieldsRaw(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsDeleteTemplateCustomFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class TemplateCustomFieldsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
-     - returns: `EventLoopFuture` of `CustomFieldsGetTemplateCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsGetTemplateCustomFields(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsGetTemplateCustomFields> {
+    open class func customFieldsGetTemplateCustomFieldsRaw(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -96,22 +106,37 @@ open class TemplateCustomFieldsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsGetTemplateCustomFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsPostTemplateCustomFields {
-        case http201(value: CustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomFields?, raw: ClientResponse)
+    public enum CustomFieldsGetTemplateCustomFields {
+        case http200(value: CustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Gets the custom document fields from a template.
+
+     GET /v2.1/accounts/{accountId}/templates/{templateId}/custom_fields
+
+     Retrieves the custom document field information from an existing template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - returns: `EventLoopFuture` of `CustomFieldsGetTemplateCustomFields`
+     */
+    open class func customFieldsGetTemplateCustomFields(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsGetTemplateCustomFields> {
+        return customFieldsGetTemplateCustomFieldsRaw(accountId: accountId, templateId: templateId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsGetTemplateCustomFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -124,9 +149,9 @@ open class TemplateCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter templateCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsPostTemplateCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsPostTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPostTemplateCustomFields> {
+    open class func customFieldsPostTemplateCustomFieldsRaw(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -148,22 +173,38 @@ open class TemplateCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsPostTemplateCustomFields in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsPutTemplateCustomFields {
-        case http200(value: CustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomFields?, raw: ClientResponse)
+    public enum CustomFieldsPostTemplateCustomFields {
+        case http201(value: CustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Creates custom document fields in an existing template document.
+
+     POST /v2.1/accounts/{accountId}/templates/{templateId}/custom_fields
+
+     Creates custom document fields in an existing template document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsPostTemplateCustomFields`
+     */
+    open class func customFieldsPostTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPostTemplateCustomFields> {
+        return customFieldsPostTemplateCustomFieldsRaw(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsPostTemplateCustomFields in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -176,9 +217,9 @@ open class TemplateCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter templateCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsPutTemplateCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsPutTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPutTemplateCustomFields> {
+    open class func customFieldsPutTemplateCustomFieldsRaw(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -200,14 +241,36 @@ open class TemplateCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsPutTemplateCustomFields in
+        }
+    }
+
+    public enum CustomFieldsPutTemplateCustomFields {
+        case http200(value: CustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Updates envelope custom fields in a template.
+
+     PUT /v2.1/accounts/{accountId}/templates/{templateId}/custom_fields
+
+     Updates the custom fields in a template.  Each custom field used in a template must have a unique name.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsPutTemplateCustomFields`
+     */
+    open class func customFieldsPutTemplateCustomFields(accountId: String, templateId: String, templateCustomFields: TemplateCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPutTemplateCustomFields> {
+        return customFieldsPutTemplateCustomFieldsRaw(accountId: accountId, templateId: templateId, templateCustomFields: templateCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsPutTemplateCustomFields in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(CustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFields.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class CustomTabsAPI {
-    public enum TabDeleteCustomTab {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes custom tab information.
 
@@ -24,9 +18,9 @@ open class CustomTabsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
-     - returns: `EventLoopFuture` of `TabDeleteCustomTab`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabDeleteCustomTab(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabDeleteCustomTab> {
+    open class func tabDeleteCustomTabRaw(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/tab_definitions/{customTabId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class CustomTabsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabDeleteCustomTab in
+        }
+    }
+
+    public enum TabDeleteCustomTab {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes custom tab information.
+
+     DELETE /v2.1/accounts/{accountId}/tab_definitions/{customTabId}
+
+     Deletes the custom from the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
+     - returns: `EventLoopFuture` of `TabDeleteCustomTab`
+     */
+    open class func tabDeleteCustomTab(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabDeleteCustomTab> {
+        return tabDeleteCustomTabRaw(accountId: accountId, customTabId: customTabId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabDeleteCustomTab in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum TabGetCustomTab {
-        case http200(value: TabMetadata?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabMetadata?, raw: ClientResponse)
     }
 
     /**
@@ -71,9 +80,9 @@ open class CustomTabsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
-     - returns: `EventLoopFuture` of `TabGetCustomTab`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabGetCustomTab(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabGetCustomTab> {
+    open class func tabGetCustomTabRaw(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/tab_definitions/{customTabId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -91,22 +100,37 @@ open class CustomTabsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabGetCustomTab in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabPutCustomTab {
-        case http200(value: TabMetadata?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabMetadata?, raw: ClientResponse)
+    public enum TabGetCustomTab {
+        case http200(value: TabMetadata, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabMetadata, raw: ClientResponse)
+    }
+
+    /**
+     Gets custom tab information.
+
+     GET /v2.1/accounts/{accountId}/tab_definitions/{customTabId}
+
+     Retrieves information about the requested custom tab on the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
+     - returns: `EventLoopFuture` of `TabGetCustomTab`
+     */
+    open class func tabGetCustomTab(accountId: String, customTabId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabGetCustomTab> {
+        return tabGetCustomTabRaw(accountId: accountId, customTabId: customTabId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabGetCustomTab in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -119,9 +143,9 @@ open class CustomTabsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
      - parameter tabMetadata: (body)  (optional)
-     - returns: `EventLoopFuture` of `TabPutCustomTab`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabPutCustomTab(accountId: String, customTabId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabPutCustomTab> {
+    open class func tabPutCustomTabRaw(accountId: String, customTabId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/tab_definitions/{customTabId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -143,22 +167,38 @@ open class CustomTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabPutCustomTab in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsGetTabDefinitions {
-        case http200(value: TabMetadataList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabMetadataList?, raw: ClientResponse)
+    public enum TabPutCustomTab {
+        case http200(value: TabMetadata, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabMetadata, raw: ClientResponse)
+    }
+
+    /**
+     Updates custom tab information.
+
+     PUT /v2.1/accounts/{accountId}/tab_definitions/{customTabId}
+
+     Updates the information in a custom tab for the specified account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter customTabId: (path) The DocuSign-generated custom tab id for the custom tab to be applied. This can only be used when adding new tabs for a recipient. When used, the new tab inherits all the custom tab properties.
+     - parameter tabMetadata: (body)  (optional)
+     - returns: `EventLoopFuture` of `TabPutCustomTab`
+     */
+    open class func tabPutCustomTab(accountId: String, customTabId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabPutCustomTab> {
+        return tabPutCustomTabRaw(accountId: accountId, customTabId: customTabId, tabMetadata: tabMetadata, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabPutCustomTab in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -170,9 +210,9 @@ open class CustomTabsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter customTabOnly: (query) When set to **true**, only custom tabs are returned in the response.  (optional)
-     - returns: `EventLoopFuture` of `TabsGetTabDefinitions`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsGetTabDefinitions(accountId: String, customTabOnly: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetTabDefinitions> {
+    open class func tabsGetTabDefinitionsRaw(accountId: String, customTabOnly: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/tab_definitions"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -192,22 +232,37 @@ open class CustomTabsAPI {
             try request.query.encode(QueryParams(customTabOnly: customTabOnly))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsGetTabDefinitions in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(TabMetadataList.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadataList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(TabMetadataList.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadataList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TabsPostTabDefinitions {
-        case http201(value: TabMetadata?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TabMetadata?, raw: ClientResponse)
+    public enum TabsGetTabDefinitions {
+        case http200(value: TabMetadataList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabMetadataList, raw: ClientResponse)
+    }
+
+    /**
+     Gets a list of all account tabs.
+
+     GET /v2.1/accounts/{accountId}/tab_definitions
+
+     Retrieves a list of all tabs associated with the account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter customTabOnly: (query) When set to **true**, only custom tabs are returned in the response.  (optional)
+     - returns: `EventLoopFuture` of `TabsGetTabDefinitions`
+     */
+    open class func tabsGetTabDefinitions(accountId: String, customTabOnly: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsGetTabDefinitions> {
+        return tabsGetTabDefinitionsRaw(accountId: accountId, customTabOnly: customTabOnly, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsGetTabDefinitions in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(TabMetadataList.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadataList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(TabMetadataList.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadataList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -219,9 +274,9 @@ open class CustomTabsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter tabMetadata: (body)  (optional)
-     - returns: `EventLoopFuture` of `TabsPostTabDefinitions`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func tabsPostTabDefinitions(accountId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPostTabDefinitions> {
+    open class func tabsPostTabDefinitionsRaw(accountId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/tab_definitions"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -240,14 +295,35 @@ open class CustomTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TabsPostTabDefinitions in
+        }
+    }
+
+    public enum TabsPostTabDefinitions {
+        case http201(value: TabMetadata, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TabMetadata, raw: ClientResponse)
+    }
+
+    /**
+     Creates a custom tab.
+
+     POST /v2.1/accounts/{accountId}/tab_definitions
+
+     Creates a tab with pre-defined properties, such as a text tab with a certain font type and validation pattern. Users can access the custom tabs when sending documents through the DocuSign web application.  Custom tabs can be created for approve, checkbox, company, date, date signed, decline, email, email address, envelope ID, first name, formula, full name, initial here, last name, list, note, number, radio, sign here, signer attachment, SSN, text, title, and zip tabs.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter tabMetadata: (body)  (optional)
+     - returns: `EventLoopFuture` of `TabsPostTabDefinitions`
+     */
+    open class func tabsPostTabDefinitions(accountId: String, tabMetadata: TabMetadata? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TabsPostTabDefinitions> {
+        return tabsPostTabDefinitionsRaw(accountId: accountId, tabMetadata: tabMetadata, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TabsPostTabDefinitions in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(TabMetadata.self, using: Configuration.contentConfiguration.requireDecoder(for: TabMetadata.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class TemplateBulkRecipientsAPI {
-    public enum RecipientsDeleteTemplateBulkRecipientsFile {
-        case http200(value: BulkRecipientsUpdateResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BulkRecipientsUpdateResponse?, raw: ClientResponse)
-    }
-
     /**
      Deletes the bulk recipient list on a template.
 
@@ -25,9 +19,9 @@ open class TemplateBulkRecipientsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter templateId: (path) The id of the template.
-     - returns: `EventLoopFuture` of `RecipientsDeleteTemplateBulkRecipientsFile`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsDeleteTemplateBulkRecipientsFile(accountId: String, recipientId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteTemplateBulkRecipientsFile> {
+    open class func recipientsDeleteTemplateBulkRecipientsFileRaw(accountId: String, recipientId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -48,22 +42,38 @@ open class TemplateBulkRecipientsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsDeleteTemplateBulkRecipientsFile in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BulkRecipientsUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsUpdateResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BulkRecipientsUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsUpdateResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsGetTemplateBulkRecipients {
-        case http200(value: BulkRecipientsResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BulkRecipientsResponse?, raw: ClientResponse)
+    public enum RecipientsDeleteTemplateBulkRecipientsFile {
+        case http200(value: BulkRecipientsUpdateResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BulkRecipientsUpdateResponse, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the bulk recipient list on a template.
+
+     DELETE /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients
+
+     Deletes the bulk recipient list on a template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - returns: `EventLoopFuture` of `RecipientsDeleteTemplateBulkRecipientsFile`
+     */
+    open class func recipientsDeleteTemplateBulkRecipientsFile(accountId: String, recipientId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteTemplateBulkRecipientsFile> {
+        return recipientsDeleteTemplateBulkRecipientsFileRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsDeleteTemplateBulkRecipientsFile in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BulkRecipientsUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsUpdateResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BulkRecipientsUpdateResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsUpdateResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -78,9 +88,9 @@ open class TemplateBulkRecipientsAPI {
      - parameter templateId: (path) The id of the template.
      - parameter includeTabs: (query) When set to **true**, the tab information associated with the recipient is included in the response. If you do not specify this parameter, the effect is the default behavior (**false**). (optional)
      - parameter startPosition: (query) The starting position of the results set. (optional)
-     - returns: `EventLoopFuture` of `RecipientsGetTemplateBulkRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsGetTemplateBulkRecipients(accountId: String, recipientId: String, templateId: String, includeTabs: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetTemplateBulkRecipients> {
+    open class func recipientsGetTemplateBulkRecipientsRaw(accountId: String, recipientId: String, templateId: String, includeTabs: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -107,22 +117,40 @@ open class TemplateBulkRecipientsAPI {
             try request.query.encode(QueryParams(includeTabs: includeTabs, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsGetTemplateBulkRecipients in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BulkRecipientsResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BulkRecipientsResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPutTemplateBulkRecipients {
-        case http200(value: BulkRecipientsSummaryResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BulkRecipientsSummaryResponse?, raw: ClientResponse)
+    public enum RecipientsGetTemplateBulkRecipients {
+        case http200(value: BulkRecipientsResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BulkRecipientsResponse, raw: ClientResponse)
+    }
+
+    /**
+     Gets the bulk recipient file from a template.
+
+     GET /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients
+
+     Retrieves the bulk recipient file information from a template that has a bulk recipient.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter includeTabs: (query) When set to **true**, the tab information associated with the recipient is included in the response. If you do not specify this parameter, the effect is the default behavior (**false**). (optional)
+     - parameter startPosition: (query) The starting position of the results set. (optional)
+     - returns: `EventLoopFuture` of `RecipientsGetTemplateBulkRecipients`
+     */
+    open class func recipientsGetTemplateBulkRecipients(accountId: String, recipientId: String, templateId: String, includeTabs: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetTemplateBulkRecipients> {
+        return recipientsGetTemplateBulkRecipientsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, includeTabs: includeTabs, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsGetTemplateBulkRecipients in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BulkRecipientsResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BulkRecipientsResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -136,9 +164,9 @@ open class TemplateBulkRecipientsAPI {
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter templateId: (path) The id of the template.
      - parameter bulkRecipientsRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPutTemplateBulkRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPutTemplateBulkRecipients(accountId: String, recipientId: String, templateId: String, bulkRecipientsRequest: BulkRecipientsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutTemplateBulkRecipients> {
+    open class func recipientsPutTemplateBulkRecipientsRaw(accountId: String, recipientId: String, templateId: String, bulkRecipientsRequest: BulkRecipientsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -163,14 +191,37 @@ open class TemplateBulkRecipientsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPutTemplateBulkRecipients in
+        }
+    }
+
+    public enum RecipientsPutTemplateBulkRecipients {
+        case http200(value: BulkRecipientsSummaryResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BulkRecipientsSummaryResponse, raw: ClientResponse)
+    }
+
+    /**
+     Adds or replaces the bulk recipients list in a template.
+
+     PUT /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/bulk_recipients
+
+     Updates the bulk recipients in a template using a file upload. The Content-Type supported for uploading a bulk recipient file is CSV (text/csv).  The REST API does not support modifying individual rows or values in the bulk recipients file. It only allows the entire file to be added or replaced with a new file.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter bulkRecipientsRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPutTemplateBulkRecipients`
+     */
+    open class func recipientsPutTemplateBulkRecipients(accountId: String, recipientId: String, templateId: String, bulkRecipientsRequest: BulkRecipientsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutTemplateBulkRecipients> {
+        return recipientsPutTemplateBulkRecipientsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, bulkRecipientsRequest: bulkRecipientsRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPutTemplateBulkRecipients in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(BulkRecipientsSummaryResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsSummaryResponse.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(BulkRecipientsSummaryResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsSummaryResponse.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(BulkRecipientsSummaryResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsSummaryResponse.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(BulkRecipientsSummaryResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BulkRecipientsSummaryResponse.defaultContentType)), raw: response)
             }
         }
     }

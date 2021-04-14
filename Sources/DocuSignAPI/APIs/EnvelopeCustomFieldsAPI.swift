@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeCustomFieldsAPI {
-    public enum CustomFieldsDeleteCustomFields {
-        case http200(value: EnvelopeCustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeCustomFields?, raw: ClientResponse)
-    }
-
     /**
      Deletes envelope custom fields for draft and in-process envelopes.
 
@@ -25,9 +19,9 @@ open class EnvelopeCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsDeleteCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsDeleteCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsDeleteCustomFields> {
+    open class func customFieldsDeleteCustomFieldsRaw(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,22 +43,38 @@ open class EnvelopeCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsDeleteCustomFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsGetCustomFields {
-        case http200(value: CustomFieldsEnvelope?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomFieldsEnvelope?, raw: ClientResponse)
+    public enum CustomFieldsDeleteCustomFields {
+        case http200(value: EnvelopeCustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeCustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Deletes envelope custom fields for draft and in-process envelopes.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
+
+     Deletes envelope custom fields for draft and in-process envelopes.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsDeleteCustomFields`
+     */
+    open class func customFieldsDeleteCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsDeleteCustomFields> {
+        return customFieldsDeleteCustomFieldsRaw(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsDeleteCustomFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class EnvelopeCustomFieldsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `CustomFieldsGetCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsGetCustomFields(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsGetCustomFields> {
+    open class func customFieldsGetCustomFieldsRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -96,22 +106,37 @@ open class EnvelopeCustomFieldsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsGetCustomFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CustomFieldsEnvelope.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFieldsEnvelope.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomFieldsEnvelope.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFieldsEnvelope.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsPostCustomFields {
-        case http201(value: EnvelopeCustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeCustomFields?, raw: ClientResponse)
+    public enum CustomFieldsGetCustomFields {
+        case http200(value: CustomFieldsEnvelope, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomFieldsEnvelope, raw: ClientResponse)
+    }
+
+    /**
+     Gets the custom field information for the specified envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
+
+     Retrieves the custom field information for the specified envelope. You can use these fields in the envelopes for your account to record information about the envelope, help search for envelopes, and track information. The envelope custom fields are shown in the Envelope Settings section when a user is creating an envelope in the DocuSign member console. The envelope custom fields are not seen by the envelope recipients.  There are two types of envelope custom fields, text, and list. A text custom field lets the sender enter the value for the field. With a list custom field, the sender selects the value of the field from a pre-made list.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `CustomFieldsGetCustomFields`
+     */
+    open class func customFieldsGetCustomFields(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsGetCustomFields> {
+        return customFieldsGetCustomFieldsRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsGetCustomFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CustomFieldsEnvelope.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFieldsEnvelope.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomFieldsEnvelope.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomFieldsEnvelope.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -124,9 +149,9 @@ open class EnvelopeCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsPostCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsPostCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPostCustomFields> {
+    open class func customFieldsPostCustomFieldsRaw(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -148,22 +173,38 @@ open class EnvelopeCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsPostCustomFields in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CustomFieldsPutCustomFields {
-        case http200(value: EnvelopeCustomFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeCustomFields?, raw: ClientResponse)
+    public enum CustomFieldsPostCustomFields {
+        case http201(value: EnvelopeCustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeCustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Creates envelope custom fields for an envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
+
+     Updates the envelope custom fields for draft and in-process envelopes.  You may assign up to three envelope custom fields to an envelope. This limit does not include account (document) custom fields. Each custom field used in an envelope must have a unique name.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsPostCustomFields`
+     */
+    open class func customFieldsPostCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPostCustomFields> {
+        return customFieldsPostCustomFieldsRaw(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsPostCustomFields in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -176,9 +217,9 @@ open class EnvelopeCustomFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeCustomFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `CustomFieldsPutCustomFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func customFieldsPutCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPutCustomFields> {
+    open class func customFieldsPutCustomFieldsRaw(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -200,14 +241,36 @@ open class EnvelopeCustomFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CustomFieldsPutCustomFields in
+        }
+    }
+
+    public enum CustomFieldsPutCustomFields {
+        case http200(value: EnvelopeCustomFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeCustomFields, raw: ClientResponse)
+    }
+
+    /**
+     Updates envelope custom fields in an envelope.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/custom_fields
+
+     Updates the envelope custom fields in draft and in-process envelopes.  Each custom field used in an envelope must have a unique name.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeCustomFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `CustomFieldsPutCustomFields`
+     */
+    open class func customFieldsPutCustomFields(accountId: String, envelopeId: String, envelopeCustomFields: EnvelopeCustomFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CustomFieldsPutCustomFields> {
+        return customFieldsPutCustomFieldsRaw(accountId: accountId, envelopeId: envelopeId, envelopeCustomFields: envelopeCustomFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CustomFieldsPutCustomFields in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeCustomFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeCustomFields.defaultContentType)), raw: response)
             }
         }
     }

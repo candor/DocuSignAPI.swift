@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeViewsAPI {
-    public enum ViewsDeleteEnvelopeCorrectView {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
 
      DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/correct
@@ -22,9 +16,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter correctViewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsDeleteEnvelopeCorrectView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsDeleteEnvelopeCorrectView(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsDeleteEnvelopeCorrectView> {
+    open class func viewsDeleteEnvelopeCorrectViewRaw(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/correct"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -46,22 +40,35 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsDeleteEnvelopeCorrectView in
+        }
+    }
+
+    public enum ViewsDeleteEnvelopeCorrectView {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/correct
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter correctViewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsDeleteEnvelopeCorrectView`
+     */
+    open class func viewsDeleteEnvelopeCorrectView(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsDeleteEnvelopeCorrectView> {
+        return viewsDeleteEnvelopeCorrectViewRaw(accountId: accountId, envelopeId: envelopeId, correctViewRequest: correctViewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsDeleteEnvelopeCorrectView in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ViewsPostAccountConsoleView {
-        case http201(value: EnvelopeViews?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeViews?, raw: ClientResponse)
     }
 
     /**
@@ -73,9 +80,9 @@ open class EnvelopeViewsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter consoleViewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostAccountConsoleView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostAccountConsoleView(accountId: String, consoleViewRequest: ConsoleViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostAccountConsoleView> {
+    open class func viewsPostAccountConsoleViewRaw(accountId: String, consoleViewRequest: ConsoleViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/views/console"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -94,22 +101,37 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostAccountConsoleView in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeCorrectView {
-        case http201(value: EnvelopeViews?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeViews?, raw: ClientResponse)
+    public enum ViewsPostAccountConsoleView {
+        case http201(value: EnvelopeViews, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeViews, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the authentication view UI.
+
+     POST /v2.1/accounts/{accountId}/views/console
+
+     Returns a URL that enables you to embed the authentication view of the DocuSign UI in your applications.  **Note**: You can revoke this URL by making the DELETE call to the same URL with no request body.   <blockquote> <p><b>Information Security notice</b>: This method provides full administrator access to the account.</p>
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter consoleViewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostAccountConsoleView`
+     */
+    open class func viewsPostAccountConsoleView(accountId: String, consoleViewRequest: ConsoleViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostAccountConsoleView> {
+        return viewsPostAccountConsoleViewRaw(accountId: accountId, consoleViewRequest: consoleViewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostAccountConsoleView in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -122,9 +144,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter correctViewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeCorrectView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeCorrectView(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeCorrectView> {
+    open class func viewsPostEnvelopeCorrectViewRaw(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/correct"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -146,22 +168,38 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeCorrectView in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeEditView {
-        case http201(value: EnvelopeViews?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeViews?, raw: ClientResponse)
+    public enum ViewsPostEnvelopeCorrectView {
+        case http201(value: EnvelopeViews, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeViews, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the envelope correction UI.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/correct
+
+     Returns a URL that allows you to embed the envelope correction view of the DocuSign UI in your applications.  **Important**: Due to screen space issues, iFrames should not be used for embedded operations on mobile devices. For iOS devices, DocuSign recommends using a WebView.   **Note**: You can revoke this URL by making the DELETE call to the same URL with no request body.   <blockquote> <p><b>Information Security notice</b>: This method provides full access to the sending account. When you use this view, the current user has full access to the account. If the account has administrative privileges, then this method also provides administrator access.</p>  <p>If your use case needs to enable a sender to update a draft envelope before it is sent or make other changes, take one of the following steps:</p>  <ul> <li>Configure each sender to have their own individual user account to use this API method.</li> <li>Enhance your API integration so that this method is not needed. Your integration can create the tabs, recipients, and other envelope settings as needed.</li> </ul> </blockquote>
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter correctViewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeCorrectView`
+     */
+    open class func viewsPostEnvelopeCorrectView(accountId: String, envelopeId: String, correctViewRequest: CorrectViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeCorrectView> {
+        return viewsPostEnvelopeCorrectViewRaw(accountId: accountId, envelopeId: envelopeId, correctViewRequest: correctViewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeCorrectView in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -174,9 +212,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter returnUrlRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeEditView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeEditView(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeEditView> {
+    open class func viewsPostEnvelopeEditViewRaw(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/edit"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -198,22 +236,38 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeEditView in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeRecipientSharedView {
-        case http201(value: ViewUrl?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ViewUrl?, raw: ClientResponse)
+    public enum ViewsPostEnvelopeEditView {
+        case http201(value: EnvelopeViews, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeViews, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the edit view UI.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/edit
+
+     Returns a URL that enables you to embed the edit view of the DocuSign UI in your applications. This is a one-time use login token that allows the user to be placed into the DocuSign editing view.   Upon sending completion, the user is returned to the return URL provided by the API application.  **Important**: Due to screen space issues, iFrames should not be used for embedded operations on mobile devices. For iOS devices, DocuSign recommends using a WebView.   **Note**: You can revoke this URL by making the DELETE call to the same URL with no request body.   <blockquote> <p><b>Information Security notice</b>: This method provides full access to the sending account. When you use this view, the current user has full access to the account. If the account has administrative privileges, then this method also provides administrator access.</p>  <p>If your use case needs to enable a sender to update a draft envelope before it is sent or make other changes, take one of the following steps:</p>  <ul> <li>Configure each sender to have their own individual user account to use this API method.</li> <li>Enhance your API integration so that this method is not needed. Your integration can create the tabs, recipients, and other envelope settings as needed.</li> </ul> </blockquote>
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter returnUrlRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeEditView`
+     */
+    open class func viewsPostEnvelopeEditView(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeEditView> {
+        return viewsPostEnvelopeEditViewRaw(accountId: accountId, envelopeId: envelopeId, returnUrlRequest: returnUrlRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeEditView in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -226,9 +280,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientViewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientSharedView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeRecipientSharedView(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientSharedView> {
+    open class func viewsPostEnvelopeRecipientSharedViewRaw(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/shared"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -250,22 +304,38 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeRecipientSharedView in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeRecipientView {
-        case http201(value: EnvelopeViews?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeViews?, raw: ClientResponse)
+    public enum ViewsPostEnvelopeRecipientSharedView {
+        case http201(value: ViewUrl, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ViewUrl, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the shared recipient view UI for an envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/shared
+
+     Returns a URL that enables you to embed the DocuSign UI recipient view of a [shared envelope](https://support.docusign.com/en/guides/ndse-admin-guide-share-envelopes) in your applications. This is the view that a user sees of an envelope that a recipient on the same account has shared with them.  **Important**: Due to screen space issues, iFrames should not be used for embedded operations on mobile devices. For iOS devices, DocuSign recommends using a WebView.  **Note**: You can revoke this URL by making the DELETE call to the same URL with no request body.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientViewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientSharedView`
+     */
+    open class func viewsPostEnvelopeRecipientSharedView(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientSharedView> {
+        return viewsPostEnvelopeRecipientSharedViewRaw(accountId: accountId, envelopeId: envelopeId, recipientViewRequest: recipientViewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeRecipientSharedView in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -278,9 +348,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientViewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeRecipientView(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientView> {
+    open class func viewsPostEnvelopeRecipientViewRaw(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/recipient"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -302,22 +372,38 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeRecipientView in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeSenderView {
-        case http201(value: EnvelopeViews?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeViews?, raw: ClientResponse)
+    public enum ViewsPostEnvelopeRecipientView {
+        case http201(value: EnvelopeViews, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeViews, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the recipient view UI.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/recipient
+
+     Returns a URL that enables you to embed the recipient view of the DocuSign UI in your applications. If the recipient is a signer, then the view will provide the signing ceremony.  **Note**: Please redirect the client to the URL. iFrames should not be used, especially if the recipient is using a mobile or tablet.   This method is only used with envelopes in the `sent` status.  Your application is responsible for authenticating the identity of the recipient or signer when you use this method. Use the parameters `assertionId`, `authenticationInstant`, `authenticationMethod`, `clientUserId`, and `securityDomain` to record information on how the recipient was authenticated. At a minimum, `authenticationMethod` and `clientUserId` are required. The information that you provide is included in the envelope's certificate of completion.  ## Redirects After the signer completes or ends the signing ceremony, DocuSign will redirect the user's browser back to your app via the `returnUrl` that you supply. (The user is redirected through a different subdomain, depending on the region of the account sending the envelope. Please [verify your domain whitelist](https://www.docusign.com/trust/security/whitelists).)   ### The event status parameter DocuSign appends an `event` query parameter to the URL with the outcome of the signing ceremony. Your app can use this event parameter to determine the next step for the envelope. Do not fetch the envelope status by using Envelopes::get or a similar method because doing so could break the DocuSign rule against polling.  **Note**: Because a user can cancel redirection, close their browser after signing, or spoof the landing URL. Hitting the `ReturnUrl` should not be the single source of truth for envelope status for your integration.  ## The URL is time-limited The URL returned by this method is valid for one use, and you must use or display it within a couple of minutes after it is generated. AFter the recipient is redirected to the recipient view, they must interact with the DocuSign system periodically or their session will time out.  Because the URL is time-limited, it should not be stored or sent through email. After you receive it, immediately redirect the user's browser to the URL.  If you want to invite someone to an embedded signing session via email, the email invitation's URL must be to your application. When invoked, your app should request a recipientView URL from DocuSign and then redirect the signer to that URL.  ## Maintaining State After the recipient completes the recipient view (or signing ceremony), they are redirected to your application. Your application can recover state information about the transaction by storing information in a cookie, or by including query parameters in the `returnUrl` field. Eg, `https://myapp.eg.com/docusign_return?myState=12345` When the user is redirected to your app, the `event` query parameter will be appended. In this example, prevent spoofing by not using a guessable value as the state value.  **Note**: You can revoke the URL by making the DELETE call to the same URL with no request body.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientViewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientView`
+     */
+    open class func viewsPostEnvelopeRecipientView(accountId: String, envelopeId: String, recipientViewRequest: RecipientViewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientView> {
+        return viewsPostEnvelopeRecipientViewRaw(accountId: accountId, envelopeId: envelopeId, recipientViewRequest: recipientViewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeRecipientView in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -330,9 +416,9 @@ open class EnvelopeViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter returnUrlRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeSenderView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeSenderView(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeSenderView> {
+    open class func viewsPostEnvelopeSenderViewRaw(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/sender"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -354,14 +440,36 @@ open class EnvelopeViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeSenderView in
+        }
+    }
+
+    public enum ViewsPostEnvelopeSenderView {
+        case http201(value: EnvelopeViews, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeViews, raw: ClientResponse)
+    }
+
+    /**
+     Returns a URL to the sender view UI.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/sender
+
+     Returns a URL that enables you to embed the sender view of the DocuSign UI in your applications.  The returned URL can only be redirected to immediately after it is generated. It can only be used once. Therefore, request the URL immediately before you redirect your user to it.  For the best user experience, don't use an iFrame. For iOS devices DocuSign recommends using a WebView.  Multiple solutions are available for maintaining your client state. See the **Maintaining State** section of the [Embedded Signing introduction.](https://developers.docusign.com/esign-rest-api/guides/embedded-signing)  After the user has completed the sending view, the browser is redirected to the `returnUrl` supplied.  By default, if the envelope already contains one or more documents, DocuSign will initially show the document tagging view when you redirect to the URL.   To start with the envelope's recipients and documents view instead, examine the URL in the method's response.  Then change the query parameter from `send=1` to `send=0` to start with the recipients/documents view.  **Note**: You can revoke the URL by making the DELETE call to the same URL with no request body.   <blockquote> <p><b>Information Security notice</b>: This method provides full access to the sending account. When you use this view, the current user has full access to the account. If the account has administrative privileges, then this method also provides administrator access.</p>  <p>If your use case needs to enable a sender to update a draft envelope before it is sent or make other changes, take one of the following steps:</p>  <ul> <li>Configure each sender to have their own individual user account to use this API method.</li> <li>Enhance your API integration so that this method is not needed. Your integration can create the tabs, recipients, and other envelope settings as needed.</li> </ul> </blockquote>
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter returnUrlRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeSenderView`
+     */
+    open class func viewsPostEnvelopeSenderView(accountId: String, envelopeId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeSenderView> {
+        return viewsPostEnvelopeSenderViewRaw(accountId: accountId, envelopeId: envelopeId, returnUrlRequest: returnUrlRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeSenderView in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeViews.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeViews.defaultContentType)), raw: response)
             }
         }
     }

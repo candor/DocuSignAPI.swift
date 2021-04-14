@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class AccountPasswordRulesAPI {
-    public enum AccountPasswordRulesGetAccountPasswordRules {
-        case http200(value: AccountPasswordRules?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountPasswordRules?, raw: ClientResponse)
-    }
-
     /**
      Gets the password rules for an account.
 
@@ -23,9 +17,9 @@ open class AccountPasswordRulesAPI {
      This method retrieves the password rules for an account.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `AccountPasswordRulesGetAccountPasswordRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountPasswordRulesGetAccountPasswordRules(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountPasswordRulesGetAccountPasswordRules> {
+    open class func accountPasswordRulesGetAccountPasswordRulesRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/password_rules"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,22 +34,36 @@ open class AccountPasswordRulesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountPasswordRulesGetAccountPasswordRules in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum AccountPasswordRulesPutAccountPasswordRules {
-        case http200(value: AccountPasswordRules?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountPasswordRules?, raw: ClientResponse)
+    public enum AccountPasswordRulesGetAccountPasswordRules {
+        case http200(value: AccountPasswordRules, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountPasswordRules, raw: ClientResponse)
+    }
+
+    /**
+     Gets the password rules for an account.
+
+     GET /v2.1/accounts/{accountId}/settings/password_rules
+
+     This method retrieves the password rules for an account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `AccountPasswordRulesGetAccountPasswordRules`
+     */
+    open class func accountPasswordRulesGetAccountPasswordRules(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountPasswordRulesGetAccountPasswordRules> {
+        return accountPasswordRulesGetAccountPasswordRulesRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountPasswordRulesGetAccountPasswordRules in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -67,9 +75,9 @@ open class AccountPasswordRulesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter accountPasswordRules: (body)  (optional)
-     - returns: `EventLoopFuture` of `AccountPasswordRulesPutAccountPasswordRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountPasswordRulesPutAccountPasswordRules(accountId: String, accountPasswordRules: AccountPasswordRules? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountPasswordRulesPutAccountPasswordRules> {
+    open class func accountPasswordRulesPutAccountPasswordRulesRaw(accountId: String, accountPasswordRules: AccountPasswordRules? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/password_rules"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -88,22 +96,37 @@ open class AccountPasswordRulesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountPasswordRulesPutAccountPasswordRules in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum PasswordRulesGetPasswordRules {
-        case http200(value: UserPasswordRules?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: UserPasswordRules?, raw: ClientResponse)
+    public enum AccountPasswordRulesPutAccountPasswordRules {
+        case http200(value: AccountPasswordRules, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountPasswordRules, raw: ClientResponse)
+    }
+
+    /**
+     Updates the password rules for an account.
+
+     PUT /v2.1/accounts/{accountId}/settings/password_rules
+
+     This method updates the password rules for an account.  **Note**: To update the password rules for an account, you must be an account administrator.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter accountPasswordRules: (body)  (optional)
+     - returns: `EventLoopFuture` of `AccountPasswordRulesPutAccountPasswordRules`
+     */
+    open class func accountPasswordRulesPutAccountPasswordRules(accountId: String, accountPasswordRules: AccountPasswordRules? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountPasswordRulesPutAccountPasswordRules> {
+        return accountPasswordRulesPutAccountPasswordRulesRaw(accountId: accountId, accountPasswordRules: accountPasswordRules, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountPasswordRulesPutAccountPasswordRules in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(AccountPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountPasswordRules.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -111,9 +134,9 @@ open class AccountPasswordRulesAPI {
 
      GET /v2.1/current_user/password_rules
 
-     - returns: `EventLoopFuture` of `PasswordRulesGetPasswordRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func passwordRulesGetPasswordRules(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PasswordRulesGetPasswordRules> {
+    open class func passwordRulesGetPasswordRulesRaw(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/password_rules"
         let URLString = DocuSignAPI.basePath + path
 
@@ -125,14 +148,31 @@ open class AccountPasswordRulesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> PasswordRulesGetPasswordRules in
+        }
+    }
+
+    public enum PasswordRulesGetPasswordRules {
+        case http200(value: UserPasswordRules, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: UserPasswordRules, raw: ClientResponse)
+    }
+
+    /**
+     Gets membership account password rules.
+
+     GET /v2.1/current_user/password_rules
+
+     - returns: `EventLoopFuture` of `PasswordRulesGetPasswordRules`
+     */
+    open class func passwordRulesGetPasswordRules(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PasswordRulesGetPasswordRules> {
+        return passwordRulesGetPasswordRulesRaw(headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> PasswordRulesGetPasswordRules in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(UserPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: UserPasswordRules.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(UserPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: UserPasswordRules.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(UserPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: UserPasswordRules.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(UserPasswordRules.self, using: Configuration.contentConfiguration.requireDecoder(for: UserPasswordRules.defaultContentType)), raw: response)
             }
         }
     }

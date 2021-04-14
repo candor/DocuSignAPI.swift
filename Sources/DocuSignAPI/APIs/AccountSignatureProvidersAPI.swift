@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class AccountSignatureProvidersAPI {
-    public enum AccountSignatureProvidersGetSignatureProviders {
-        case http200(value: AccountSignatureProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountSignatureProviders?, raw: ClientResponse)
-    }
-
     /**
      Gets the available signature providers for an account.
 
@@ -23,9 +17,9 @@ open class AccountSignatureProvidersAPI {
      Returns a list of signature providers that the specified account can use.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `AccountSignatureProvidersGetSignatureProviders`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountSignatureProvidersGetSignatureProviders(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountSignatureProvidersGetSignatureProviders> {
+    open class func accountSignatureProvidersGetSignatureProvidersRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/signatureProviders"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,14 +34,34 @@ open class AccountSignatureProvidersAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountSignatureProvidersGetSignatureProviders in
+        }
+    }
+
+    public enum AccountSignatureProvidersGetSignatureProviders {
+        case http200(value: AccountSignatureProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountSignatureProviders, raw: ClientResponse)
+    }
+
+    /**
+     Gets the available signature providers for an account.
+
+     GET /v2.1/accounts/{accountId}/signatureProviders
+
+     Returns a list of signature providers that the specified account can use.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `AccountSignatureProvidersGetSignatureProviders`
+     */
+    open class func accountSignatureProvidersGetSignatureProviders(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountSignatureProvidersGetSignatureProviders> {
+        return accountSignatureProvidersGetSignatureProvidersRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountSignatureProvidersGetSignatureProviders in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(AccountSignatureProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSignatureProviders.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(AccountSignatureProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSignatureProviders.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(AccountSignatureProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSignatureProviders.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(AccountSignatureProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSignatureProviders.defaultContentType)), raw: response)
             }
         }
     }

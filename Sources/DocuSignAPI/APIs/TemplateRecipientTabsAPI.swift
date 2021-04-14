@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class TemplateRecipientTabsAPI {
-    public enum RecipientsDeleteTemplateRecipientTabs {
-        case http200(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
-    }
-
     /**
      Deletes the tabs associated with a recipient in a template.
 
@@ -26,9 +20,9 @@ open class TemplateRecipientTabsAPI {
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter templateId: (path) The id of the template.
      - parameter templateTabs: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsDeleteTemplateRecipientTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsDeleteTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteTemplateRecipientTabs> {
+    open class func recipientsDeleteTemplateRecipientTabsRaw(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -53,22 +47,39 @@ open class TemplateRecipientTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsDeleteTemplateRecipientTabs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsGetTemplateRecipientTabs {
-        case http200(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
+    public enum RecipientsDeleteTemplateRecipientTabs {
+        case http200(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the tabs associated with a recipient in a template.
+
+     DELETE /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs
+
+     Deletes one or more tabs associated with a recipient in a template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateTabs: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsDeleteTemplateRecipientTabs`
+     */
+    open class func recipientsDeleteTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteTemplateRecipientTabs> {
+        return recipientsDeleteTemplateRecipientTabsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, templateTabs: templateTabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsDeleteTemplateRecipientTabs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -83,9 +94,9 @@ open class TemplateRecipientTabsAPI {
      - parameter templateId: (path) The id of the template.
      - parameter includeAnchorTabLocations: (query) When set to **true**, all tabs with anchor tab properties are included in the response. The default value is **false**. (optional)
      - parameter includeMetadata: (query) When set to **true**, the response includes metadata indicating which properties are editable. (optional)
-     - returns: `EventLoopFuture` of `RecipientsGetTemplateRecipientTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsGetTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, includeAnchorTabLocations: String? = nil, includeMetadata: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetTemplateRecipientTabs> {
+    open class func recipientsGetTemplateRecipientTabsRaw(accountId: String, recipientId: String, templateId: String, includeAnchorTabLocations: String? = nil, includeMetadata: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -112,22 +123,40 @@ open class TemplateRecipientTabsAPI {
             try request.query.encode(QueryParams(includeAnchorTabLocations: includeAnchorTabLocations, includeMetadata: includeMetadata))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsGetTemplateRecipientTabs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPostTemplateRecipientTabs {
-        case http201(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
+    public enum RecipientsGetTemplateRecipientTabs {
+        case http200(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+     Gets the tabs information for a signer or sign-in-person recipient in a template.
+
+     GET /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs
+
+     Gets the tabs information for a signer or sign-in-person recipient in a template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter includeAnchorTabLocations: (query) When set to **true**, all tabs with anchor tab properties are included in the response. The default value is **false**. (optional)
+     - parameter includeMetadata: (query) When set to **true**, the response includes metadata indicating which properties are editable. (optional)
+     - returns: `EventLoopFuture` of `RecipientsGetTemplateRecipientTabs`
+     */
+    open class func recipientsGetTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, includeAnchorTabLocations: String? = nil, includeMetadata: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetTemplateRecipientTabs> {
+        return recipientsGetTemplateRecipientTabsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, includeAnchorTabLocations: includeAnchorTabLocations, includeMetadata: includeMetadata, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsGetTemplateRecipientTabs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -141,9 +170,9 @@ open class TemplateRecipientTabsAPI {
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter templateId: (path) The id of the template.
      - parameter templateTabs: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPostTemplateRecipientTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPostTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostTemplateRecipientTabs> {
+    open class func recipientsPostTemplateRecipientTabsRaw(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -168,22 +197,39 @@ open class TemplateRecipientTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPostTemplateRecipientTabs in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPutTemplateRecipientTabs {
-        case http200(value: Tabs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Tabs?, raw: ClientResponse)
+    public enum RecipientsPostTemplateRecipientTabs {
+        case http201(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+     Adds tabs for a recipient.
+
+     POST /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs
+
+     Adds one or more tabs for a recipient.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateTabs: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPostTemplateRecipientTabs`
+     */
+    open class func recipientsPostTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostTemplateRecipientTabs> {
+        return recipientsPostTemplateRecipientTabsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, templateTabs: templateTabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPostTemplateRecipientTabs in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -197,9 +243,9 @@ open class TemplateRecipientTabsAPI {
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter templateId: (path) The id of the template.
      - parameter templateTabs: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPutTemplateRecipientTabs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPutTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutTemplateRecipientTabs> {
+    open class func recipientsPutTemplateRecipientTabsRaw(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -224,14 +270,37 @@ open class TemplateRecipientTabsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPutTemplateRecipientTabs in
+        }
+    }
+
+    public enum RecipientsPutTemplateRecipientTabs {
+        case http200(value: Tabs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Tabs, raw: ClientResponse)
+    }
+
+    /**
+     Updates the tabs for a recipient.
+
+     PUT /v2.1/accounts/{accountId}/templates/{templateId}/recipients/{recipientId}/tabs
+
+     Updates one or more tabs for a recipient in a template.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter templateId: (path) The id of the template.
+     - parameter templateTabs: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPutTemplateRecipientTabs`
+     */
+    open class func recipientsPutTemplateRecipientTabs(accountId: String, recipientId: String, templateId: String, templateTabs: TemplateTabs? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutTemplateRecipientTabs> {
+        return recipientsPutTemplateRecipientTabsRaw(accountId: accountId, recipientId: recipientId, templateId: templateId, templateTabs: templateTabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPutTemplateRecipientTabs in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(Tabs.self, using: Configuration.contentConfiguration.requireDecoder(for: Tabs.defaultContentType)), raw: response)
             }
         }
     }

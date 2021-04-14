@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class NotaryJurisdictionAPI {
-    public enum NotaryJurisdictionsDeleteNotaryJurisdiction {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes the specified jurisdiction.
 
@@ -23,9 +17,9 @@ open class NotaryJurisdictionAPI {
      Deletes the specified jurisdiction.
 
      - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
-     - returns: `EventLoopFuture` of `NotaryJurisdictionsDeleteNotaryJurisdiction`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryJurisdictionsDeleteNotaryJurisdiction(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsDeleteNotaryJurisdiction> {
+    open class func notaryJurisdictionsDeleteNotaryJurisdictionRaw(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/current_user/notary/jurisdictions/{jurisdictionId}"
         let jurisdictionIdPreEscape = String(describing: jurisdictionId)
         let jurisdictionIdPostEscape = jurisdictionIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,22 +34,36 @@ open class NotaryJurisdictionAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJurisdictionsDeleteNotaryJurisdiction in
+        }
+    }
+
+    public enum NotaryJurisdictionsDeleteNotaryJurisdiction {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the specified jurisdiction.
+
+     DELETE /v2.1/current_user/notary/jurisdictions/{jurisdictionId}
+
+     Deletes the specified jurisdiction.
+
+     - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
+     - returns: `EventLoopFuture` of `NotaryJurisdictionsDeleteNotaryJurisdiction`
+     */
+    open class func notaryJurisdictionsDeleteNotaryJurisdiction(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsDeleteNotaryJurisdiction> {
+        return notaryJurisdictionsDeleteNotaryJurisdictionRaw(jurisdictionId: jurisdictionId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJurisdictionsDeleteNotaryJurisdiction in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum NotaryJurisdictionsGetNotaryJurisdiction {
-        case http200(value: NotaryJurisdiction?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryJurisdiction?, raw: ClientResponse)
     }
 
     /**
@@ -66,9 +74,9 @@ open class NotaryJurisdictionAPI {
      Gets a jurisdiction object for the current user.  The following restrictions apply:  - The current user must be a notary. - The `jurisdictionId` must be a jurisdiction that the notary is registered for.
 
      - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
-     - returns: `EventLoopFuture` of `NotaryJurisdictionsGetNotaryJurisdiction`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryJurisdictionsGetNotaryJurisdiction(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsGetNotaryJurisdiction> {
+    open class func notaryJurisdictionsGetNotaryJurisdictionRaw(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/current_user/notary/jurisdictions/{jurisdictionId}"
         let jurisdictionIdPreEscape = String(describing: jurisdictionId)
         let jurisdictionIdPostEscape = jurisdictionIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -83,22 +91,66 @@ open class NotaryJurisdictionAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJurisdictionsGetNotaryJurisdiction in
+        }
+    }
+
+    public enum NotaryJurisdictionsGetNotaryJurisdiction {
+        case http200(value: NotaryJurisdiction, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryJurisdiction, raw: ClientResponse)
+    }
+
+    /**
+     Gets a jurisdiction object for the current user. The user must be a notary.
+
+     GET /v2.1/current_user/notary/jurisdictions/{jurisdictionId}
+
+     Gets a jurisdiction object for the current user.  The following restrictions apply:  - The current user must be a notary. - The `jurisdictionId` must be a jurisdiction that the notary is registered for.
+
+     - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
+     - returns: `EventLoopFuture` of `NotaryJurisdictionsGetNotaryJurisdiction`
+     */
+    open class func notaryJurisdictionsGetNotaryJurisdiction(jurisdictionId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsGetNotaryJurisdiction> {
+        return notaryJurisdictionsGetNotaryJurisdictionRaw(jurisdictionId: jurisdictionId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJurisdictionsGetNotaryJurisdiction in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
             }
         }
     }
 
+    /**
+     Returns a list of jurisdictions that the notary is registered in.
+
+     GET /v2.1/current_user/notary/jurisdictions
+
+     Returns a list of jurisdictions that the notary is registered in. The current user must be a notary.
+
+     - returns: `EventLoopFuture` of `ClientResponse`
+     */
+    open class func notaryJurisdictionsGetNotaryJurisdictionsRaw(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
+        let path = "/v2.1/current_user/notary/jurisdictions"
+        let URLString = DocuSignAPI.basePath + path
+
+        guard let apiClient = Configuration.apiClient else {
+            fatalError("Configuration.apiClient is not set.")
+        }
+
+        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
+            try Configuration.apiWrapper(&request)
+
+            try beforeSend(&request)
+        }
+    }
+
     public enum NotaryJurisdictionsGetNotaryJurisdictions {
-        case http200(value: NotaryJurisdictionList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryJurisdictionList?, raw: ClientResponse)
+        case http200(value: NotaryJurisdictionList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryJurisdictionList, raw: ClientResponse)
     }
 
     /**
@@ -111,33 +163,16 @@ open class NotaryJurisdictionAPI {
      - returns: `EventLoopFuture` of `NotaryJurisdictionsGetNotaryJurisdictions`
      */
     open class func notaryJurisdictionsGetNotaryJurisdictions(headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsGetNotaryJurisdictions> {
-        let path = "/v2.1/current_user/notary/jurisdictions"
-        let URLString = DocuSignAPI.basePath + path
-
-        guard let apiClient = Configuration.apiClient else {
-            fatalError("Configuration.apiClient is not set.")
-        }
-
-        return apiClient.send(.GET, headers: headers, to: URI(string: URLString)) { request in
-            try Configuration.apiWrapper(&request)
-
-            try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJurisdictionsGetNotaryJurisdictions in
+        return notaryJurisdictionsGetNotaryJurisdictionsRaw(headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJurisdictionsGetNotaryJurisdictions in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(NotaryJurisdictionList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdictionList.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(NotaryJurisdictionList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdictionList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(NotaryJurisdictionList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdictionList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(NotaryJurisdictionList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdictionList.defaultContentType)), raw: response)
             }
         }
-    }
-
-    public enum NotaryJurisdictionsPostNotaryJurisdictions {
-        case http201(value: NotaryJurisdiction?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryJurisdiction?, raw: ClientResponse)
     }
 
     /**
@@ -148,9 +183,9 @@ open class NotaryJurisdictionAPI {
      Creates a jurisdiction object.
 
      - parameter notaryJurisdiction: (body)  (optional)
-     - returns: `EventLoopFuture` of `NotaryJurisdictionsPostNotaryJurisdictions`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryJurisdictionsPostNotaryJurisdictions(notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsPostNotaryJurisdictions> {
+    open class func notaryJurisdictionsPostNotaryJurisdictionsRaw(notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/notary/jurisdictions"
         let URLString = DocuSignAPI.basePath + path
 
@@ -166,22 +201,36 @@ open class NotaryJurisdictionAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJurisdictionsPostNotaryJurisdictions in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum NotaryJurisdictionsPutNotaryJurisdiction {
-        case http200(value: NotaryJurisdiction?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryJurisdiction?, raw: ClientResponse)
+    public enum NotaryJurisdictionsPostNotaryJurisdictions {
+        case http201(value: NotaryJurisdiction, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryJurisdiction, raw: ClientResponse)
+    }
+
+    /**
+     Creates a jurisdiction object.
+
+     POST /v2.1/current_user/notary/jurisdictions
+
+     Creates a jurisdiction object.
+
+     - parameter notaryJurisdiction: (body)  (optional)
+     - returns: `EventLoopFuture` of `NotaryJurisdictionsPostNotaryJurisdictions`
+     */
+    open class func notaryJurisdictionsPostNotaryJurisdictions(notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsPostNotaryJurisdictions> {
+        return notaryJurisdictionsPostNotaryJurisdictionsRaw(notaryJurisdiction: notaryJurisdiction, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJurisdictionsPostNotaryJurisdictions in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -193,9 +242,9 @@ open class NotaryJurisdictionAPI {
 
      - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
      - parameter notaryJurisdiction: (body)  (optional)
-     - returns: `EventLoopFuture` of `NotaryJurisdictionsPutNotaryJurisdiction`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryJurisdictionsPutNotaryJurisdiction(jurisdictionId: String, notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsPutNotaryJurisdiction> {
+    open class func notaryJurisdictionsPutNotaryJurisdictionRaw(jurisdictionId: String, notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/current_user/notary/jurisdictions/{jurisdictionId}"
         let jurisdictionIdPreEscape = String(describing: jurisdictionId)
         let jurisdictionIdPostEscape = jurisdictionIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -214,14 +263,35 @@ open class NotaryJurisdictionAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJurisdictionsPutNotaryJurisdiction in
+        }
+    }
+
+    public enum NotaryJurisdictionsPutNotaryJurisdiction {
+        case http200(value: NotaryJurisdiction, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryJurisdiction, raw: ClientResponse)
+    }
+
+    /**
+     Updates the jurisdiction information about a notary.
+
+     PUT /v2.1/current_user/notary/jurisdictions/{jurisdictionId}
+
+     Updates the jurisdiction information about a notary.  The following restrictions apply:  - The current user must be a notary. - The `jurisdictionId` path parameter must be a jurisdiction that the notary is registered for. - The `jurisdictionId` path parameter must match the request body's `jurisdiction.jurisdictionId`.  The request body must have a full `jurisdiction` object for the jurisdiction property. The best way to do this is to use `getNotaryJurisdiction` to obtain the current values and update the properties you want to change.  For example, assume `getNotaryJurisdiction` returns this:  ``` {     \"jurisdiction\": {         \"jurisdictionId\": \"15\",         \"name\": \"Iowa\",         \"county\": \"\",         \"enabled\": \"true\",         \"countyInSeal\": \"false\",         \"commissionIdInSeal\": \"true\",         \"stateNameInSeal\": \"true\",         \"notaryPublicInSeal\": \"true\",         \"allowSystemCreatedSeal\": \"true\",         \"allowUserUploadedSeal\": \"false\"     },     \"commissionId\": \"123456\",     \"commissionExpiration\": \"2020-08-31T07:00:00.0000000Z\",     \"registeredName\": \"Bob Notary\",     \"county\": \"Adams\",     \"sealType\": \"system_created\" } ```  If you want to change the name of the notary from \"Bob Notary\" to \"Robert Notary\", your request body would be:  ``` {     \"jurisdiction\": {         \"jurisdictionId\": \"15\",         \"name\": \"Iowa\",         \"county\": \"\",         \"enabled\": \"true\",         \"countyInSeal\": \"false\",         \"commissionIdInSeal\": \"true\",         \"stateNameInSeal\": \"true\",         \"notaryPublicInSeal\": \"true\",         \"allowSystemCreatedSeal\": \"true\",         \"allowUserUploadedSeal\": \"false\"     },     \"commissionId\": \"123456\",     \"commissionExpiration\": \"2020-08-31T07:00:00.0000000Z\",     \"registeredName\": \"Robert Notary\",     \"county\": \"Adams\",     \"sealType\": \"system_created\" } ```
+
+     - parameter jurisdictionId: (path) The ID of the jurisdiction. The following jurisdictions are supported:  -  `5 - California` -  `6 - Colorado` -  `9 - Florida` -  `10 - Georgia` -  `12 - Idaho` -  `13 - Illinois` -  `14 - Indiana` -  `15 - Iowa` -  `17 - Kentucky` -  `23 - Minnesota` -  `25 - Missouri` -  `30 - New Jersey` -  `32 - New York` -  `33 - North Carolina` -  `35 - Ohio` -  `37 - Oregon` -  `38 - Pennsylvania` -  `40 - South Carolina` -  `43 - Texas` -  `44 - Utah` -  `47 - Washington` -  `48 - West Virginia` -  `49 - Wisconsin` -  `62 - Florida Commissioner of Deeds`
+     - parameter notaryJurisdiction: (body)  (optional)
+     - returns: `EventLoopFuture` of `NotaryJurisdictionsPutNotaryJurisdiction`
+     */
+    open class func notaryJurisdictionsPutNotaryJurisdiction(jurisdictionId: String, notaryJurisdiction: NotaryJurisdiction? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJurisdictionsPutNotaryJurisdiction> {
+        return notaryJurisdictionsPutNotaryJurisdictionRaw(jurisdictionId: jurisdictionId, notaryJurisdiction: notaryJurisdiction, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJurisdictionsPutNotaryJurisdiction in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(NotaryJurisdiction.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJurisdiction.defaultContentType)), raw: response)
             }
         }
     }

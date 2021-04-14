@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeTemplatesAPI {
-    public enum TemplatesDeleteDocumentTemplates {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes a template from a document in an existing envelope.
 
@@ -26,9 +20,9 @@ open class EnvelopeTemplatesAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter templateId: (path) The id of the template.
-     - returns: `EventLoopFuture` of `TemplatesDeleteDocumentTemplates`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func templatesDeleteDocumentTemplates(accountId: String, documentId: String, envelopeId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesDeleteDocumentTemplates> {
+    open class func templatesDeleteDocumentTemplatesRaw(accountId: String, documentId: String, envelopeId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates/{templateId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -52,22 +46,39 @@ open class EnvelopeTemplatesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TemplatesDeleteDocumentTemplates in
+        }
+    }
+
+    public enum TemplatesDeleteDocumentTemplates {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a template from a document in an existing envelope.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates/{templateId}
+
+     Deletes the specified template from a document in an existing envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter templateId: (path) The id of the template.
+     - returns: `EventLoopFuture` of `TemplatesDeleteDocumentTemplates`
+     */
+    open class func templatesDeleteDocumentTemplates(accountId: String, documentId: String, envelopeId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesDeleteDocumentTemplates> {
+        return templatesDeleteDocumentTemplatesRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, templateId: templateId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TemplatesDeleteDocumentTemplates in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum TemplatesGetDocumentTemplates {
-        case http200(value: TemplateInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TemplateInformation?, raw: ClientResponse)
     }
 
     /**
@@ -81,9 +92,9 @@ open class EnvelopeTemplatesAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter include: (query) A comma-separated list that limits the results. Valid values are:  * `applied` * `matched`  (optional)
-     - returns: `EventLoopFuture` of `TemplatesGetDocumentTemplates`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func templatesGetDocumentTemplates(accountId: String, documentId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesGetDocumentTemplates> {
+    open class func templatesGetDocumentTemplatesRaw(accountId: String, documentId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -109,22 +120,39 @@ open class EnvelopeTemplatesAPI {
             try request.query.encode(QueryParams(include: include))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TemplatesGetDocumentTemplates in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum TemplatesGetEnvelopeTemplates {
-        case http200(value: TemplateInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: TemplateInformation?, raw: ClientResponse)
+    public enum TemplatesGetDocumentTemplates {
+        case http200(value: TemplateInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TemplateInformation, raw: ClientResponse)
+    }
+
+    /**
+     Gets the templates associated with a document in an existing envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates
+
+     Retrieves the templates associated with a document in the specified envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter include: (query) A comma-separated list that limits the results. Valid values are:  * `applied` * `matched`  (optional)
+     - returns: `EventLoopFuture` of `TemplatesGetDocumentTemplates`
+     */
+    open class func templatesGetDocumentTemplates(accountId: String, documentId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesGetDocumentTemplates> {
+        return templatesGetDocumentTemplatesRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, include: include, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TemplatesGetDocumentTemplates in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -137,9 +165,9 @@ open class EnvelopeTemplatesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter include: (query) The possible value is `matching_applied`, which returns template matching information for the template. (optional)
-     - returns: `EventLoopFuture` of `TemplatesGetEnvelopeTemplates`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func templatesGetEnvelopeTemplates(accountId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesGetEnvelopeTemplates> {
+    open class func templatesGetEnvelopeTemplatesRaw(accountId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/templates"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -162,22 +190,90 @@ open class EnvelopeTemplatesAPI {
             try request.query.encode(QueryParams(include: include))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TemplatesGetEnvelopeTemplates in
+        }
+    }
+
+    public enum TemplatesGetEnvelopeTemplates {
+        case http200(value: TemplateInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: TemplateInformation, raw: ClientResponse)
+    }
+
+    /**
+     Get List of Templates used in an Envelope
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/templates
+
+     This returns a list of the server-side templates, their name and ID, used in an envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter include: (query) The possible value is `matching_applied`, which returns template matching information for the template. (optional)
+     - returns: `EventLoopFuture` of `TemplatesGetEnvelopeTemplates`
+     */
+    open class func templatesGetEnvelopeTemplates(accountId: String, envelopeId: String, include: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesGetEnvelopeTemplates> {
+        return templatesGetEnvelopeTemplatesRaw(accountId: accountId, envelopeId: envelopeId, include: include, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TemplatesGetEnvelopeTemplates in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(TemplateInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: TemplateInformation.defaultContentType)), raw: response)
             }
         }
     }
 
+    /**
+     Adds templates to a document in an  envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates
+
+     Adds templates to a document in the specified envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter preserveTemplateRecipient: (query)  (optional)
+     - parameter documentTemplateList: (body)  (optional)
+     - returns: `EventLoopFuture` of `ClientResponse`
+     */
+    open class func templatesPostDocumentTemplatesRaw(accountId: String, documentId: String, envelopeId: String, preserveTemplateRecipient: String? = nil, documentTemplateList: DocumentTemplateList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
+        var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates"
+        let accountIdPreEscape = String(describing: accountId)
+        let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        path = path.replacingOccurrences(of: "{accountId}", with: accountIdPostEscape, options: .literal, range: nil)
+        let documentIdPreEscape = String(describing: documentId)
+        let documentIdPostEscape = documentIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        path = path.replacingOccurrences(of: "{documentId}", with: documentIdPostEscape, options: .literal, range: nil)
+        let envelopeIdPreEscape = String(describing: envelopeId)
+        let envelopeIdPostEscape = envelopeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
+        path = path.replacingOccurrences(of: "{envelopeId}", with: envelopeIdPostEscape, options: .literal, range: nil)
+        let URLString = DocuSignAPI.basePath + path
+
+        guard let apiClient = Configuration.apiClient else {
+            fatalError("Configuration.apiClient is not set.")
+        }
+
+        return apiClient.send(.POST, headers: headers, to: URI(string: URLString)) { request in
+            try Configuration.apiWrapper(&request)
+
+            struct QueryParams: Content {
+                var preserveTemplateRecipient: String?
+            }
+            try request.query.encode(QueryParams(preserveTemplateRecipient: preserveTemplateRecipient))
+            if let body = documentTemplateList {
+                try request.content.encode(body)
+            }
+
+            try beforeSend(&request)
+        }
+    }
+
     public enum TemplatesPostDocumentTemplates {
-        case http201(value: DocumentTemplateList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentTemplateList?, raw: ClientResponse)
+        case http201(value: DocumentTemplateList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentTemplateList, raw: ClientResponse)
     }
 
     /**
@@ -195,50 +291,16 @@ open class EnvelopeTemplatesAPI {
      - returns: `EventLoopFuture` of `TemplatesPostDocumentTemplates`
      */
     open class func templatesPostDocumentTemplates(accountId: String, documentId: String, envelopeId: String, preserveTemplateRecipient: String? = nil, documentTemplateList: DocumentTemplateList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesPostDocumentTemplates> {
-        var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/templates"
-        let accountIdPreEscape = String(describing: accountId)
-        let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        path = path.replacingOccurrences(of: "{accountId}", with: accountIdPostEscape, options: .literal, range: nil)
-        let documentIdPreEscape = String(describing: documentId)
-        let documentIdPostEscape = documentIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        path = path.replacingOccurrences(of: "{documentId}", with: documentIdPostEscape, options: .literal, range: nil)
-        let envelopeIdPreEscape = String(describing: envelopeId)
-        let envelopeIdPostEscape = envelopeIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
-        path = path.replacingOccurrences(of: "{envelopeId}", with: envelopeIdPostEscape, options: .literal, range: nil)
-        let URLString = DocuSignAPI.basePath + path
-
-        guard let apiClient = Configuration.apiClient else {
-            fatalError("Configuration.apiClient is not set.")
-        }
-
-        return apiClient.send(.POST, headers: headers, to: URI(string: URLString)) { request in
-            try Configuration.apiWrapper(&request)
-
-            struct QueryParams: Content {
-                var preserveTemplateRecipient: String?
-            }
-            try request.query.encode(QueryParams(preserveTemplateRecipient: preserveTemplateRecipient))
-            if let body = documentTemplateList {
-                try request.content.encode(body)
-            }
-
-            try beforeSend(&request)
-        }.flatMapThrowing { response -> TemplatesPostDocumentTemplates in
+        return templatesPostDocumentTemplatesRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, preserveTemplateRecipient: preserveTemplateRecipient, documentTemplateList: documentTemplateList, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TemplatesPostDocumentTemplates in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
             }
         }
-    }
-
-    public enum TemplatesPostEnvelopeTemplates {
-        case http201(value: DocumentTemplateList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentTemplateList?, raw: ClientResponse)
     }
 
     /**
@@ -252,9 +314,9 @@ open class EnvelopeTemplatesAPI {
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter preserveTemplateRecipient: (query)  (optional)
      - parameter documentTemplateList: (body)  (optional)
-     - returns: `EventLoopFuture` of `TemplatesPostEnvelopeTemplates`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func templatesPostEnvelopeTemplates(accountId: String, envelopeId: String, preserveTemplateRecipient: String? = nil, documentTemplateList: DocumentTemplateList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesPostEnvelopeTemplates> {
+    open class func templatesPostEnvelopeTemplatesRaw(accountId: String, envelopeId: String, preserveTemplateRecipient: String? = nil, documentTemplateList: DocumentTemplateList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/templates"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -280,14 +342,37 @@ open class EnvelopeTemplatesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> TemplatesPostEnvelopeTemplates in
+        }
+    }
+
+    public enum TemplatesPostEnvelopeTemplates {
+        case http201(value: DocumentTemplateList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentTemplateList, raw: ClientResponse)
+    }
+
+    /**
+     Adds templates to an envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/templates
+
+     Adds templates to the specified envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter preserveTemplateRecipient: (query)  (optional)
+     - parameter documentTemplateList: (body)  (optional)
+     - returns: `EventLoopFuture` of `TemplatesPostEnvelopeTemplates`
+     */
+    open class func templatesPostEnvelopeTemplates(accountId: String, envelopeId: String, preserveTemplateRecipient: String? = nil, documentTemplateList: DocumentTemplateList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<TemplatesPostEnvelopeTemplates> {
+        return templatesPostEnvelopeTemplatesRaw(accountId: accountId, envelopeId: envelopeId, preserveTemplateRecipient: preserveTemplateRecipient, documentTemplateList: documentTemplateList, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> TemplatesPostEnvelopeTemplates in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(DocumentTemplateList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentTemplateList.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class ConnectConfigurationsAPI {
-    public enum ConnectDeleteConnectConfig {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes the specified connect configuration.
 
@@ -24,9 +18,9 @@ open class ConnectConfigurationsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter connectId: (path) The ID of the custom Connect configuration being accessed.
-     - returns: `EventLoopFuture` of `ConnectDeleteConnectConfig`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectDeleteConnectConfig(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectDeleteConnectConfig> {
+    open class func connectDeleteConnectConfigRaw(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/{connectId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class ConnectConfigurationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectDeleteConnectConfig in
+        }
+    }
+
+    public enum ConnectDeleteConnectConfig {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the specified connect configuration.
+
+     DELETE /v2.1/accounts/{accountId}/connect/{connectId}
+
+     Deletes the specified DocuSign Connect configuration.  **Note**: Connect must be enabled for your account to use this function.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectId: (path) The ID of the custom Connect configuration being accessed.
+     - returns: `EventLoopFuture` of `ConnectDeleteConnectConfig`
+     */
+    open class func connectDeleteConnectConfig(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectDeleteConnectConfig> {
+        return connectDeleteConnectConfigRaw(accountId: accountId, connectId: connectId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectDeleteConnectConfig in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ConnectGetConnectConfig {
-        case http200(value: ConnectConfigResults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectConfigResults?, raw: ClientResponse)
     }
 
     /**
@@ -71,9 +80,9 @@ open class ConnectConfigurationsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter connectId: (path) The ID of the custom Connect configuration being accessed.
-     - returns: `EventLoopFuture` of `ConnectGetConnectConfig`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectGetConnectConfig(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectConfig> {
+    open class func connectGetConnectConfigRaw(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/{connectId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -91,22 +100,37 @@ open class ConnectConfigurationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectGetConnectConfig in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectGetConnectConfigs {
-        case http200(value: ConnectConfigResults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectConfigResults?, raw: ClientResponse)
+    public enum ConnectGetConnectConfig {
+        case http200(value: ConnectConfigResults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectConfigResults, raw: ClientResponse)
+    }
+
+    /**
+     Gets the details about a Connect configuration.
+
+     GET /v2.1/accounts/{accountId}/connect/{connectId}
+
+     Retrieves the information for the specified DocuSign Connect configuration.  **Note**: Connect must be enabled for your account to use this function.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectId: (path) The ID of the custom Connect configuration being accessed.
+     - returns: `EventLoopFuture` of `ConnectGetConnectConfig`
+     */
+    open class func connectGetConnectConfig(accountId: String, connectId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectConfig> {
+        return connectGetConnectConfigRaw(accountId: accountId, connectId: connectId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectGetConnectConfig in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -117,9 +141,9 @@ open class ConnectConfigurationsAPI {
      Retrieves all the DocuSign Custom Connect definitions for the specified account.  **Note**: Connect must be enabled for your account to use this function. This does not retrieve information for Connect configurations for Box, eOriginal, or Salesforce.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `ConnectGetConnectConfigs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectGetConnectConfigs(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectConfigs> {
+    open class func connectGetConnectConfigsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -134,22 +158,36 @@ open class ConnectConfigurationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectGetConnectConfigs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectGetConnectUsers {
-        case http200(value: IntegratedUserInfoList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: IntegratedUserInfoList?, raw: ClientResponse)
+    public enum ConnectGetConnectConfigs {
+        case http200(value: ConnectConfigResults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectConfigResults, raw: ClientResponse)
+    }
+
+    /**
+     Get Connect Configuration Information
+
+     GET /v2.1/accounts/{accountId}/connect
+
+     Retrieves all the DocuSign Custom Connect definitions for the specified account.  **Note**: Connect must be enabled for your account to use this function. This does not retrieve information for Connect configurations for Box, eOriginal, or Salesforce.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `ConnectGetConnectConfigs`
+     */
+    open class func connectGetConnectConfigs(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectConfigs> {
+        return connectGetConnectConfigsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectGetConnectConfigs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectConfigResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectConfigResults.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -167,9 +205,9 @@ open class ConnectConfigurationsAPI {
      - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
      - parameter status: (query) Filters the results by user status. You can specify a comma-separated list of the following statuses:  * ActivationRequired  * ActivationSent  * Active * Closed  * Disabled  (optional)
      - parameter userNameSubstring: (query) Filters results based on a full or partial user name.  **Note**: When you enter a partial user name, you do not use a wildcard character. (optional)
-     - returns: `EventLoopFuture` of `ConnectGetConnectUsers`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectGetConnectUsers(accountId: String, connectId: String, count: String? = nil, emailSubstring: String? = nil, listIncludedUsers: String? = nil, startPosition: String? = nil, status: String? = nil, userNameSubstring: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectUsers> {
+    open class func connectGetConnectUsersRaw(accountId: String, connectId: String, count: String? = nil, emailSubstring: String? = nil, listIncludedUsers: String? = nil, startPosition: String? = nil, status: String? = nil, userNameSubstring: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/{connectId}/users"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -197,22 +235,43 @@ open class ConnectConfigurationsAPI {
             try request.query.encode(QueryParams(count: count, emailSubstring: emailSubstring, listIncludedUsers: listIncludedUsers, startPosition: startPosition, status: status, userNameSubstring: userNameSubstring))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectGetConnectUsers in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(IntegratedUserInfoList.self, using: Configuration.contentConfiguration.requireDecoder(for: IntegratedUserInfoList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(IntegratedUserInfoList.self, using: Configuration.contentConfiguration.requireDecoder(for: IntegratedUserInfoList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectPostConnectConfiguration {
-        case http201(value: ConnectCustomConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectCustomConfiguration?, raw: ClientResponse)
+    public enum ConnectGetConnectUsers {
+        case http200(value: IntegratedUserInfoList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: IntegratedUserInfoList, raw: ClientResponse)
+    }
+
+    /**
+     Returns users from the configured Connect service.
+
+     GET /v2.1/accounts/{accountId}/connect/{connectId}/users
+
+     Returns users from the configured Connect service.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectId: (path) The ID of the custom Connect configuration being accessed.
+     - parameter count: (query) Optional. Number of items to return.  (optional)
+     - parameter emailSubstring: (query) Filters returned user records by full email address or a substring of email address. (optional)
+     - parameter listIncludedUsers: (query)  (optional)
+     - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
+     - parameter status: (query) Filters the results by user status. You can specify a comma-separated list of the following statuses:  * ActivationRequired  * ActivationSent  * Active * Closed  * Disabled  (optional)
+     - parameter userNameSubstring: (query) Filters results based on a full or partial user name.  **Note**: When you enter a partial user name, you do not use a wildcard character. (optional)
+     - returns: `EventLoopFuture` of `ConnectGetConnectUsers`
+     */
+    open class func connectGetConnectUsers(accountId: String, connectId: String, count: String? = nil, emailSubstring: String? = nil, listIncludedUsers: String? = nil, startPosition: String? = nil, status: String? = nil, userNameSubstring: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectGetConnectUsers> {
+        return connectGetConnectUsersRaw(accountId: accountId, connectId: connectId, count: count, emailSubstring: emailSubstring, listIncludedUsers: listIncludedUsers, startPosition: startPosition, status: status, userNameSubstring: userNameSubstring, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectGetConnectUsers in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(IntegratedUserInfoList.self, using: Configuration.contentConfiguration.requireDecoder(for: IntegratedUserInfoList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(IntegratedUserInfoList.self, using: Configuration.contentConfiguration.requireDecoder(for: IntegratedUserInfoList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -224,9 +283,9 @@ open class ConnectConfigurationsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter connectCustomConfiguration: (body)  (optional)
-     - returns: `EventLoopFuture` of `ConnectPostConnectConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectPostConnectConfiguration(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPostConnectConfiguration> {
+    open class func connectPostConnectConfigurationRaw(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -245,22 +304,37 @@ open class ConnectConfigurationsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectPostConnectConfiguration in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectPutConnectConfiguration {
-        case http200(value: ConnectCustomConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectCustomConfiguration?, raw: ClientResponse)
+    public enum ConnectPostConnectConfiguration {
+        case http201(value: ConnectCustomConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectCustomConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Creates a connect configuration for the specified account.
+
+     POST /v2.1/accounts/{accountId}/connect
+
+     Creates a DocuSign Custom Connect definition for your account. DocuSign Connect enables the sending of real-time data updates to external applications. These updates are generated by user transactions as the envelope progresses through actions to completion. The Connect Service provides updated information about the status of these transactions and returns updates that include the actual content of document form fields. Be aware that, these updates might or might not include the document itself. For more information about Connect, see the [DocuSign Connect](https://developers.docusign.com/esign-rest-api/guides/connect).  **Note**: Connect must be enabled for your account to use this function. This cannot be used to set up Connect configurations for Salesforce or eOriginal.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectCustomConfiguration: (body)  (optional)
+     - returns: `EventLoopFuture` of `ConnectPostConnectConfiguration`
+     */
+    open class func connectPostConnectConfiguration(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPostConnectConfiguration> {
+        return connectPostConnectConfigurationRaw(accountId: accountId, connectCustomConfiguration: connectCustomConfiguration, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectPostConnectConfiguration in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -272,9 +346,9 @@ open class ConnectConfigurationsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter connectCustomConfiguration: (body)  (optional)
-     - returns: `EventLoopFuture` of `ConnectPutConnectConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectPutConnectConfiguration(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPutConnectConfiguration> {
+    open class func connectPutConnectConfigurationRaw(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -293,14 +367,35 @@ open class ConnectConfigurationsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectPutConnectConfiguration in
+        }
+    }
+
+    public enum ConnectPutConnectConfiguration {
+        case http200(value: ConnectCustomConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectCustomConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Updates a specified Connect configuration.
+
+     PUT /v2.1/accounts/{accountId}/connect
+
+     Updates the specified DocuSign Connect configuration in your account.  **Note**: Connect must be enabled for your account to use this function. This cannot be used to update Connect configurations for Box, eOriginal, or Salesforce.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectCustomConfiguration: (body)  (optional)
+     - returns: `EventLoopFuture` of `ConnectPutConnectConfiguration`
+     */
+    open class func connectPutConnectConfiguration(accountId: String, connectCustomConfiguration: ConnectCustomConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPutConnectConfiguration> {
+        return connectPutConnectConfigurationRaw(accountId: accountId, connectCustomConfiguration: connectCustomConfiguration, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectPutConnectConfiguration in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ConnectCustomConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectCustomConfiguration.defaultContentType)), raw: response)
             }
         }
     }

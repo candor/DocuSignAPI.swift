@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class NotaryJournalsAPI {
-    public enum NotaryJournalsGetNotaryJournals {
-        case http200(value: NotaryJournalList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryJournalList?, raw: ClientResponse)
-    }
-
     /**
 
      GET /v2.1/current_user/notary/journals
@@ -22,9 +16,9 @@ open class NotaryJournalsAPI {
      - parameter count: (query) The maximum number of results to return. (optional)
      - parameter searchText: (query) Use this parameter to search for specific text. (optional)
      - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
-     - returns: `EventLoopFuture` of `NotaryJournalsGetNotaryJournals`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryJournalsGetNotaryJournals(count: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJournalsGetNotaryJournals> {
+    open class func notaryJournalsGetNotaryJournalsRaw(count: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/notary/journals"
         let URLString = DocuSignAPI.basePath + path
 
@@ -43,14 +37,33 @@ open class NotaryJournalsAPI {
             try request.query.encode(QueryParams(count: count, searchText: searchText, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryJournalsGetNotaryJournals in
+        }
+    }
+
+    public enum NotaryJournalsGetNotaryJournals {
+        case http200(value: NotaryJournalList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryJournalList, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/current_user/notary/journals
+
+     - parameter count: (query) The maximum number of results to return. (optional)
+     - parameter searchText: (query) Use this parameter to search for specific text. (optional)
+     - parameter startPosition: (query) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
+     - returns: `EventLoopFuture` of `NotaryJournalsGetNotaryJournals`
+     */
+    open class func notaryJournalsGetNotaryJournals(count: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryJournalsGetNotaryJournals> {
+        return notaryJournalsGetNotaryJournalsRaw(count: count, searchText: searchText, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryJournalsGetNotaryJournals in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(NotaryJournalList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJournalList.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(NotaryJournalList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJournalList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(NotaryJournalList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJournalList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(NotaryJournalList.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryJournalList.defaultContentType)), raw: response)
             }
         }
     }

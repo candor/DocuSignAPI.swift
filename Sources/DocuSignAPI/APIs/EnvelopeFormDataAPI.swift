@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeFormDataAPI {
-    public enum FormDataGetFormData {
-        case http200(value: EnvelopeFormData?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeFormData?, raw: ClientResponse)
-    }
-
     /**
      Returns envelope form data for an existing envelope.
 
@@ -24,9 +18,9 @@ open class EnvelopeFormDataAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `FormDataGetFormData`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func formDataGetFormData(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<FormDataGetFormData> {
+    open class func formDataGetFormDataRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/form_data"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,14 +38,35 @@ open class EnvelopeFormDataAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> FormDataGetFormData in
+        }
+    }
+
+    public enum FormDataGetFormData {
+        case http200(value: EnvelopeFormData, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeFormData, raw: ClientResponse)
+    }
+
+    /**
+     Returns envelope form data for an existing envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/form_data
+
+     This method downloads the envelope and field data from any in-process, completed, or canceled envelope that you sent or that is shared with you. Recipients who are also full administrators on an account can view form data for any envelopes that another user on the account has sent to them.  **Note**: To use this feature, the Sending Setting \"Allow sender to download form data\" must be enabled for the account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `FormDataGetFormData`
+     */
+    open class func formDataGetFormData(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<FormDataGetFormData> {
+        return formDataGetFormDataRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> FormDataGetFormData in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeFormData.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeFormData.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeFormData.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeFormData.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeFormData.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeFormData.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeFormData.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeFormData.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,21 +9,15 @@ import Foundation
 import Vapor
 
 open class ReportsAPI {
-    public enum ReportsInProductDeleteReportInProduct {
-        case http200(value: ReportInProductSaveResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductSaveResponse?, raw: ClientResponse)
-    }
-
     /**
 
      DELETE /v2.1/accounts/{accountId}/reports/{id}
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter id: (path) A unique ID for the Salesforce object.
-     - returns: `EventLoopFuture` of `ReportsInProductDeleteReportInProduct`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductDeleteReportInProduct(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductDeleteReportInProduct> {
+    open class func reportsInProductDeleteReportInProductRaw(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports/{id}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -41,22 +35,34 @@ open class ReportsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductDeleteReportInProduct in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductGetReportInProduct {
-        case http200(value: ReportInProductGet?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductGet?, raw: ClientResponse)
+    public enum ReportsInProductDeleteReportInProduct {
+        case http200(value: ReportInProductSaveResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductSaveResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     DELETE /v2.1/accounts/{accountId}/reports/{id}
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter id: (path) A unique ID for the Salesforce object.
+     - returns: `EventLoopFuture` of `ReportsInProductDeleteReportInProduct`
+     */
+    open class func reportsInProductDeleteReportInProduct(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductDeleteReportInProduct> {
+        return reportsInProductDeleteReportInProductRaw(accountId: accountId, id: id, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductDeleteReportInProduct in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -65,9 +71,9 @@ open class ReportsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter id: (path) A unique ID for the Salesforce object.
-     - returns: `EventLoopFuture` of `ReportsInProductGetReportInProduct`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductGetReportInProduct(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductGetReportInProduct> {
+    open class func reportsInProductGetReportInProductRaw(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports/{id}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -85,22 +91,34 @@ open class ReportsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductGetReportInProduct in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ReportInProductGet.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductGet.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductGet.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductGet.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductGetReportInProductList {
-        case http200(value: ReportInProductList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductList?, raw: ClientResponse)
+    public enum ReportsInProductGetReportInProduct {
+        case http200(value: ReportInProductGet, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductGet, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/reports/{id}
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter id: (path) A unique ID for the Salesforce object.
+     - returns: `EventLoopFuture` of `ReportsInProductGetReportInProduct`
+     */
+    open class func reportsInProductGetReportInProduct(accountId: String, id: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductGetReportInProduct> {
+        return reportsInProductGetReportInProductRaw(accountId: accountId, id: id, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductGetReportInProduct in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ReportInProductGet.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductGet.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductGet.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductGet.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -108,9 +126,9 @@ open class ReportsAPI {
      GET /v2.1/accounts/{accountId}/reports
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `ReportsInProductGetReportInProductList`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductGetReportInProductList(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductGetReportInProductList> {
+    open class func reportsInProductGetReportInProductListRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -125,22 +143,33 @@ open class ReportsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductGetReportInProductList in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ReportInProductList.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductList.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductPostReportInProductCreate {
-        case http201(value: ReportInProductSaveResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductSaveResponse?, raw: ClientResponse)
+    public enum ReportsInProductGetReportInProductList {
+        case http200(value: ReportInProductList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductList, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/reports
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `ReportsInProductGetReportInProductList`
+     */
+    open class func reportsInProductGetReportInProductList(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductGetReportInProductList> {
+        return reportsInProductGetReportInProductListRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductGetReportInProductList in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ReportInProductList.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductList.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -149,9 +178,9 @@ open class ReportsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter reportInProductRunRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ReportsInProductPostReportInProductCreate`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductPostReportInProductCreate(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPostReportInProductCreate> {
+    open class func reportsInProductPostReportInProductCreateRaw(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -170,22 +199,34 @@ open class ReportsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductPostReportInProductCreate in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductPutReportInProductRunResults {
-        case http200(value: ReportInProductRunResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductRunResponse?, raw: ClientResponse)
+    public enum ReportsInProductPostReportInProductCreate {
+        case http201(value: ReportInProductSaveResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductSaveResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     POST /v2.1/accounts/{accountId}/reports
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter reportInProductRunRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ReportsInProductPostReportInProductCreate`
+     */
+    open class func reportsInProductPostReportInProductCreate(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPostReportInProductCreate> {
+        return reportsInProductPostReportInProductCreateRaw(accountId: accountId, reportInProductRunRequest: reportInProductRunRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductPostReportInProductCreate in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -194,9 +235,9 @@ open class ReportsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter reportInProductRunRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ReportsInProductPutReportInProductRunResults`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductPutReportInProductRunResults(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportInProductRunResults> {
+    open class func reportsInProductPutReportInProductRunResultsRaw(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports/report_results"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -215,22 +256,34 @@ open class ReportsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductPutReportInProductRunResults in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ReportInProductRunResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductRunResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductRunResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductRunResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductPutReportInProductSave {
-        case http200(value: ReportInProductSaveResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ReportInProductSaveResponse?, raw: ClientResponse)
+    public enum ReportsInProductPutReportInProductRunResults {
+        case http200(value: ReportInProductRunResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductRunResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     PUT /v2.1/accounts/{accountId}/reports/report_results
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter reportInProductRunRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ReportsInProductPutReportInProductRunResults`
+     */
+    open class func reportsInProductPutReportInProductRunResults(accountId: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportInProductRunResults> {
+        return reportsInProductPutReportInProductRunResultsRaw(accountId: accountId, reportInProductRunRequest: reportInProductRunRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductPutReportInProductRunResults in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ReportInProductRunResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductRunResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductRunResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductRunResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -240,9 +293,9 @@ open class ReportsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter id: (path) A unique ID for the Salesforce object.
      - parameter reportInProductRunRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ReportsInProductPutReportInProductSave`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductPutReportInProductSave(accountId: String, id: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportInProductSave> {
+    open class func reportsInProductPutReportInProductSaveRaw(accountId: String, id: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports/{id}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -264,22 +317,35 @@ open class ReportsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductPutReportInProductSave in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ReportsInProductPutReportResultsCsv {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
+    public enum ReportsInProductPutReportInProductSave {
+        case http200(value: ReportInProductSaveResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ReportInProductSaveResponse, raw: ClientResponse)
+    }
+
+    /**
+
+     PUT /v2.1/accounts/{accountId}/reports/{id}
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter id: (path) A unique ID for the Salesforce object.
+     - parameter reportInProductRunRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ReportsInProductPutReportInProductSave`
+     */
+    open class func reportsInProductPutReportInProductSave(accountId: String, id: String, reportInProductRunRequest: ReportInProductRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportInProductSave> {
+        return reportsInProductPutReportInProductSaveRaw(accountId: accountId, id: id, reportInProductRunRequest: reportInProductRunRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductPutReportInProductSave in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ReportInProductSaveResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: ReportInProductSaveResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -288,9 +354,9 @@ open class ReportsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter reportInProductCsvRunRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ReportsInProductPutReportResultsCsv`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func reportsInProductPutReportResultsCsv(accountId: String, reportInProductCsvRunRequest: ReportInProductCsvRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportResultsCsv> {
+    open class func reportsInProductPutReportResultsCsvRaw(accountId: String, reportInProductCsvRunRequest: ReportInProductCsvRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/reports/report_results_csv"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -309,12 +375,30 @@ open class ReportsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ReportsInProductPutReportResultsCsv in
+        }
+    }
+
+    public enum ReportsInProductPutReportResultsCsv {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+
+     PUT /v2.1/accounts/{accountId}/reports/report_results_csv
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter reportInProductCsvRunRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ReportsInProductPutReportResultsCsv`
+     */
+    open class func reportsInProductPutReportResultsCsv(accountId: String, reportInProductCsvRunRequest: ReportInProductCsvRunRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ReportsInProductPutReportResultsCsv> {
+        return reportsInProductPutReportResultsCsvRaw(accountId: accountId, reportInProductCsvRunRequest: reportInProductCsvRunRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ReportsInProductPutReportResultsCsv in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }

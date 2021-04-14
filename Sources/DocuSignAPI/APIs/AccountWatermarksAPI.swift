@@ -9,21 +9,15 @@ import Foundation
 import Vapor
 
 open class AccountWatermarksAPI {
-    public enum WatermarkGetWatermark {
-        case http200(value: Watermark?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Watermark?, raw: ClientResponse)
-    }
-
     /**
      Get watermark information.
 
      GET /v2.1/accounts/{accountId}/watermark
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `WatermarkGetWatermark`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func watermarkGetWatermark(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkGetWatermark> {
+    open class func watermarkGetWatermarkRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/watermark"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -38,22 +32,34 @@ open class AccountWatermarksAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WatermarkGetWatermark in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WatermarkPreviewPutWatermarkPreview {
-        case http200(value: Watermark?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Watermark?, raw: ClientResponse)
+    public enum WatermarkGetWatermark {
+        case http200(value: Watermark, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Watermark, raw: ClientResponse)
+    }
+
+    /**
+     Get watermark information.
+
+     GET /v2.1/accounts/{accountId}/watermark
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `WatermarkGetWatermark`
+     */
+    open class func watermarkGetWatermark(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkGetWatermark> {
+        return watermarkGetWatermarkRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WatermarkGetWatermark in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -63,9 +69,9 @@ open class AccountWatermarksAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter watermark: (body) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
-     - returns: `EventLoopFuture` of `WatermarkPreviewPutWatermarkPreview`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func watermarkPreviewPutWatermarkPreview(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkPreviewPutWatermarkPreview> {
+    open class func watermarkPreviewPutWatermarkPreviewRaw(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/watermark/preview"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -84,22 +90,35 @@ open class AccountWatermarksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WatermarkPreviewPutWatermarkPreview in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum WatermarkPutWatermark {
-        case http200(value: Watermark?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Watermark?, raw: ClientResponse)
+    public enum WatermarkPreviewPutWatermarkPreview {
+        case http200(value: Watermark, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Watermark, raw: ClientResponse)
+    }
+
+    /**
+     Get watermark preview.
+
+     PUT /v2.1/accounts/{accountId}/watermark/preview
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter watermark: (body) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
+     - returns: `EventLoopFuture` of `WatermarkPreviewPutWatermarkPreview`
+     */
+    open class func watermarkPreviewPutWatermarkPreview(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkPreviewPutWatermarkPreview> {
+        return watermarkPreviewPutWatermarkPreviewRaw(accountId: accountId, watermark: watermark, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WatermarkPreviewPutWatermarkPreview in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -109,9 +128,9 @@ open class AccountWatermarksAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter watermark: (body) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
-     - returns: `EventLoopFuture` of `WatermarkPutWatermark`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func watermarkPutWatermark(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkPutWatermark> {
+    open class func watermarkPutWatermarkRaw(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/watermark"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -130,14 +149,33 @@ open class AccountWatermarksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> WatermarkPutWatermark in
+        }
+    }
+
+    public enum WatermarkPutWatermark {
+        case http200(value: Watermark, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Watermark, raw: ClientResponse)
+    }
+
+    /**
+     Update watermark information.
+
+     PUT /v2.1/accounts/{accountId}/watermark
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter watermark: (body) When set to **true**, the account has the watermark feature enabled, and the envelope is not complete, then the watermark for the account is added to the PDF documents. This option can remove the watermark.  (optional)
+     - returns: `EventLoopFuture` of `WatermarkPutWatermark`
+     */
+    open class func watermarkPutWatermark(accountId: String, watermark: Watermark? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<WatermarkPutWatermark> {
+        return watermarkPutWatermarkRaw(accountId: accountId, watermark: watermark, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> WatermarkPutWatermark in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(Watermark.self, using: Configuration.contentConfiguration.requireDecoder(for: Watermark.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,21 +9,15 @@ import Foundation
 import Vapor
 
 open class EnvelopeHtmlDefinitionsAPI {
-    public enum ResponsiveHtmlGetEnvelopeHtmlDefinitions {
-        case http200(value: DocumentHtmlDefinitionOriginals?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentHtmlDefinitionOriginals?, raw: ClientResponse)
-    }
-
     /**
 
      GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/html_definitions
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `ResponsiveHtmlGetEnvelopeHtmlDefinitions`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func responsiveHtmlGetEnvelopeHtmlDefinitions(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ResponsiveHtmlGetEnvelopeHtmlDefinitions> {
+    open class func responsiveHtmlGetEnvelopeHtmlDefinitionsRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/html_definitions"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -41,14 +35,32 @@ open class EnvelopeHtmlDefinitionsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ResponsiveHtmlGetEnvelopeHtmlDefinitions in
+        }
+    }
+
+    public enum ResponsiveHtmlGetEnvelopeHtmlDefinitions {
+        case http200(value: DocumentHtmlDefinitionOriginals, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentHtmlDefinitionOriginals, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/html_definitions
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `ResponsiveHtmlGetEnvelopeHtmlDefinitions`
+     */
+    open class func responsiveHtmlGetEnvelopeHtmlDefinitions(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ResponsiveHtmlGetEnvelopeHtmlDefinitions> {
+        return responsiveHtmlGetEnvelopeHtmlDefinitionsRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ResponsiveHtmlGetEnvelopeHtmlDefinitions in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
             }
         }
     }

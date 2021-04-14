@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeLocksAPI {
-    public enum LockDeleteEnvelopeLock {
-        case http200(value: EnvelopeLocks?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeLocks?, raw: ClientResponse)
-    }
-
     /**
      Deletes an envelope lock.
 
@@ -24,9 +18,9 @@ open class EnvelopeLocksAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `LockDeleteEnvelopeLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockDeleteEnvelopeLock(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockDeleteEnvelopeLock> {
+    open class func lockDeleteEnvelopeLockRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class EnvelopeLocksAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockDeleteEnvelopeLock in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockGetEnvelopeLock {
-        case http200(value: EnvelopeLocks?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeLocks?, raw: ClientResponse)
+    public enum LockDeleteEnvelopeLock {
+        case http200(value: EnvelopeLocks, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeLocks, raw: ClientResponse)
+    }
+
+    /**
+     Deletes an envelope lock.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock
+
+     Deletes the lock from the specified envelope. The user must match the user specified by the `lockByUser` property, and the integrator key that you pass in must match the integrator key information. You must also include the `X-DocuSign-Edit` header, which contains a `lockToken` that proves ownership of the lock and the `lockDurationInSeconds`. The token that you need for this header is returned in the response to the POST and GET methods.  Example:  `X-DocuSign-Edit:<DocuSignEdit><LockToken>{{lockToken}}</LockToken></DocuSignEdit>`  **Important**: You must use the query parameter `save_changes` to indicate whether you want to commit the user's changes when deleting the lock. When set to **true**, the system commits the changes that the user made while the lock was active. When set to **false**, the user's changes are discarded. This query parameter does not currently appear in the list of query parameters on this page. However, it is crucial that you include it to ensure that the user's changes are saved or discarded as appropriate.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `LockDeleteEnvelopeLock`
+     */
+    open class func lockDeleteEnvelopeLock(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockDeleteEnvelopeLock> {
+        return lockDeleteEnvelopeLockRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockDeleteEnvelopeLock in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -71,9 +80,9 @@ open class EnvelopeLocksAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `LockGetEnvelopeLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockGetEnvelopeLock(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockGetEnvelopeLock> {
+    open class func lockGetEnvelopeLockRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -91,22 +100,37 @@ open class EnvelopeLocksAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockGetEnvelopeLock in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockPostEnvelopeLock {
-        case http201(value: EnvelopeLocks?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeLocks?, raw: ClientResponse)
+    public enum LockGetEnvelopeLock {
+        case http200(value: EnvelopeLocks, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeLocks, raw: ClientResponse)
+    }
+
+    /**
+     Gets envelope lock information.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock
+
+     Retrieves general information about an envelope lock.  If the call is made by the locked by user and the request has the same integrator key as original, then the `X-DocuSign-Edit` header and additional lock information is included in the response. This information enables users to recover a lost editing session token and the `X-DocuSign-Edit` header.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `LockGetEnvelopeLock`
+     */
+    open class func lockGetEnvelopeLock(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockGetEnvelopeLock> {
+        return lockGetEnvelopeLockRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockGetEnvelopeLock in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -119,9 +143,9 @@ open class EnvelopeLocksAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter lockRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `LockPostEnvelopeLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockPostEnvelopeLock(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPostEnvelopeLock> {
+    open class func lockPostEnvelopeLockRaw(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -143,22 +167,38 @@ open class EnvelopeLocksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockPostEnvelopeLock in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockPutEnvelopeLock {
-        case http200(value: EnvelopeLocks?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeLocks?, raw: ClientResponse)
+    public enum LockPostEnvelopeLock {
+        case http201(value: EnvelopeLocks, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeLocks, raw: ClientResponse)
+    }
+
+    /**
+     Locks an envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock
+
+     This method locks the specified envelope and sets the time until the lock expires to prevent other users or recipients from changing the envelope.  The response to this request returns a `lockToken` parameter. You must use the `lockToken` to update or delete an existing lock. You must also include the `lockToken` in the header for every PUT call that you make on the envelope while it is locked. If you do not include the `lockToken`, the system returns the following error:  ``` {    \"errorCode\": \"EDIT_LOCK_NOT_LOCK_OWNER\",    \"message\": \"The user is not the owner of the lock. The template is locked by another user or in another application\" } ```  **Note**: Users must have envelope locking capability enabled to use this function (userSetting `canLockEnvelopes` must be  set to true for the user).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter lockRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `LockPostEnvelopeLock`
+     */
+    open class func lockPostEnvelopeLock(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPostEnvelopeLock> {
+        return lockPostEnvelopeLockRaw(accountId: accountId, envelopeId: envelopeId, lockRequest: lockRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockPostEnvelopeLock in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -171,9 +211,9 @@ open class EnvelopeLocksAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter lockRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `LockPutEnvelopeLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockPutEnvelopeLock(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPutEnvelopeLock> {
+    open class func lockPutEnvelopeLockRaw(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -195,14 +235,36 @@ open class EnvelopeLocksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockPutEnvelopeLock in
+        }
+    }
+
+    public enum LockPutEnvelopeLock {
+        case http200(value: EnvelopeLocks, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeLocks, raw: ClientResponse)
+    }
+
+    /**
+     Updates an envelope lock.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/lock
+
+     Updates the lock duration or the `lockedByApp` property for the specified envelope. The user must match the user specified by the `lockByUser` property, and the integrator key that you pass in must match the integrator key information. You must also include the `X-DocuSign-Edit` header, which contains a `lockToken` that proves ownership of the lock and the `lockDurationInSeconds`. The token that you need for this header is returned in the response to the POST and GET methods.  Example:  `X-DocuSign-Edit:<DocuSignEdit><LockToken>{{lockToken}}</LockToken></DocuSignEdit>`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter lockRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `LockPutEnvelopeLock`
+     */
+    open class func lockPutEnvelopeLock(accountId: String, envelopeId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPutEnvelopeLock> {
+        return lockPutEnvelopeLockRaw(accountId: accountId, envelopeId: envelopeId, lockRequest: lockRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockPutEnvelopeLock in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeLocks.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeLocks.defaultContentType)), raw: response)
             }
         }
     }

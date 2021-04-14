@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class IdentityVerificationsAPI {
-    public enum AccountIdentityVerificationGetAccountIdentityVerification {
-        case http200(value: AccountIdentityVerificationResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountIdentityVerificationResponse?, raw: ClientResponse)
-    }
-
     /**
      Retrieves the Identity Verification workflows available to an account.
 
@@ -23,9 +17,9 @@ open class IdentityVerificationsAPI {
      This method returns a list of Identity Verification workflows that are available to an account.  **Note**: To use this method, you must either be an account administrator or a sender.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `AccountIdentityVerificationGetAccountIdentityVerification`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountIdentityVerificationGetAccountIdentityVerification(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountIdentityVerificationGetAccountIdentityVerification> {
+    open class func accountIdentityVerificationGetAccountIdentityVerificationRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/identity_verification"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,14 +34,34 @@ open class IdentityVerificationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountIdentityVerificationGetAccountIdentityVerification in
+        }
+    }
+
+    public enum AccountIdentityVerificationGetAccountIdentityVerification {
+        case http200(value: AccountIdentityVerificationResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountIdentityVerificationResponse, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves the Identity Verification workflows available to an account.
+
+     GET /v2.1/accounts/{accountId}/identity_verification
+
+     This method returns a list of Identity Verification workflows that are available to an account.  **Note**: To use this method, you must either be an account administrator or a sender.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `AccountIdentityVerificationGetAccountIdentityVerification`
+     */
+    open class func accountIdentityVerificationGetAccountIdentityVerification(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountIdentityVerificationGetAccountIdentityVerification> {
+        return accountIdentityVerificationGetAccountIdentityVerificationRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountIdentityVerificationGetAccountIdentityVerification in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(AccountIdentityVerificationResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountIdentityVerificationResponse.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(AccountIdentityVerificationResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountIdentityVerificationResponse.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(AccountIdentityVerificationResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountIdentityVerificationResponse.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(AccountIdentityVerificationResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountIdentityVerificationResponse.defaultContentType)), raw: response)
             }
         }
     }

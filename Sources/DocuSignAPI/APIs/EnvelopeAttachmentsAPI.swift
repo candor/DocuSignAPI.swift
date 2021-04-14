@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeAttachmentsAPI {
-    public enum AttachmentsDeleteAttachments {
-        case http200(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
-    }
-
     /**
      Delete one or more attachments from a DRAFT envelope.
 
@@ -23,9 +17,9 @@ open class EnvelopeAttachmentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeAttachmentsRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `AttachmentsDeleteAttachments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func attachmentsDeleteAttachments(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsDeleteAttachments> {
+    open class func attachmentsDeleteAttachmentsRaw(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -47,22 +41,36 @@ open class EnvelopeAttachmentsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AttachmentsDeleteAttachments in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum AttachmentsGetAttachment {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
+    public enum AttachmentsDeleteAttachments {
+        case http200(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Delete one or more attachments from a DRAFT envelope.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeAttachmentsRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `AttachmentsDeleteAttachments`
+     */
+    open class func attachmentsDeleteAttachments(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsDeleteAttachments> {
+        return attachmentsDeleteAttachmentsRaw(accountId: accountId, envelopeId: envelopeId, envelopeAttachmentsRequest: envelopeAttachmentsRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AttachmentsDeleteAttachments in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -73,9 +81,9 @@ open class EnvelopeAttachmentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter attachmentId: (path) The unique identifier for the attachment.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `AttachmentsGetAttachment`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func attachmentsGetAttachment(accountId: String, attachmentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsGetAttachment> {
+    open class func attachmentsGetAttachmentRaw(accountId: String, attachmentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments/{attachmentId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -96,22 +104,36 @@ open class EnvelopeAttachmentsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AttachmentsGetAttachment in
+        }
+    }
+
+    public enum AttachmentsGetAttachment {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves an attachment from the envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments/{attachmentId}
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter attachmentId: (path) The unique identifier for the attachment.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `AttachmentsGetAttachment`
+     */
+    open class func attachmentsGetAttachment(accountId: String, attachmentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsGetAttachment> {
+        return attachmentsGetAttachmentRaw(accountId: accountId, attachmentId: attachmentId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AttachmentsGetAttachment in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum AttachmentsGetAttachments {
-        case http200(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
     }
 
     /**
@@ -121,9 +143,9 @@ open class EnvelopeAttachmentsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `AttachmentsGetAttachments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func attachmentsGetAttachments(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsGetAttachments> {
+    open class func attachmentsGetAttachmentsRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -141,22 +163,35 @@ open class EnvelopeAttachmentsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AttachmentsGetAttachments in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum AttachmentsPutAttachment {
-        case http200(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
+    public enum AttachmentsGetAttachments {
+        case http200(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Returns a list of attachments associated with the specified envelope
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `AttachmentsGetAttachments`
+     */
+    open class func attachmentsGetAttachments(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsGetAttachments> {
+        return attachmentsGetAttachmentsRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AttachmentsGetAttachments in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -168,9 +203,9 @@ open class EnvelopeAttachmentsAPI {
      - parameter attachmentId: (path) The unique identifier for the attachment.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter attachment: (body)  (optional)
-     - returns: `EventLoopFuture` of `AttachmentsPutAttachment`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func attachmentsPutAttachment(accountId: String, attachmentId: String, envelopeId: String, attachment: Attachment? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsPutAttachment> {
+    open class func attachmentsPutAttachmentRaw(accountId: String, attachmentId: String, envelopeId: String, attachment: Attachment? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments/{attachmentId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -195,22 +230,37 @@ open class EnvelopeAttachmentsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AttachmentsPutAttachment in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum AttachmentsPutAttachments {
-        case http200(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeAttachmentsResult?, raw: ClientResponse)
+    public enum AttachmentsPutAttachment {
+        case http200(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Add an attachment to a DRAFT or IN-PROCESS envelope.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments/{attachmentId}
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter attachmentId: (path) The unique identifier for the attachment.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter attachment: (body)  (optional)
+     - returns: `EventLoopFuture` of `AttachmentsPutAttachment`
+     */
+    open class func attachmentsPutAttachment(accountId: String, attachmentId: String, envelopeId: String, attachment: Attachment? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsPutAttachment> {
+        return attachmentsPutAttachmentRaw(accountId: accountId, attachmentId: attachmentId, envelopeId: envelopeId, attachment: attachment, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AttachmentsPutAttachment in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -223,9 +273,9 @@ open class EnvelopeAttachmentsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeAttachmentsRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `AttachmentsPutAttachments`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func attachmentsPutAttachments(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsPutAttachments> {
+    open class func attachmentsPutAttachmentsRaw(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -247,14 +297,36 @@ open class EnvelopeAttachmentsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AttachmentsPutAttachments in
+        }
+    }
+
+    public enum AttachmentsPutAttachments {
+        case http200(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeAttachmentsResult, raw: ClientResponse)
+    }
+
+    /**
+     Add one or more attachments to a draft or in-process envelope.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/attachments
+
+     Supported attachment formats include: .asp, .bmp, .csv, .doc, .docm, .docx, .dot, .dotm, .dotx, .gif, .htm, .html, .jpeg, .jpg, .msg, .pdf, .png, .pot, .potx, .pps, .ppt, .pptm, .pptx, .ps, .rtf, .tif, .tiff, .txt, .wpd, .xls, .xlsm, .xlsx, .xml, and .xps. For more information about supported file formats, see [Supported File Formats](https://support.docusign.com/guides/ndse-user-guide-supported-file-formats).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeAttachmentsRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `AttachmentsPutAttachments`
+     */
+    open class func attachmentsPutAttachments(accountId: String, envelopeId: String, envelopeAttachmentsRequest: EnvelopeAttachmentsRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AttachmentsPutAttachments> {
+        return attachmentsPutAttachmentsRaw(accountId: accountId, envelopeId: envelopeId, envelopeAttachmentsRequest: envelopeAttachmentsRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AttachmentsPutAttachments in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeAttachmentsResult.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeAttachmentsResult.defaultContentType)), raw: response)
             }
         }
     }

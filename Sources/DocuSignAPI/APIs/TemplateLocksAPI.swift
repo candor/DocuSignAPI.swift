@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class TemplateLocksAPI {
-    public enum LockDeleteTemplateLock {
-        case http200(value: LockInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: LockInformation?, raw: ClientResponse)
-    }
-
     /**
      Deletes a template lock.
 
@@ -25,9 +19,9 @@ open class TemplateLocksAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter lockRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `LockDeleteTemplateLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockDeleteTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockDeleteTemplateLock> {
+    open class func lockDeleteTemplateLockRaw(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,22 +43,38 @@ open class TemplateLocksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockDeleteTemplateLock in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockGetTemplateLock {
-        case http200(value: LockInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: LockInformation?, raw: ClientResponse)
+    public enum LockDeleteTemplateLock {
+        case http200(value: LockInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: LockInformation, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a template lock.
+
+     DELETE /v2.1/accounts/{accountId}/templates/{templateId}/lock
+
+     This method deletes a lock from a template.  You must include the `X-DocuSign-Edit` header, which contains a `lockToken` that proves ownership of the lock and the `lockDurationInSeconds`. The token that you need for this header is returned in the response to the POST and GET methods.  Example:  `X-DocuSign-Edit:<DocuSignEdit><LockToken>{{lockToken}}</LockToken></DocuSignEdit>`    **Important**: You must use the query parameter `save_changes` to indicate whether you want to commit the user's changes when deleting the lock. When set to **true**, the system commits the changes that the user made while the lock was active. When set to **false**, the user's changes are discarded. This query parameter does not currently appear in the list of query parameters on this page due to a technical issue. However, it is crucial that you include it to ensure that the user's changes are saved or discarded as appropriate.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter lockRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `LockDeleteTemplateLock`
+     */
+    open class func lockDeleteTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockDeleteTemplateLock> {
+        return lockDeleteTemplateLockRaw(accountId: accountId, templateId: templateId, lockRequest: lockRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockDeleteTemplateLock in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class TemplateLocksAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
-     - returns: `EventLoopFuture` of `LockGetTemplateLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockGetTemplateLock(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockGetTemplateLock> {
+    open class func lockGetTemplateLockRaw(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -96,22 +106,37 @@ open class TemplateLocksAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockGetTemplateLock in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockPostTemplateLock {
-        case http201(value: LockInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: LockInformation?, raw: ClientResponse)
+    public enum LockGetTemplateLock {
+        case http200(value: LockInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: LockInformation, raw: ClientResponse)
+    }
+
+    /**
+     Gets template lock information.
+
+     GET /v2.1/accounts/{accountId}/templates/{templateId}/lock
+
+     Retrieves general information about the template lock.  If the call is made by the user who has the lock and the request has the same integration key as original, then the `X-DocuSign-Edit` header  field and additional lock information is included in the response. This enables users to recover a lost editing session token and the `X-DocuSign-Edit` header.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - returns: `EventLoopFuture` of `LockGetTemplateLock`
+     */
+    open class func lockGetTemplateLock(accountId: String, templateId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockGetTemplateLock> {
+        return lockGetTemplateLockRaw(accountId: accountId, templateId: templateId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockGetTemplateLock in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -124,9 +149,9 @@ open class TemplateLocksAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter lockRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `LockPostTemplateLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockPostTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPostTemplateLock> {
+    open class func lockPostTemplateLockRaw(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -148,22 +173,38 @@ open class TemplateLocksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockPostTemplateLock in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum LockPutTemplateLock {
-        case http200(value: LockInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: LockInformation?, raw: ClientResponse)
+    public enum LockPostTemplateLock {
+        case http201(value: LockInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: LockInformation, raw: ClientResponse)
+    }
+
+    /**
+     Locks a template.
+
+     POST /v2.1/accounts/{accountId}/templates/{templateId}/lock
+
+     Locks the specified template and sets the time until the lock expires to prevent other users or recipients from changing the template.  The response to this request returns a `lockToken` parameter. You must use the `lockToken` to update or delete an existing lock. You must also include the `lockToken` in the header for every PUT call that you make on the template while the template is locked. If you do not include the `lockToken`, the system returns the following error:  ``` {    \"errorCode\": \"EDIT_LOCK_NOT_LOCK_OWNER\",    \"message\": \"The user is not the owner of the lock. The template is locked by another user or in another application\" } ```  **Note**: Users must have envelope locking capability enabled to use this function (the userSetting property `canLockEnvelopes` must be set to **true** for the user).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter lockRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `LockPostTemplateLock`
+     */
+    open class func lockPostTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPostTemplateLock> {
+        return lockPostTemplateLockRaw(accountId: accountId, templateId: templateId, lockRequest: lockRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockPostTemplateLock in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -176,9 +217,9 @@ open class TemplateLocksAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter lockRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `LockPutTemplateLock`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func lockPutTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPutTemplateLock> {
+    open class func lockPutTemplateLockRaw(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/lock"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -200,14 +241,36 @@ open class TemplateLocksAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> LockPutTemplateLock in
+        }
+    }
+
+    public enum LockPutTemplateLock {
+        case http200(value: LockInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: LockInformation, raw: ClientResponse)
+    }
+
+    /**
+     Updates a template lock.
+
+     PUT /v2.1/accounts/{accountId}/templates/{templateId}/lock
+
+     This method updates the lock duration time or the `lockedByApp` property information for the specified template. The user and integrator key must match the user specified by the `lockByUser` property and integrator key information.   You must also include the `X-DocuSign-Edit` header, which contains a `lockToken` that proves ownership of the lock and the `lockDurationInSeconds`. The token that you need for this header is returned in the response to the POST and GET methods.  Example:  `X-DocuSign-Edit:<DocuSignEdit><LockToken>{{lockToken}}</LockToken></DocuSignEdit>`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter lockRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `LockPutTemplateLock`
+     */
+    open class func lockPutTemplateLock(accountId: String, templateId: String, lockRequest: LockRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<LockPutTemplateLock> {
+        return lockPutTemplateLockRaw(accountId: accountId, templateId: templateId, lockRequest: lockRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> LockPutTemplateLock in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(LockInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: LockInformation.defaultContentType)), raw: response)
             }
         }
     }

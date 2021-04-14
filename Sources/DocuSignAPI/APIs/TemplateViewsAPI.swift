@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class TemplateViewsAPI {
-    public enum ViewsPostTemplateEditView {
-        case http201(value: ViewUrl?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ViewUrl?, raw: ClientResponse)
-    }
-
     /**
      Gets a URL for a template edit view.
 
@@ -25,9 +19,9 @@ open class TemplateViewsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter templateId: (path) The id of the template.
      - parameter returnUrlRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostTemplateEditView`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostTemplateEditView(accountId: String, templateId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostTemplateEditView> {
+    open class func viewsPostTemplateEditViewRaw(accountId: String, templateId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/templates/{templateId}/views/edit"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,14 +43,36 @@ open class TemplateViewsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostTemplateEditView in
+        }
+    }
+
+    public enum ViewsPostTemplateEditView {
+        case http201(value: ViewUrl, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ViewUrl, raw: ClientResponse)
+    }
+
+    /**
+     Gets a URL for a template edit view.
+
+     POST /v2.1/accounts/{accountId}/templates/{templateId}/views/edit
+
+     This method returns a URL for starting an edit view of a template that uses the DocuSign Template UI.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter templateId: (path) The id of the template.
+     - parameter returnUrlRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostTemplateEditView`
+     */
+    open class func viewsPostTemplateEditView(accountId: String, templateId: String, returnUrlRequest: ReturnUrlRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostTemplateEditView> {
+        return viewsPostTemplateEditViewRaw(accountId: accountId, templateId: templateId, returnUrlRequest: returnUrlRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostTemplateEditView in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
             }
         }
     }

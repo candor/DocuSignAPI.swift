@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class CloudStorageProvidersAPI {
-    public enum CloudStorageDeleteCloudStorage {
-        case http200(value: CloudStorageProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CloudStorageProviders?, raw: ClientResponse)
-    }
-
     /**
      Deletes the user authentication information for the specified cloud storage provider.
 
@@ -25,9 +19,9 @@ open class CloudStorageProvidersAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
-     - returns: `EventLoopFuture` of `CloudStorageDeleteCloudStorage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageDeleteCloudStorage(accountId: String, serviceId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageDeleteCloudStorage> {
+    open class func cloudStorageDeleteCloudStorageRaw(accountId: String, serviceId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -48,22 +42,38 @@ open class CloudStorageProvidersAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageDeleteCloudStorage in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CloudStorageDeleteCloudStorageProviders {
-        case http200(value: CloudStorageProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CloudStorageProviders?, raw: ClientResponse)
+    public enum CloudStorageDeleteCloudStorage {
+        case http200(value: CloudStorageProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CloudStorageProviders, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the user authentication information for the specified cloud storage provider.
+
+     DELETE /v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}
+
+     Deletes the user authentication information for the specified cloud storage provider. The next time the user tries to access the cloud storage provider, they must pass normal authentication for this cloud storage provider.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - returns: `EventLoopFuture` of `CloudStorageDeleteCloudStorage`
+     */
+    open class func cloudStorageDeleteCloudStorage(accountId: String, serviceId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageDeleteCloudStorage> {
+        return cloudStorageDeleteCloudStorageRaw(accountId: accountId, serviceId: serviceId, userId: userId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageDeleteCloudStorage in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class CloudStorageProvidersAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter cloudStorageProviders: (body)  (optional)
-     - returns: `EventLoopFuture` of `CloudStorageDeleteCloudStorageProviders`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageDeleteCloudStorageProviders(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageDeleteCloudStorageProviders> {
+    open class func cloudStorageDeleteCloudStorageProvidersRaw(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -100,22 +110,38 @@ open class CloudStorageProvidersAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageDeleteCloudStorageProviders in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CloudStorageGetCloudStorage {
-        case http200(value: CloudStorageProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CloudStorageProviders?, raw: ClientResponse)
+    public enum CloudStorageDeleteCloudStorageProviders {
+        case http200(value: CloudStorageProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CloudStorageProviders, raw: ClientResponse)
+    }
+
+    /**
+     Deletes the user authentication information for one or more cloud storage providers.
+
+     DELETE /v2.1/accounts/{accountId}/users/{userId}/cloud_storage
+
+     Deletes the user authentication information for one or more cloud storage providers. The next time the user tries to access the cloud storage provider, they must pass normal authentication.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter cloudStorageProviders: (body)  (optional)
+     - returns: `EventLoopFuture` of `CloudStorageDeleteCloudStorageProviders`
+     */
+    open class func cloudStorageDeleteCloudStorageProviders(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageDeleteCloudStorageProviders> {
+        return cloudStorageDeleteCloudStorageProvidersRaw(accountId: accountId, userId: userId, cloudStorageProviders: cloudStorageProviders, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageDeleteCloudStorageProviders in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -129,9 +155,9 @@ open class CloudStorageProvidersAPI {
      - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter redirectUrl: (query)  The URL the user is redirected to after the cloud storage provider authenticates the user. Using this will append the redirectUrl to the authenticationUrl.  The redirectUrl is restricted to URLs in the docusign.com or docusign.net domains.   (optional)
-     - returns: `EventLoopFuture` of `CloudStorageGetCloudStorage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageGetCloudStorage(accountId: String, serviceId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageGetCloudStorage> {
+    open class func cloudStorageGetCloudStorageRaw(accountId: String, serviceId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -157,22 +183,39 @@ open class CloudStorageProvidersAPI {
             try request.query.encode(QueryParams(redirectUrl: redirectUrl))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageGetCloudStorage in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CloudStorageGetCloudStorageProviders {
-        case http200(value: CloudStorageProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CloudStorageProviders?, raw: ClientResponse)
+    public enum CloudStorageGetCloudStorage {
+        case http200(value: CloudStorageProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CloudStorageProviders, raw: ClientResponse)
+    }
+
+    /**
+     Gets the specified Cloud Storage Provider configuration for the User.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/cloud_storage/{serviceId}
+
+     Retrieves the list of cloud storage providers enabled for the account and the configuration information for the user.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter serviceId: (path) The ID of the service to access.   Valid values are the service name (\"Box\") or the numerical serviceId (\"4136\").
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter redirectUrl: (query)  The URL the user is redirected to after the cloud storage provider authenticates the user. Using this will append the redirectUrl to the authenticationUrl.  The redirectUrl is restricted to URLs in the docusign.com or docusign.net domains.   (optional)
+     - returns: `EventLoopFuture` of `CloudStorageGetCloudStorage`
+     */
+    open class func cloudStorageGetCloudStorage(accountId: String, serviceId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageGetCloudStorage> {
+        return cloudStorageGetCloudStorageRaw(accountId: accountId, serviceId: serviceId, userId: userId, redirectUrl: redirectUrl, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageGetCloudStorage in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -185,9 +228,9 @@ open class CloudStorageProvidersAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter redirectUrl: (query)  The URL the user is redirected to after the cloud storage provider authenticates the user. Using this will append the redirectUrl to the authenticationUrl.  The redirectUrl is restricted to URLs in the docusign.com or docusign.net domains.   (optional)
-     - returns: `EventLoopFuture` of `CloudStorageGetCloudStorageProviders`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStorageGetCloudStorageProviders(accountId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageGetCloudStorageProviders> {
+    open class func cloudStorageGetCloudStorageProvidersRaw(accountId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -210,22 +253,38 @@ open class CloudStorageProvidersAPI {
             try request.query.encode(QueryParams(redirectUrl: redirectUrl))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStorageGetCloudStorageProviders in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum CloudStoragePostCloudStorage {
-        case http201(value: CloudStorageProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CloudStorageProviders?, raw: ClientResponse)
+    public enum CloudStorageGetCloudStorageProviders {
+        case http200(value: CloudStorageProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CloudStorageProviders, raw: ClientResponse)
+    }
+
+    /**
+     Get the Cloud Storage Provider configuration for the specified user.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/cloud_storage
+
+     Retrieves the list of cloud storage providers enabled for the account and the configuration information for the user.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter redirectUrl: (query)  The URL the user is redirected to after the cloud storage provider authenticates the user. Using this will append the redirectUrl to the authenticationUrl.  The redirectUrl is restricted to URLs in the docusign.com or docusign.net domains.   (optional)
+     - returns: `EventLoopFuture` of `CloudStorageGetCloudStorageProviders`
+     */
+    open class func cloudStorageGetCloudStorageProviders(accountId: String, userId: String, redirectUrl: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStorageGetCloudStorageProviders> {
+        return cloudStorageGetCloudStorageProvidersRaw(accountId: accountId, userId: userId, redirectUrl: redirectUrl, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStorageGetCloudStorageProviders in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -238,9 +297,9 @@ open class CloudStorageProvidersAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter cloudStorageProviders: (body)  (optional)
-     - returns: `EventLoopFuture` of `CloudStoragePostCloudStorage`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func cloudStoragePostCloudStorage(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStoragePostCloudStorage> {
+    open class func cloudStoragePostCloudStorageRaw(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/cloud_storage"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -262,14 +321,36 @@ open class CloudStorageProvidersAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> CloudStoragePostCloudStorage in
+        }
+    }
+
+    public enum CloudStoragePostCloudStorage {
+        case http201(value: CloudStorageProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CloudStorageProviders, raw: ClientResponse)
+    }
+
+    /**
+     Configures the redirect URL information  for one or more cloud storage providers for the specified user.
+
+     POST /v2.1/accounts/{accountId}/users/{userId}/cloud_storage
+
+     Configures the redirect URL information  for one or more cloud storage providers for the specified user. The redirect URL is added to the authentication URL to complete the return route.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter cloudStorageProviders: (body)  (optional)
+     - returns: `EventLoopFuture` of `CloudStoragePostCloudStorage`
+     */
+    open class func cloudStoragePostCloudStorage(accountId: String, userId: String, cloudStorageProviders: CloudStorageProviders? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<CloudStoragePostCloudStorage> {
+        return cloudStoragePostCloudStorageRaw(accountId: accountId, userId: userId, cloudStorageProviders: cloudStorageProviders, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> CloudStoragePostCloudStorage in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(CloudStorageProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: CloudStorageProviders.defaultContentType)), raw: response)
             }
         }
     }

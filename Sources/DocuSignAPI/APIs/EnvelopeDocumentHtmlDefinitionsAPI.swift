@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeDocumentHtmlDefinitionsAPI {
-    public enum ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions {
-        case http200(value: DocumentHtmlDefinitionOriginals?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentHtmlDefinitionOriginals?, raw: ClientResponse)
-    }
-
     /**
 
      GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/html_definitions
@@ -22,9 +16,9 @@ open class EnvelopeDocumentHtmlDefinitionsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func responsiveHtmlGetEnvelopeDocumentHtmlDefinitions(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions> {
+    open class func responsiveHtmlGetEnvelopeDocumentHtmlDefinitionsRaw(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/html_definitions"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -45,14 +39,33 @@ open class EnvelopeDocumentHtmlDefinitionsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions in
+        }
+    }
+
+    public enum ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions {
+        case http200(value: DocumentHtmlDefinitionOriginals, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentHtmlDefinitionOriginals, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/html_definitions
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions`
+     */
+    open class func responsiveHtmlGetEnvelopeDocumentHtmlDefinitions(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions> {
+        return responsiveHtmlGetEnvelopeDocumentHtmlDefinitionsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ResponsiveHtmlGetEnvelopeDocumentHtmlDefinitions in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(DocumentHtmlDefinitionOriginals.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentHtmlDefinitionOriginals.defaultContentType)), raw: response)
             }
         }
     }

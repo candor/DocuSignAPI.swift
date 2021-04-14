@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class ConnectEventsAPI {
-    public enum ConnectFailuresDeleteConnectFailureLog {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes a Connect failure log entry.
 
@@ -24,9 +18,9 @@ open class ConnectEventsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter failureId: (path) The id of the Connect post failure.
-     - returns: `EventLoopFuture` of `ConnectFailuresDeleteConnectFailureLog`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectFailuresDeleteConnectFailureLog(accountId: String, failureId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectFailuresDeleteConnectFailureLog> {
+    open class func connectFailuresDeleteConnectFailureLogRaw(accountId: String, failureId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/failures/{failureId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class ConnectEventsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectFailuresDeleteConnectFailureLog in
+        }
+    }
+
+    public enum ConnectFailuresDeleteConnectFailureLog {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a Connect failure log entry.
+
+     DELETE /v2.1/accounts/{accountId}/connect/failures/{failureId}
+
+     Deletes the Connect failure log information for the specified entry.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter failureId: (path) The id of the Connect post failure.
+     - returns: `EventLoopFuture` of `ConnectFailuresDeleteConnectFailureLog`
+     */
+    open class func connectFailuresDeleteConnectFailureLog(accountId: String, failureId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectFailuresDeleteConnectFailureLog> {
+        return connectFailuresDeleteConnectFailureLogRaw(accountId: accountId, failureId: failureId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectFailuresDeleteConnectFailureLog in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ConnectFailuresGetConnectLogs {
-        case http200(value: ConnectLogs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectLogs?, raw: ClientResponse)
     }
 
     /**
@@ -72,9 +81,9 @@ open class ConnectEventsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter fromDate: (query) The start date for a date range in UTC DateTime format.  **Note**: If this property is null, no date filtering is applied. (optional)
      - parameter toDate: (query) The end of a search date range in UTC DateTime format. When you use this parameter, only templates created up to this date and time are returned.  **Note**: If this property is null, the value defaults to the current date. (optional)
-     - returns: `EventLoopFuture` of `ConnectFailuresGetConnectLogs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectFailuresGetConnectLogs(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectFailuresGetConnectLogs> {
+    open class func connectFailuresGetConnectLogsRaw(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/failures"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -95,22 +104,38 @@ open class ConnectEventsAPI {
             try request.query.encode(QueryParams(fromDate: fromDate, toDate: toDate))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectFailuresGetConnectLogs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectLogDeleteConnectLog {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
+    public enum ConnectFailuresGetConnectLogs {
+        case http200(value: ConnectLogs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectLogs, raw: ClientResponse)
+    }
+
+    /**
+     Gets the Connect failure log information.
+
+     GET /v2.1/accounts/{accountId}/connect/failures
+
+     Retrieves the Connect failure log information. You can use this log to determine which envelopes failed to post, in order to create a republish request.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fromDate: (query) The start date for a date range in UTC DateTime format.  **Note**: If this property is null, no date filtering is applied. (optional)
+     - parameter toDate: (query) The end of a search date range in UTC DateTime format. When you use this parameter, only templates created up to this date and time are returned.  **Note**: If this property is null, the value defaults to the current date. (optional)
+     - returns: `EventLoopFuture` of `ConnectFailuresGetConnectLogs`
+     */
+    open class func connectFailuresGetConnectLogs(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectFailuresGetConnectLogs> {
+        return connectFailuresGetConnectLogsRaw(accountId: accountId, fromDate: fromDate, toDate: toDate, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectFailuresGetConnectLogs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -122,9 +147,9 @@ open class ConnectEventsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter logId: (path) The id of the Connect log entry.
-     - returns: `EventLoopFuture` of `ConnectLogDeleteConnectLog`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectLogDeleteConnectLog(accountId: String, logId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogDeleteConnectLog> {
+    open class func connectLogDeleteConnectLogRaw(accountId: String, logId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/logs/{logId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -142,22 +167,37 @@ open class ConnectEventsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectLogDeleteConnectLog in
+        }
+    }
+
+    public enum ConnectLogDeleteConnectLog {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a specified Connect log entry.
+
+     DELETE /v2.1/accounts/{accountId}/connect/logs/{logId}
+
+     Deletes a specified entry from the Connect Log.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter logId: (path) The id of the Connect log entry.
+     - returns: `EventLoopFuture` of `ConnectLogDeleteConnectLog`
+     */
+    open class func connectLogDeleteConnectLog(accountId: String, logId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogDeleteConnectLog> {
+        return connectLogDeleteConnectLogRaw(accountId: accountId, logId: logId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectLogDeleteConnectLog in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ConnectLogDeleteConnectLogs {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
     }
 
     /**
@@ -168,9 +208,9 @@ open class ConnectEventsAPI {
      Deletes a list of Connect log entries for your account.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `ConnectLogDeleteConnectLogs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectLogDeleteConnectLogs(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogDeleteConnectLogs> {
+    open class func connectLogDeleteConnectLogsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/logs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -185,22 +225,36 @@ open class ConnectEventsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectLogDeleteConnectLogs in
+        }
+    }
+
+    public enum ConnectLogDeleteConnectLogs {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a list of Connect log entries.
+
+     DELETE /v2.1/accounts/{accountId}/connect/logs
+
+     Deletes a list of Connect log entries for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `ConnectLogDeleteConnectLogs`
+     */
+    open class func connectLogDeleteConnectLogs(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogDeleteConnectLogs> {
+        return connectLogDeleteConnectLogsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectLogDeleteConnectLogs in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ConnectLogGetConnectLog {
-        case http200(value: ConnectLog?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectLog?, raw: ClientResponse)
     }
 
     /**
@@ -213,9 +267,9 @@ open class ConnectEventsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter logId: (path) The id of the Connect log entry.
      - parameter additionalInfo: (query) When set to **true**, the response includes the `connectDebugLog` information. (optional)
-     - returns: `EventLoopFuture` of `ConnectLogGetConnectLog`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectLogGetConnectLog(accountId: String, logId: String, additionalInfo: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogGetConnectLog> {
+    open class func connectLogGetConnectLogRaw(accountId: String, logId: String, additionalInfo: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/logs/{logId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -238,22 +292,38 @@ open class ConnectEventsAPI {
             try request.query.encode(QueryParams(additionalInfo: additionalInfo))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectLogGetConnectLog in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectLog.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLog.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectLog.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLog.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectLogGetConnectLogs {
-        case http200(value: ConnectLogs?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectLogs?, raw: ClientResponse)
+    public enum ConnectLogGetConnectLog {
+        case http200(value: ConnectLog, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectLog, raw: ClientResponse)
+    }
+
+    /**
+     Gets a Connect log entry.
+
+     GET /v2.1/accounts/{accountId}/connect/logs/{logId}
+
+     Retrieves the specified Connect log entry for your account.  **Note**: The `enableLog` setting in the Connect configuration must be set to true to enable logging. If logging is not enabled, then no log entries are recorded.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter logId: (path) The id of the Connect log entry.
+     - parameter additionalInfo: (query) When set to **true**, the response includes the `connectDebugLog` information. (optional)
+     - returns: `EventLoopFuture` of `ConnectLogGetConnectLog`
+     */
+    open class func connectLogGetConnectLog(accountId: String, logId: String, additionalInfo: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogGetConnectLog> {
+        return connectLogGetConnectLogRaw(accountId: accountId, logId: logId, additionalInfo: additionalInfo, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectLogGetConnectLog in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectLog.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLog.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectLog.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLog.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -266,9 +336,9 @@ open class ConnectEventsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter fromDate: (query) The start date for a date range in UTC DateTime format.  **Note**: If this property is null, no date filtering is applied. (optional)
      - parameter toDate: (query) The end of a search date range in UTC DateTime format. When you use this parameter, only templates created up to this date and time are returned.  **Note**: If this property is null, the value defaults to the current date. (optional)
-     - returns: `EventLoopFuture` of `ConnectLogGetConnectLogs`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectLogGetConnectLogs(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogGetConnectLogs> {
+    open class func connectLogGetConnectLogsRaw(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/logs"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -289,22 +359,38 @@ open class ConnectEventsAPI {
             try request.query.encode(QueryParams(fromDate: fromDate, toDate: toDate))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectLogGetConnectLogs in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectPublishPutConnectRetry {
-        case http200(value: ConnectFailureResults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectFailureResults?, raw: ClientResponse)
+    public enum ConnectLogGetConnectLogs {
+        case http200(value: ConnectLogs, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectLogs, raw: ClientResponse)
+    }
+
+    /**
+     Gets the Connect log.
+
+     GET /v2.1/accounts/{accountId}/connect/logs
+
+     Retrieves a list of connect log entries for your account.  **Note**: The `enableLog` setting in the Connect configuration must be set to true to enable logging. If logging is not enabled, then no log entries are recorded.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fromDate: (query) The start date for a date range in UTC DateTime format.  **Note**: If this property is null, no date filtering is applied. (optional)
+     - parameter toDate: (query) The end of a search date range in UTC DateTime format. When you use this parameter, only templates created up to this date and time are returned.  **Note**: If this property is null, the value defaults to the current date. (optional)
+     - returns: `EventLoopFuture` of `ConnectLogGetConnectLogs`
+     */
+    open class func connectLogGetConnectLogs(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectLogGetConnectLogs> {
+        return connectLogGetConnectLogsRaw(accountId: accountId, fromDate: fromDate, toDate: toDate, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectLogGetConnectLogs in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectLogs.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectLogs.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -316,9 +402,9 @@ open class ConnectEventsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter connectFailureFilter: (body)  (optional)
-     - returns: `EventLoopFuture` of `ConnectPublishPutConnectRetry`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectPublishPutConnectRetry(accountId: String, connectFailureFilter: ConnectFailureFilter? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPublishPutConnectRetry> {
+    open class func connectPublishPutConnectRetryRaw(accountId: String, connectFailureFilter: ConnectFailureFilter? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/envelopes/retry_queue"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -337,22 +423,37 @@ open class ConnectEventsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectPublishPutConnectRetry in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ConnectPublishPutConnectRetryByEnvelope {
-        case http200(value: ConnectFailureResults?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ConnectFailureResults?, raw: ClientResponse)
+    public enum ConnectPublishPutConnectRetry {
+        case http200(value: ConnectFailureResults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectFailureResults, raw: ClientResponse)
+    }
+
+    /**
+     Republishes Connect information for multiple envelopes.
+
+     PUT /v2.1/accounts/{accountId}/connect/envelopes/retry_queue
+
+     Republishes Connect information for the  specified set of envelopes. The primary use is to republish Connect post failures by including envelope IDs for the envelopes that failed to post in the request. The list of envelope IDs that failed to post correctly can be retrieved by calling to [Connect::listEventLogs](https://developers.docusign.com/esign-rest-api/reference/Connect/ConnectEvents/list) retrieve the failure log.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter connectFailureFilter: (body)  (optional)
+     - returns: `EventLoopFuture` of `ConnectPublishPutConnectRetry`
+     */
+    open class func connectPublishPutConnectRetry(accountId: String, connectFailureFilter: ConnectFailureFilter? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPublishPutConnectRetry> {
+        return connectPublishPutConnectRetryRaw(accountId: accountId, connectFailureFilter: connectFailureFilter, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectPublishPutConnectRetry in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -364,9 +465,9 @@ open class ConnectEventsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `ConnectPublishPutConnectRetryByEnvelope`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func connectPublishPutConnectRetryByEnvelope(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPublishPutConnectRetryByEnvelope> {
+    open class func connectPublishPutConnectRetryByEnvelopeRaw(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/connect/envelopes/{envelopeId}/retry_queue"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -384,14 +485,35 @@ open class ConnectEventsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ConnectPublishPutConnectRetryByEnvelope in
+        }
+    }
+
+    public enum ConnectPublishPutConnectRetryByEnvelope {
+        case http200(value: ConnectFailureResults, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ConnectFailureResults, raw: ClientResponse)
+    }
+
+    /**
+     Republishes Connect information for the specified envelope.
+
+     PUT /v2.1/accounts/{accountId}/connect/envelopes/{envelopeId}/retry_queue
+
+     Republishes Connect information for the specified envelope.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `ConnectPublishPutConnectRetryByEnvelope`
+     */
+    open class func connectPublishPutConnectRetryByEnvelope(accountId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ConnectPublishPutConnectRetryByEnvelope> {
+        return connectPublishPutConnectRetryByEnvelopeRaw(accountId: accountId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ConnectPublishPutConnectRetryByEnvelope in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ConnectFailureResults.self, using: Configuration.contentConfiguration.requireDecoder(for: ConnectFailureResults.defaultContentType)), raw: response)
             }
         }
     }

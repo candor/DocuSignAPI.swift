@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class GroupsAPI {
-    public enum GroupsDeleteGroups {
-        case http200(value: GroupInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: GroupInformation?, raw: ClientResponse)
-    }
-
     /**
      Deletes an existing user group.
 
@@ -24,9 +18,9 @@ open class GroupsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter groupInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `GroupsDeleteGroups`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func groupsDeleteGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsDeleteGroups> {
+    open class func groupsDeleteGroupsRaw(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/groups"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -45,22 +39,37 @@ open class GroupsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> GroupsDeleteGroups in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum GroupsGetGroups {
-        case http200(value: GroupInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: GroupInformation?, raw: ClientResponse)
+    public enum GroupsDeleteGroups {
+        case http200(value: GroupInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: GroupInformation, raw: ClientResponse)
+    }
+
+    /**
+     Deletes an existing user group.
+
+     DELETE /v2.1/accounts/{accountId}/groups
+
+     Deletes an existing user group.  When you delete a group, you include only the `groupId` in the request body.  Example:  ``` {   \"groups\": [     {       \"groupId\": \"12345\"     } } ```
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter groupInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `GroupsDeleteGroups`
+     */
+    open class func groupsDeleteGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsDeleteGroups> {
+        return groupsDeleteGroupsRaw(accountId: accountId, groupInformation: groupInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> GroupsDeleteGroups in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +85,9 @@ open class GroupsAPI {
      - parameter includeUsercount: (query) When set to **true**, every group returned in the response includes a `userCount` property that contains the total number of users in the group. The default is **true**. (optional)
      - parameter searchText: (query) Filters the results of a GET request based on the text that you specify. (optional)
      - parameter startPosition: (query) The starting value for the list. (optional)
-     - returns: `EventLoopFuture` of `GroupsGetGroups`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func groupsGetGroups(accountId: String, count: String? = nil, groupType: String? = nil, includeUsercount: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsGetGroups> {
+    open class func groupsGetGroupsRaw(accountId: String, count: String? = nil, groupType: String? = nil, includeUsercount: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/groups"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -102,22 +111,41 @@ open class GroupsAPI {
             try request.query.encode(QueryParams(count: count, groupType: groupType, includeUsercount: includeUsercount, searchText: searchText, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> GroupsGetGroups in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum GroupsPostGroups {
-        case http201(value: GroupInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: GroupInformation?, raw: ClientResponse)
+    public enum GroupsGetGroups {
+        case http200(value: GroupInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: GroupInformation, raw: ClientResponse)
+    }
+
+    /**
+     Gets information about groups associated with the account.
+
+     GET /v2.1/accounts/{accountId}/groups
+
+     Retrieves information about groups associated with the account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter count: (query) Number of records to return. The number must be greater than 1 and less than or equal to 100. (optional)
+     - parameter groupType: (query)  (optional)
+     - parameter includeUsercount: (query) When set to **true**, every group returned in the response includes a `userCount` property that contains the total number of users in the group. The default is **true**. (optional)
+     - parameter searchText: (query) Filters the results of a GET request based on the text that you specify. (optional)
+     - parameter startPosition: (query) The starting value for the list. (optional)
+     - returns: `EventLoopFuture` of `GroupsGetGroups`
+     */
+    open class func groupsGetGroups(accountId: String, count: String? = nil, groupType: String? = nil, includeUsercount: String? = nil, searchText: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsGetGroups> {
+        return groupsGetGroupsRaw(accountId: accountId, count: count, groupType: groupType, includeUsercount: includeUsercount, searchText: searchText, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> GroupsGetGroups in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -129,9 +157,9 @@ open class GroupsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter groupInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `GroupsPostGroups`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func groupsPostGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsPostGroups> {
+    open class func groupsPostGroupsRaw(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/groups"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -150,22 +178,37 @@ open class GroupsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> GroupsPostGroups in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum GroupsPutGroups {
-        case http200(value: GroupInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: GroupInformation?, raw: ClientResponse)
+    public enum GroupsPostGroups {
+        case http201(value: GroupInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: GroupInformation, raw: ClientResponse)
+    }
+
+    /**
+     Creates one or more groups for the account.
+
+     POST /v2.1/accounts/{accountId}/groups
+
+     Creates one or more groups for the account.  Groups can be used to help manage users by associating users with a group. You can associate a group with a Permission Profile, which sets the user permissions for users in that group without having to set the `userSettings` property for each user. You are not required to set Permission Profiles for a group, but it makes it easier to manage user permissions for a large number of users. You can also use groups with template sharing to limit user access to templates.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter groupInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `GroupsPostGroups`
+     */
+    open class func groupsPostGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsPostGroups> {
+        return groupsPostGroupsRaw(accountId: accountId, groupInformation: groupInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> GroupsPostGroups in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -177,9 +220,9 @@ open class GroupsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter groupInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `GroupsPutGroups`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func groupsPutGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsPutGroups> {
+    open class func groupsPutGroupsRaw(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/groups"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -198,14 +241,35 @@ open class GroupsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> GroupsPutGroups in
+        }
+    }
+
+    public enum GroupsPutGroups {
+        case http200(value: GroupInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: GroupInformation, raw: ClientResponse)
+    }
+
+    /**
+     Updates the group information for a group.
+
+     PUT /v2.1/accounts/{accountId}/groups
+
+     Updates the group name and modifies, or sets, the permission profile for the group.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter groupInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `GroupsPutGroups`
+     */
+    open class func groupsPutGroups(accountId: String, groupInformation: GroupInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<GroupsPutGroups> {
+        return groupsPutGroupsRaw(accountId: accountId, groupInformation: groupInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> GroupsPutGroups in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(GroupInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: GroupInformation.defaultContentType)), raw: response)
             }
         }
     }

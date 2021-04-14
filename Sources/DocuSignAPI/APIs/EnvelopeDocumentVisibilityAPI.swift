@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeDocumentVisibilityAPI {
-    public enum RecipientsGetRecipientDocumentVisibility {
-        case http200(value: DocumentVisibilityList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentVisibilityList?, raw: ClientResponse)
-    }
-
     /**
      Returns document visibility for a recipient
 
@@ -25,9 +19,9 @@ open class EnvelopeDocumentVisibilityAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
-     - returns: `EventLoopFuture` of `RecipientsGetRecipientDocumentVisibility`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsGetRecipientDocumentVisibility(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetRecipientDocumentVisibility> {
+    open class func recipientsGetRecipientDocumentVisibilityRaw(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/document_visibility"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -48,22 +42,38 @@ open class EnvelopeDocumentVisibilityAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsGetRecipientDocumentVisibility in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPutRecipientDocumentVisibility {
-        case http200(value: DocumentVisibilityList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentVisibilityList?, raw: ClientResponse)
+    public enum RecipientsGetRecipientDocumentVisibility {
+        case http200(value: DocumentVisibilityList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentVisibilityList, raw: ClientResponse)
+    }
+
+    /**
+     Returns document visibility for a recipient
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/document_visibility
+
+     This method returns information about document visibility for a recipient.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - returns: `EventLoopFuture` of `RecipientsGetRecipientDocumentVisibility`
+     */
+    open class func recipientsGetRecipientDocumentVisibility(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetRecipientDocumentVisibility> {
+        return recipientsGetRecipientDocumentVisibilityRaw(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsGetRecipientDocumentVisibility in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -77,9 +87,9 @@ open class EnvelopeDocumentVisibilityAPI {
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
      - parameter documentVisibilityList: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPutRecipientDocumentVisibility`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPutRecipientDocumentVisibility(accountId: String, envelopeId: String, recipientId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipientDocumentVisibility> {
+    open class func recipientsPutRecipientDocumentVisibilityRaw(accountId: String, envelopeId: String, recipientId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/document_visibility"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -104,22 +114,39 @@ open class EnvelopeDocumentVisibilityAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPutRecipientDocumentVisibility in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPutRecipientsDocumentVisibility {
-        case http200(value: DocumentVisibilityList?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: DocumentVisibilityList?, raw: ClientResponse)
+    public enum RecipientsPutRecipientDocumentVisibility {
+        case http200(value: DocumentVisibilityList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentVisibilityList, raw: ClientResponse)
+    }
+
+    /**
+     Updates document visibility for a recipient
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/document_visibility
+
+     This method updates document visibility for a recipient.  **Note**: A document cannot be hidden from a recipient if the recipient has tabs assigned to them on the document. Carbon Copy, Certified Delivery (Needs to Sign), Editor, and Agent recipients can always see all documents.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - parameter documentVisibilityList: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPutRecipientDocumentVisibility`
+     */
+    open class func recipientsPutRecipientDocumentVisibility(accountId: String, envelopeId: String, recipientId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipientDocumentVisibility> {
+        return recipientsPutRecipientDocumentVisibilityRaw(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, documentVisibilityList: documentVisibilityList, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPutRecipientDocumentVisibility in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -132,9 +159,9 @@ open class EnvelopeDocumentVisibilityAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter documentVisibilityList: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPutRecipientsDocumentVisibility`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPutRecipientsDocumentVisibility(accountId: String, envelopeId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipientsDocumentVisibility> {
+    open class func recipientsPutRecipientsDocumentVisibilityRaw(accountId: String, envelopeId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/document_visibility"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -156,14 +183,36 @@ open class EnvelopeDocumentVisibilityAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPutRecipientsDocumentVisibility in
+        }
+    }
+
+    public enum RecipientsPutRecipientsDocumentVisibility {
+        case http200(value: DocumentVisibilityList, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: DocumentVisibilityList, raw: ClientResponse)
+    }
+
+    /**
+     Updates document visibility for recipients
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/document_visibility
+
+     This method updates document visibility for one or more recipients based on the `recipientId` and `visible` values that you include in the request body.  **Note**: A document cannot be hidden from a recipient if the recipient has tabs assigned to them on the document. Carbon Copy, Certified Delivery (Needs to Sign), Editor, and Agent recipients can always see all documents.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter documentVisibilityList: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPutRecipientsDocumentVisibility`
+     */
+    open class func recipientsPutRecipientsDocumentVisibility(accountId: String, envelopeId: String, documentVisibilityList: DocumentVisibilityList? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipientsDocumentVisibility> {
+        return recipientsPutRecipientsDocumentVisibilityRaw(accountId: accountId, envelopeId: envelopeId, documentVisibilityList: documentVisibilityList, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPutRecipientsDocumentVisibility in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(DocumentVisibilityList.self, using: Configuration.contentConfiguration.requireDecoder(for: DocumentVisibilityList.defaultContentType)), raw: response)
             }
         }
     }

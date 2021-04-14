@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class InvoicesAPI {
-    public enum BillingInvoicesGetBillingInvoice {
-        case http200(value: BillingInvoice?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingInvoice?, raw: ClientResponse)
-    }
-
     /**
      Retrieves a billing invoice.
 
@@ -24,9 +18,9 @@ open class InvoicesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter invoiceId: (path)
-     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoice`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingInvoicesGetBillingInvoice(accountId: String, invoiceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoice> {
+    open class func billingInvoicesGetBillingInvoiceRaw(accountId: String, invoiceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_invoices/{invoiceId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class InvoicesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingInvoicesGetBillingInvoice in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BillingInvoice.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoice.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BillingInvoice.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoice.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingInvoicesGetBillingInvoices {
-        case http200(value: BillingInvoicesResponse?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingInvoicesResponse?, raw: ClientResponse)
+    public enum BillingInvoicesGetBillingInvoice {
+        case http200(value: BillingInvoice, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingInvoice, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves a billing invoice.
+
+     GET /v2.1/accounts/{accountId}/billing_invoices/{invoiceId}
+
+     Retrieves the specified invoice.  **Note**: If the `pdfAvailable` property in the response is set to *true*, you can download a PDF version of the invoice. To download the PDF, make the call again and change the value of the `Accept` property in the header to `Accept: application/pdf`.  Privileges required: account administrator  The response returns a list of charges and information about the charges. Quantities are usually shown as 'unlimited' or an integer. Amounts are shown in the currency set for the account.  **Response** The following table provides a description of the different `chargeName` property values. The information will grow as more chargeable items are added to the system.  | chargeName | Description | | --- | --- | | id_check | ID Check Charge | | in_person_signing | In Person Signing charge | | envelopes Included | Sent Envelopes for the account | | age_verify | Age verification check | | ofac | OFAC Check | | id_confirm | ID confirmation check | | student_authentication | STAN PIN authentication check | | wet_sign_fax | Pages for returning signed documents by fax | | attachment_fax | Pages for returning attachments by fax | | phone_authentication | Phone authentication charge | | powerforms | PowerForm envelopes sent | | signer_payments | Payment processing charge | | outbound_fax | Send by fax charge | | bulk_recipient_envelopes | Bulk Recipient Envelopes sent | | sms_authentications | SMS authentication charge | | saml_authentications | SAML authentication charge | | express_signer_certificate | DocuSign Express Certificate charge | | personal_signer_certificate | Personal Signer Certificate charge | | safe_certificate | SAFE BioPharma Signer Certificate charge | | seats | Included active seats charge | | open_trust_certificate | OpenTrust Signer Certificate charge |
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter invoiceId: (path)
+     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoice`
+     */
+    open class func billingInvoicesGetBillingInvoice(accountId: String, invoiceId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoice> {
+        return billingInvoicesGetBillingInvoiceRaw(accountId: accountId, invoiceId: invoiceId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingInvoicesGetBillingInvoice in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BillingInvoice.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoice.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BillingInvoice.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoice.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -72,9 +81,9 @@ open class InvoicesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter fromDate: (query) Specifies the date/time of the earliest invoice in the account to retrieve. (optional)
      - parameter toDate: (query) Specifies the date/time of the latest invoice in the account to retrieve. (optional)
-     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoices`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingInvoicesGetBillingInvoices(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoices> {
+    open class func billingInvoicesGetBillingInvoicesRaw(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_invoices"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -95,22 +104,38 @@ open class InvoicesAPI {
             try request.query.encode(QueryParams(fromDate: fromDate, toDate: toDate))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingInvoicesGetBillingInvoices in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(BillingInvoicesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesResponse.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(BillingInvoicesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesResponse.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum BillingInvoicesGetBillingInvoicesPastDue {
-        case http200(value: BillingInvoicesSummary?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: BillingInvoicesSummary?, raw: ClientResponse)
+    public enum BillingInvoicesGetBillingInvoices {
+        case http200(value: BillingInvoicesResponse, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingInvoicesResponse, raw: ClientResponse)
+    }
+
+    /**
+     Get a List of Billing Invoices
+
+     GET /v2.1/accounts/{accountId}/billing_invoices
+
+     Retrieves a list of invoices for the account. If the from date or to date queries are not specified, the response returns invoices for the last 365 days.  Privileges required: account administrator
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter fromDate: (query) Specifies the date/time of the earliest invoice in the account to retrieve. (optional)
+     - parameter toDate: (query) Specifies the date/time of the latest invoice in the account to retrieve. (optional)
+     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoices`
+     */
+    open class func billingInvoicesGetBillingInvoices(accountId: String, fromDate: String? = nil, toDate: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoices> {
+        return billingInvoicesGetBillingInvoicesRaw(accountId: accountId, fromDate: fromDate, toDate: toDate, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingInvoicesGetBillingInvoices in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(BillingInvoicesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesResponse.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(BillingInvoicesResponse.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesResponse.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -121,9 +146,9 @@ open class InvoicesAPI {
      Returns a list past due invoices for the account and notes if payment can be made through the REST API.   Privileges Required: account administrator
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoicesPastDue`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func billingInvoicesGetBillingInvoicesPastDue(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoicesPastDue> {
+    open class func billingInvoicesGetBillingInvoicesPastDueRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/billing_invoices_past_due"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -138,14 +163,34 @@ open class InvoicesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> BillingInvoicesGetBillingInvoicesPastDue in
+        }
+    }
+
+    public enum BillingInvoicesGetBillingInvoicesPastDue {
+        case http200(value: BillingInvoicesSummary, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: BillingInvoicesSummary, raw: ClientResponse)
+    }
+
+    /**
+     Get a list of past due invoices.
+
+     GET /v2.1/accounts/{accountId}/billing_invoices_past_due
+
+     Returns a list past due invoices for the account and notes if payment can be made through the REST API.   Privileges Required: account administrator
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `BillingInvoicesGetBillingInvoicesPastDue`
+     */
+    open class func billingInvoicesGetBillingInvoicesPastDue(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<BillingInvoicesGetBillingInvoicesPastDue> {
+        return billingInvoicesGetBillingInvoicesPastDueRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> BillingInvoicesGetBillingInvoicesPastDue in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(BillingInvoicesSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesSummary.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(BillingInvoicesSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesSummary.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(BillingInvoicesSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesSummary.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(BillingInvoicesSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: BillingInvoicesSummary.defaultContentType)), raw: response)
             }
         }
     }

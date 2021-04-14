@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeDocumentFieldsAPI {
-    public enum DocumentFieldsDeleteDocumentFields {
-        case http200(value: EnvelopeDocumentFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentFields?, raw: ClientResponse)
-    }
-
     /**
      Deletes custom document fields from an existing envelope document.
 
@@ -26,9 +20,9 @@ open class EnvelopeDocumentFieldsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeDocumentFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `DocumentFieldsDeleteDocumentFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentFieldsDeleteDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsDeleteDocumentFields> {
+    open class func documentFieldsDeleteDocumentFieldsRaw(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -53,22 +47,39 @@ open class EnvelopeDocumentFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentFieldsDeleteDocumentFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentFieldsGetDocumentFields {
-        case http200(value: EnvelopeDocumentFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentFields?, raw: ClientResponse)
+    public enum DocumentFieldsDeleteDocumentFields {
+        case http200(value: EnvelopeDocumentFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentFields, raw: ClientResponse)
+    }
+
+    /**
+     Deletes custom document fields from an existing envelope document.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields
+
+     Deletes custom document fields from an existing envelope document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeDocumentFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `DocumentFieldsDeleteDocumentFields`
+     */
+    open class func documentFieldsDeleteDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsDeleteDocumentFields> {
+        return documentFieldsDeleteDocumentFieldsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, envelopeDocumentFields: envelopeDocumentFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentFieldsDeleteDocumentFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -81,9 +92,9 @@ open class EnvelopeDocumentFieldsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
-     - returns: `EventLoopFuture` of `DocumentFieldsGetDocumentFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentFieldsGetDocumentFields(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsGetDocumentFields> {
+    open class func documentFieldsGetDocumentFieldsRaw(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -104,22 +115,38 @@ open class EnvelopeDocumentFieldsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentFieldsGetDocumentFields in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentFieldsPostDocumentFields {
-        case http201(value: EnvelopeDocumentFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentFields?, raw: ClientResponse)
+    public enum DocumentFieldsGetDocumentFields {
+        case http200(value: EnvelopeDocumentFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentFields, raw: ClientResponse)
+    }
+
+    /**
+     Gets the custom document fields from an  existing envelope document.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields
+
+     Retrieves the custom document field information from an existing envelope document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - returns: `EventLoopFuture` of `DocumentFieldsGetDocumentFields`
+     */
+    open class func documentFieldsGetDocumentFields(accountId: String, documentId: String, envelopeId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsGetDocumentFields> {
+        return documentFieldsGetDocumentFieldsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentFieldsGetDocumentFields in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -133,9 +160,9 @@ open class EnvelopeDocumentFieldsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeDocumentFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `DocumentFieldsPostDocumentFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentFieldsPostDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsPostDocumentFields> {
+    open class func documentFieldsPostDocumentFieldsRaw(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -160,22 +187,39 @@ open class EnvelopeDocumentFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentFieldsPostDocumentFields in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum DocumentFieldsPutDocumentFields {
-        case http200(value: EnvelopeDocumentFields?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeDocumentFields?, raw: ClientResponse)
+    public enum DocumentFieldsPostDocumentFields {
+        case http201(value: EnvelopeDocumentFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentFields, raw: ClientResponse)
+    }
+
+    /**
+     Creates custom document fields in an existing envelope document.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields
+
+     Creates custom document fields in an existing envelope document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeDocumentFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `DocumentFieldsPostDocumentFields`
+     */
+    open class func documentFieldsPostDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsPostDocumentFields> {
+        return documentFieldsPostDocumentFieldsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, envelopeDocumentFields: envelopeDocumentFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentFieldsPostDocumentFields in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -189,9 +233,9 @@ open class EnvelopeDocumentFieldsAPI {
      - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeDocumentFields: (body)  (optional)
-     - returns: `EventLoopFuture` of `DocumentFieldsPutDocumentFields`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func documentFieldsPutDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsPutDocumentFields> {
+    open class func documentFieldsPutDocumentFieldsRaw(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -216,14 +260,37 @@ open class EnvelopeDocumentFieldsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> DocumentFieldsPutDocumentFields in
+        }
+    }
+
+    public enum DocumentFieldsPutDocumentFields {
+        case http200(value: EnvelopeDocumentFields, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeDocumentFields, raw: ClientResponse)
+    }
+
+    /**
+     Updates existing custom document fields in an existing envelope document.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/documents/{documentId}/fields
+
+     Updates existing custom document fields in an existing envelope document.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter documentId: (path) The `documentId` is set by the API client. It is an integer that falls between `1` and 2,147,483,647. The value is encoded as a string without commas. The values `1`, `2`, `3`, and so on are typically used to identify the first few documents in an envelope. Tab definitions include a `documentId` property that specifies the document on which to place the tab.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeDocumentFields: (body)  (optional)
+     - returns: `EventLoopFuture` of `DocumentFieldsPutDocumentFields`
+     */
+    open class func documentFieldsPutDocumentFields(accountId: String, documentId: String, envelopeId: String, envelopeDocumentFields: EnvelopeDocumentFields? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<DocumentFieldsPutDocumentFields> {
+        return documentFieldsPutDocumentFieldsRaw(accountId: accountId, documentId: documentId, envelopeId: envelopeId, envelopeDocumentFields: envelopeDocumentFields, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> DocumentFieldsPutDocumentFields in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeDocumentFields.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeDocumentFields.defaultContentType)), raw: response)
             }
         }
     }

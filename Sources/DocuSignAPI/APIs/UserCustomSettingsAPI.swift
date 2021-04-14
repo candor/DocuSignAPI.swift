@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class UserCustomSettingsAPI {
-    public enum UserCustomSettingsDeleteCustomSettings {
-        case http200(value: CustomSettingsInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomSettingsInformation?, raw: ClientResponse)
-    }
-
     /**
      Deletes custom user settings for a specified user.
 
@@ -25,9 +19,9 @@ open class UserCustomSettingsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter customSettingsInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `UserCustomSettingsDeleteCustomSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userCustomSettingsDeleteCustomSettings(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsDeleteCustomSettings> {
+    open class func userCustomSettingsDeleteCustomSettingsRaw(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/custom_settings"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -49,22 +43,38 @@ open class UserCustomSettingsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserCustomSettingsDeleteCustomSettings in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserCustomSettingsGetCustomSettings {
-        case http200(value: CustomSettingsInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomSettingsInformation?, raw: ClientResponse)
+    public enum UserCustomSettingsDeleteCustomSettings {
+        case http200(value: CustomSettingsInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomSettingsInformation, raw: ClientResponse)
+    }
+
+    /**
+     Deletes custom user settings for a specified user.
+
+     DELETE /v2.1/accounts/{accountId}/users/{userId}/custom_settings
+
+     Deletes the specified custom user settings for a single user.  ###Deleting Grouped Custom User Settings###  If the custom user settings you want to delete are grouped, you must include the following information in the header, after Content-Type, in the request:  `X-DocuSign-User-Settings-Key:group_name`  Where the `group_name` is your designated name for the group of customer user settings.  If the extra header information is not included, only the custom user settings that were added without a group are deleted.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter customSettingsInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `UserCustomSettingsDeleteCustomSettings`
+     */
+    open class func userCustomSettingsDeleteCustomSettings(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsDeleteCustomSettings> {
+        return userCustomSettingsDeleteCustomSettingsRaw(accountId: accountId, userId: userId, customSettingsInformation: customSettingsInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserCustomSettingsDeleteCustomSettings in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class UserCustomSettingsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
-     - returns: `EventLoopFuture` of `UserCustomSettingsGetCustomSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userCustomSettingsGetCustomSettings(accountId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsGetCustomSettings> {
+    open class func userCustomSettingsGetCustomSettingsRaw(accountId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/custom_settings"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -96,22 +106,37 @@ open class UserCustomSettingsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserCustomSettingsGetCustomSettings in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum UserCustomSettingsPutCustomSettings {
-        case http200(value: CustomSettingsInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: CustomSettingsInformation?, raw: ClientResponse)
+    public enum UserCustomSettingsGetCustomSettings {
+        case http200(value: CustomSettingsInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomSettingsInformation, raw: ClientResponse)
+    }
+
+    /**
+     Retrieves the custom user settings for a specified user.
+
+     GET /v2.1/accounts/{accountId}/users/{userId}/custom_settings
+
+     Retrieves a list of custom user settings for a single user.  Custom settings provide a flexible way to store and retrieve custom user information that can be used in your own system.  **Note**: Custom user settings are not the same as user account settings.  ###Getting Grouped Custom User Settings###  If the custom user settings you want to retrieve are grouped, you must include the following information in the header, after Content-Type, in the request:  `X-DocuSign-User-Settings-Key:group_name`  Where the `group_name` is your designated name for the group of customer user settings.  If the extra header information is not included, only the custom user settings that were added without a group are retrieved.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - returns: `EventLoopFuture` of `UserCustomSettingsGetCustomSettings`
+     */
+    open class func userCustomSettingsGetCustomSettings(accountId: String, userId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsGetCustomSettings> {
+        return userCustomSettingsGetCustomSettingsRaw(accountId: accountId, userId: userId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserCustomSettingsGetCustomSettings in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -124,9 +149,9 @@ open class UserCustomSettingsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
      - parameter customSettingsInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `UserCustomSettingsPutCustomSettings`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func userCustomSettingsPutCustomSettings(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsPutCustomSettings> {
+    open class func userCustomSettingsPutCustomSettingsRaw(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/users/{userId}/custom_settings"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -148,14 +173,36 @@ open class UserCustomSettingsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> UserCustomSettingsPutCustomSettings in
+        }
+    }
+
+    public enum UserCustomSettingsPutCustomSettings {
+        case http200(value: CustomSettingsInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: CustomSettingsInformation, raw: ClientResponse)
+    }
+
+    /**
+     Adds or updates custom user settings for the specified user.
+
+     PUT /v2.1/accounts/{accountId}/users/{userId}/custom_settings
+
+     Adds or updates custom user settings for the specified user.  ***Note**: Custom user settings are not the same as user account settings.  Custom settings provide a flexible way to store and retrieve custom user information that you can use in your own system.  **Important**: There is a limit on the size for all the custom user settings for a single user. The limit is 4,000 characters, which includes the XML and JSON structure for the settings.  ### Grouping Custom User Settings ###  You can group custom user settings when adding them. Grouping allows you to retrieve settings that are in a specific group, instead of retrieving all the user custom settings.  To group custom user settings, add the following information in the header, after Content-Type:  `X-DocuSign-User-Settings-Key:group_name`  Where the `group_name` is your designated name for the group of customer user settings. Grouping is shown in the Example Request Body below.  When getting or deleting grouped custom user settings, you must include the extra header information.  Grouping custom user settings is not required and if the extra header information is not included, the custom user settings are added normally and can be retrieved or deleted without including the additional header.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter userId: (path) The ID of the user to access. Generally this is the ID of the current authenticated user, but if the authenticated user is an Administrator on the account, `userId` can represent another user whom the Administrator is accessing.
+     - parameter customSettingsInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `UserCustomSettingsPutCustomSettings`
+     */
+    open class func userCustomSettingsPutCustomSettings(accountId: String, userId: String, customSettingsInformation: CustomSettingsInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<UserCustomSettingsPutCustomSettings> {
+        return userCustomSettingsPutCustomSettingsRaw(accountId: accountId, userId: userId, customSettingsInformation: customSettingsInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> UserCustomSettingsPutCustomSettings in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(CustomSettingsInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: CustomSettingsInformation.defaultContentType)), raw: response)
             }
         }
     }

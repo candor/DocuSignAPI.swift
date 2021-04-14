@@ -9,20 +9,14 @@ import Foundation
 import Vapor
 
 open class AccountSealProvidersAPI {
-    public enum AccountSignatureProvidersGetSealProviders {
-        case http200(value: AccountSealProviders?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: AccountSealProviders?, raw: ClientResponse)
-    }
-
     /**
 
      GET /v2.1/accounts/{accountId}/seals
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `AccountSignatureProvidersGetSealProviders`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func accountSignatureProvidersGetSealProviders(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountSignatureProvidersGetSealProviders> {
+    open class func accountSignatureProvidersGetSealProvidersRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/seals"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -37,14 +31,31 @@ open class AccountSealProvidersAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> AccountSignatureProvidersGetSealProviders in
+        }
+    }
+
+    public enum AccountSignatureProvidersGetSealProviders {
+        case http200(value: AccountSealProviders, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: AccountSealProviders, raw: ClientResponse)
+    }
+
+    /**
+
+     GET /v2.1/accounts/{accountId}/seals
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `AccountSignatureProvidersGetSealProviders`
+     */
+    open class func accountSignatureProvidersGetSealProviders(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<AccountSignatureProvidersGetSealProviders> {
+        return accountSignatureProvidersGetSealProvidersRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> AccountSignatureProvidersGetSealProviders in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(AccountSealProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSealProviders.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(AccountSealProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSealProviders.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(AccountSealProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSealProviders.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(AccountSealProviders.self, using: Configuration.contentConfiguration.requireDecoder(for: AccountSealProviders.defaultContentType)), raw: response)
             }
         }
     }

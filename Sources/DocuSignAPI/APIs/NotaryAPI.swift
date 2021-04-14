@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class NotaryAPI {
-    public enum NotaryGetNotary {
-        case http200(value: NotaryResult?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: NotaryResult?, raw: ClientResponse)
-    }
-
     /**
      Gets settings for a  notary user.
 
@@ -23,9 +17,9 @@ open class NotaryAPI {
      Gets settings for a notary user. The current user must be a notary.
 
      - parameter includeJurisdictions: (query) If **true**, the response will include a `jurisdiction` property that contains an array of all supported jurisdictions for the current user. (optional)
-     - returns: `EventLoopFuture` of `NotaryGetNotary`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryGetNotary(includeJurisdictions: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryGetNotary> {
+    open class func notaryGetNotaryRaw(includeJurisdictions: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/notary"
         let URLString = DocuSignAPI.basePath + path
 
@@ -42,22 +36,36 @@ open class NotaryAPI {
             try request.query.encode(QueryParams(includeJurisdictions: includeJurisdictions))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryGetNotary in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(NotaryResult.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryResult.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(NotaryResult.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryResult.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum NotaryPostNotary {
-        case http201(value: Notary?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Notary?, raw: ClientResponse)
+    public enum NotaryGetNotary {
+        case http200(value: NotaryResult, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: NotaryResult, raw: ClientResponse)
+    }
+
+    /**
+     Gets settings for a  notary user.
+
+     GET /v2.1/current_user/notary
+
+     Gets settings for a notary user. The current user must be a notary.
+
+     - parameter includeJurisdictions: (query) If **true**, the response will include a `jurisdiction` property that contains an array of all supported jurisdictions for the current user. (optional)
+     - returns: `EventLoopFuture` of `NotaryGetNotary`
+     */
+    open class func notaryGetNotary(includeJurisdictions: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryGetNotary> {
+        return notaryGetNotaryRaw(includeJurisdictions: includeJurisdictions, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryGetNotary in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(NotaryResult.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryResult.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(NotaryResult.self, using: Configuration.contentConfiguration.requireDecoder(for: NotaryResult.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -68,9 +76,9 @@ open class NotaryAPI {
      Registers the current user as a notary.
 
      - parameter notary: (body)  (optional)
-     - returns: `EventLoopFuture` of `NotaryPostNotary`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryPostNotary(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryPostNotary> {
+    open class func notaryPostNotaryRaw(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/notary"
         let URLString = DocuSignAPI.basePath + path
 
@@ -86,22 +94,36 @@ open class NotaryAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryPostNotary in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum NotaryPutNotary {
-        case http200(value: Notary?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Notary?, raw: ClientResponse)
+    public enum NotaryPostNotary {
+        case http201(value: Notary, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Notary, raw: ClientResponse)
+    }
+
+    /**
+     Registers the current user as a notary.
+
+     POST /v2.1/current_user/notary
+
+     Registers the current user as a notary.
+
+     - parameter notary: (body)  (optional)
+     - returns: `EventLoopFuture` of `NotaryPostNotary`
+     */
+    open class func notaryPostNotary(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryPostNotary> {
+        return notaryPostNotaryRaw(notary: notary, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryPostNotary in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -112,9 +134,9 @@ open class NotaryAPI {
      Updates notary information for the current user.
 
      - parameter notary: (body)  (optional)
-     - returns: `EventLoopFuture` of `NotaryPutNotary`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func notaryPutNotary(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryPutNotary> {
+    open class func notaryPutNotaryRaw(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         let path = "/v2.1/current_user/notary"
         let URLString = DocuSignAPI.basePath + path
 
@@ -130,14 +152,34 @@ open class NotaryAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> NotaryPutNotary in
+        }
+    }
+
+    public enum NotaryPutNotary {
+        case http200(value: Notary, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Notary, raw: ClientResponse)
+    }
+
+    /**
+     Updates notary information for the current user.
+
+     PUT /v2.1/current_user/notary
+
+     Updates notary information for the current user.
+
+     - parameter notary: (body)  (optional)
+     - returns: `EventLoopFuture` of `NotaryPutNotary`
+     */
+    open class func notaryPutNotary(notary: Notary? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<NotaryPutNotary> {
+        return notaryPutNotaryRaw(notary: notary, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> NotaryPutNotary in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(Notary.self, using: Configuration.contentConfiguration.requireDecoder(for: Notary.defaultContentType)), raw: response)
             }
         }
     }

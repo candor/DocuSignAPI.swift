@@ -9,21 +9,15 @@ import Foundation
 import Vapor
 
 open class ENoteConfigurationsAPI {
-    public enum ENoteConfigurationDeleteENoteConfiguration {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes configuration information for the eNote eOriginal integration.
 
      DELETE /v2.1/accounts/{accountId}/settings/enote_configuration
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `ENoteConfigurationDeleteENoteConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func eNoteConfigurationDeleteENoteConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationDeleteENoteConfiguration> {
+    open class func eNoteConfigurationDeleteENoteConfigurationRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/enote_configuration"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -38,22 +32,34 @@ open class ENoteConfigurationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ENoteConfigurationDeleteENoteConfiguration in
+        }
+    }
+
+    public enum ENoteConfigurationDeleteENoteConfiguration {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes configuration information for the eNote eOriginal integration.
+
+     DELETE /v2.1/accounts/{accountId}/settings/enote_configuration
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `ENoteConfigurationDeleteENoteConfiguration`
+     */
+    open class func eNoteConfigurationDeleteENoteConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationDeleteENoteConfiguration> {
+        return eNoteConfigurationDeleteENoteConfigurationRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ENoteConfigurationDeleteENoteConfiguration in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum ENoteConfigurationGetENoteConfiguration {
-        case http200(value: ENoteConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ENoteConfiguration?, raw: ClientResponse)
     }
 
     /**
@@ -62,9 +68,9 @@ open class ENoteConfigurationsAPI {
      GET /v2.1/accounts/{accountId}/settings/enote_configuration
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `ENoteConfigurationGetENoteConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func eNoteConfigurationGetENoteConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationGetENoteConfiguration> {
+    open class func eNoteConfigurationGetENoteConfigurationRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/enote_configuration"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -79,22 +85,34 @@ open class ENoteConfigurationsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ENoteConfigurationGetENoteConfiguration in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ENoteConfigurationPutENoteConfiguration {
-        case http200(value: ENoteConfiguration?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ENoteConfiguration?, raw: ClientResponse)
+    public enum ENoteConfigurationGetENoteConfiguration {
+        case http200(value: ENoteConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ENoteConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Returns the configuration information for the eNote eOriginal integration.
+
+     GET /v2.1/accounts/{accountId}/settings/enote_configuration
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `ENoteConfigurationGetENoteConfiguration`
+     */
+    open class func eNoteConfigurationGetENoteConfiguration(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationGetENoteConfiguration> {
+        return eNoteConfigurationGetENoteConfigurationRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ENoteConfigurationGetENoteConfiguration in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -104,9 +122,9 @@ open class ENoteConfigurationsAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter eNoteConfiguration: (body)  (optional)
-     - returns: `EventLoopFuture` of `ENoteConfigurationPutENoteConfiguration`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func eNoteConfigurationPutENoteConfiguration(accountId: String, eNoteConfiguration: ENoteConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationPutENoteConfiguration> {
+    open class func eNoteConfigurationPutENoteConfigurationRaw(accountId: String, eNoteConfiguration: ENoteConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/settings/enote_configuration"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -125,14 +143,33 @@ open class ENoteConfigurationsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ENoteConfigurationPutENoteConfiguration in
+        }
+    }
+
+    public enum ENoteConfigurationPutENoteConfiguration {
+        case http200(value: ENoteConfiguration, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ENoteConfiguration, raw: ClientResponse)
+    }
+
+    /**
+     Updates configuration information for the eNote eOriginal integration.
+
+     PUT /v2.1/accounts/{accountId}/settings/enote_configuration
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter eNoteConfiguration: (body)  (optional)
+     - returns: `EventLoopFuture` of `ENoteConfigurationPutENoteConfiguration`
+     */
+    open class func eNoteConfigurationPutENoteConfiguration(accountId: String, eNoteConfiguration: ENoteConfiguration? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ENoteConfigurationPutENoteConfiguration> {
+        return eNoteConfigurationPutENoteConfigurationRaw(accountId: accountId, eNoteConfiguration: eNoteConfiguration, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ENoteConfigurationPutENoteConfiguration in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ENoteConfiguration.self, using: Configuration.contentConfiguration.requireDecoder(for: ENoteConfiguration.defaultContentType)), raw: response)
             }
         }
     }

@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeRecipientsAPI {
-    public enum RecipientsDeleteRecipient {
-        case http200(value: EnvelopeRecipients?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeRecipients?, raw: ClientResponse)
-    }
-
     /**
      Deletes a recipient from an envelope.
 
@@ -25,9 +19,9 @@ open class EnvelopeRecipientsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
-     - returns: `EventLoopFuture` of `RecipientsDeleteRecipient`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsDeleteRecipient(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteRecipient> {
+    open class func recipientsDeleteRecipientRaw(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -48,22 +42,38 @@ open class EnvelopeRecipientsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsDeleteRecipient in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsDeleteRecipients {
-        case http200(value: EnvelopeRecipients?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeRecipients?, raw: ClientResponse)
+    public enum RecipientsDeleteRecipient {
+        case http200(value: EnvelopeRecipients, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeRecipients, raw: ClientResponse)
+    }
+
+    /**
+     Deletes a recipient from an envelope.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}
+
+     Deletes a recipient from a `draft` or `sent` envelope.  If the envelope is \"In Process\" (has been sent and is not completed or voided), recipients that have completed their actions cannot be deleted.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientId: (path) A local reference that senders use to map recipients to other objects, such as specific document tabs. Within an envelope, each `recipientId` must be unique, but there is no uniqueness requirement across envelopes. For example, many envelopes assign the first recipient a `recipientId` of `1`.
+     - returns: `EventLoopFuture` of `RecipientsDeleteRecipient`
+     */
+    open class func recipientsDeleteRecipient(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteRecipient> {
+        return recipientsDeleteRecipientRaw(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsDeleteRecipient in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -76,9 +86,9 @@ open class EnvelopeRecipientsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter envelopeRecipients: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsDeleteRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsDeleteRecipients(accountId: String, envelopeId: String, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteRecipients> {
+    open class func recipientsDeleteRecipientsRaw(accountId: String, envelopeId: String, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -100,22 +110,38 @@ open class EnvelopeRecipientsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsDeleteRecipients in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsGetRecipients {
-        case http200(value: EnvelopeRecipients?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeRecipients?, raw: ClientResponse)
+    public enum RecipientsDeleteRecipients {
+        case http200(value: EnvelopeRecipients, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeRecipients, raw: ClientResponse)
+    }
+
+    /**
+     Deletes recipients from an envelope.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients
+
+     Deletes one or more recipients from a draft or sent envelope. List the recipients that you want to delete in the body of the request. This method uses the `recipientId` as the key for deleting recipients.  If the envelope is `In Process`, meaning that it has been sent and has not been completed or voided, recipients that have completed their actions cannot be deleted.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter envelopeRecipients: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsDeleteRecipients`
+     */
+    open class func recipientsDeleteRecipients(accountId: String, envelopeId: String, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsDeleteRecipients> {
+        return recipientsDeleteRecipientsRaw(accountId: accountId, envelopeId: envelopeId, envelopeRecipients: envelopeRecipients, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsDeleteRecipients in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -131,9 +157,9 @@ open class EnvelopeRecipientsAPI {
      - parameter includeExtended: (query)  When set to **true**, the extended properties are included in the response.  (optional)
      - parameter includeMetadata: (query) Boolean value that specifies whether to include metadata associated with the recipients (for envelopes only, not templates). (optional)
      - parameter includeTabs: (query) When set to **true**, the tab information associated with the recipient is included in the response. If you do not specify this parameter, the effect is the default behavior (**false**). (optional)
-     - returns: `EventLoopFuture` of `RecipientsGetRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsGetRecipients(accountId: String, envelopeId: String, includeAnchorTabLocations: String? = nil, includeExtended: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetRecipients> {
+    open class func recipientsGetRecipientsRaw(accountId: String, envelopeId: String, includeAnchorTabLocations: String? = nil, includeExtended: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -159,22 +185,41 @@ open class EnvelopeRecipientsAPI {
             try request.query.encode(QueryParams(includeAnchorTabLocations: includeAnchorTabLocations, includeExtended: includeExtended, includeMetadata: includeMetadata, includeTabs: includeTabs))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsGetRecipients in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPostRecipientProofFileResourceToken {
-        case http201(value: ProofServiceResourceToken?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ProofServiceResourceToken?, raw: ClientResponse)
+    public enum RecipientsGetRecipients {
+        case http200(value: EnvelopeRecipients, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeRecipients, raw: ClientResponse)
+    }
+
+    /**
+     Gets the status of recipients for an envelope.
+
+     GET /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients
+
+     Retrieves the status of all recipients in a single envelope and identifies the current recipient in the routing list. This method can also be used to retrieve the tab values.  The `currentRoutingOrder` property of the response contains the `routingOrder` value of the current recipient indicating that the envelope has been sent to the recipient, but the recipient has not completed their actions.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter includeAnchorTabLocations: (query)  When set to **true** and `include_tabs` value is set to **true**, all tabs with anchor tab properties are included in the response.  (optional)
+     - parameter includeExtended: (query)  When set to **true**, the extended properties are included in the response.  (optional)
+     - parameter includeMetadata: (query) Boolean value that specifies whether to include metadata associated with the recipients (for envelopes only, not templates). (optional)
+     - parameter includeTabs: (query) When set to **true**, the tab information associated with the recipient is included in the response. If you do not specify this parameter, the effect is the default behavior (**false**). (optional)
+     - returns: `EventLoopFuture` of `RecipientsGetRecipients`
+     */
+    open class func recipientsGetRecipients(accountId: String, envelopeId: String, includeAnchorTabLocations: String? = nil, includeExtended: String? = nil, includeMetadata: String? = nil, includeTabs: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsGetRecipients> {
+        return recipientsGetRecipientsRaw(accountId: accountId, envelopeId: envelopeId, includeAnchorTabLocations: includeAnchorTabLocations, includeExtended: includeExtended, includeMetadata: includeMetadata, includeTabs: includeTabs, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsGetRecipients in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -187,9 +232,9 @@ open class EnvelopeRecipientsAPI {
      - parameter accountId: (path) The account ID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientId: (path) The `recipientIdGuid`.
-     - returns: `EventLoopFuture` of `RecipientsPostRecipientProofFileResourceToken`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPostRecipientProofFileResourceToken(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostRecipientProofFileResourceToken> {
+    open class func recipientsPostRecipientProofFileResourceTokenRaw(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/identity_proof_token"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -210,22 +255,38 @@ open class EnvelopeRecipientsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPostRecipientProofFileResourceToken in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(ProofServiceResourceToken.self, using: Configuration.contentConfiguration.requireDecoder(for: ProofServiceResourceToken.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(ProofServiceResourceToken.self, using: Configuration.contentConfiguration.requireDecoder(for: ProofServiceResourceToken.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPostRecipients {
-        case http201(value: EnvelopeRecipients?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeRecipients?, raw: ClientResponse)
+    public enum RecipientsPostRecipientProofFileResourceToken {
+        case http201(value: ProofServiceResourceToken, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ProofServiceResourceToken, raw: ClientResponse)
+    }
+
+    /**
+     Creates a resource token for a sender to request ID Evidence data.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients/{recipientId}/identity_proof_token
+
+     Creates a resource token for a sender. This token allows a sender to return identification data for a recipient using the [ID Evidence API](https://developers.docusign.com/docs/idevidence-api/).
+
+     - parameter accountId: (path) The account ID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientId: (path) The `recipientIdGuid`.
+     - returns: `EventLoopFuture` of `RecipientsPostRecipientProofFileResourceToken`
+     */
+    open class func recipientsPostRecipientProofFileResourceToken(accountId: String, envelopeId: String, recipientId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostRecipientProofFileResourceToken> {
+        return recipientsPostRecipientProofFileResourceTokenRaw(accountId: accountId, envelopeId: envelopeId, recipientId: recipientId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPostRecipientProofFileResourceToken in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(ProofServiceResourceToken.self, using: Configuration.contentConfiguration.requireDecoder(for: ProofServiceResourceToken.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(ProofServiceResourceToken.self, using: Configuration.contentConfiguration.requireDecoder(for: ProofServiceResourceToken.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -239,9 +300,9 @@ open class EnvelopeRecipientsAPI {
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter resendEnvelope: (query) When set to **true**, resends the envelope to the recipients that you specify in the request body. You use this parameter to resend the envelope to a recipient who deleted the original email notification.  **Note**: Correcting an envelope is a different process. DocuSign always resends an envelope when you correct it, regardless of the value that you enter here. (optional)
      - parameter envelopeRecipients: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPostRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPostRecipients(accountId: String, envelopeId: String, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostRecipients> {
+    open class func recipientsPostRecipientsRaw(accountId: String, envelopeId: String, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -267,22 +328,39 @@ open class EnvelopeRecipientsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPostRecipients in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum RecipientsPutRecipients {
-        case http200(value: RecipientsUpdateSummary?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: RecipientsUpdateSummary?, raw: ClientResponse)
+    public enum RecipientsPostRecipients {
+        case http201(value: EnvelopeRecipients, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeRecipients, raw: ClientResponse)
+    }
+
+    /**
+     Adds one or more recipients to an envelope.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients
+
+     Adds one or more recipients to an envelope.  For an in process envelope, one that has been sent and has not been completed or voided, an email is sent to a new recipient when they are reached in the routing order. If the new recipient's routing order is before or the same as the envelope's next recipient, an email is only sent if the optional `resend_envelope` query string is set to **true**.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter resendEnvelope: (query) When set to **true**, resends the envelope to the recipients that you specify in the request body. You use this parameter to resend the envelope to a recipient who deleted the original email notification.  **Note**: Correcting an envelope is a different process. DocuSign always resends an envelope when you correct it, regardless of the value that you enter here. (optional)
+     - parameter envelopeRecipients: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPostRecipients`
+     */
+    open class func recipientsPostRecipients(accountId: String, envelopeId: String, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPostRecipients> {
+        return recipientsPostRecipientsRaw(accountId: accountId, envelopeId: envelopeId, resendEnvelope: resendEnvelope, envelopeRecipients: envelopeRecipients, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPostRecipients in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeRecipients.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeRecipients.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -298,9 +376,9 @@ open class EnvelopeRecipientsAPI {
      - parameter offlineSigning: (query) Indicates if offline signing is enabled for the recipient when a network connection is unavailable.  (optional)
      - parameter resendEnvelope: (query) When set to **true**, resends the envelope to the recipients that you specify in the request body. You use this parameter to resend the envelope to a recipient who deleted the original email notification.  **Note**: Correcting an envelope is a different process. DocuSign always resends an envelope when you correct it, regardless of the value that you enter here. (optional)
      - parameter envelopeRecipients: (body)  (optional)
-     - returns: `EventLoopFuture` of `RecipientsPutRecipients`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func recipientsPutRecipients(accountId: String, envelopeId: String, combineSameOrderRecipients: String? = nil, offlineSigning: String? = nil, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipients> {
+    open class func recipientsPutRecipientsRaw(accountId: String, envelopeId: String, combineSameOrderRecipients: String? = nil, offlineSigning: String? = nil, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -328,22 +406,41 @@ open class EnvelopeRecipientsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> RecipientsPutRecipients in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(RecipientsUpdateSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientsUpdateSummary.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(RecipientsUpdateSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientsUpdateSummary.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum ViewsPostEnvelopeRecipientPreview {
-        case http201(value: ViewUrl?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: ViewUrl?, raw: ClientResponse)
+    public enum RecipientsPutRecipients {
+        case http200(value: RecipientsUpdateSummary, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: RecipientsUpdateSummary, raw: ClientResponse)
+    }
+
+    /**
+     Updates recipients in a draft envelope or corrects recipient information for an in-process envelope.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/{envelopeId}/recipients
+
+     Updates the recipients of a draft envelope or corrects recipient information for an in-process envelope.   If you send information for a recipient that does not already exist in a draft envelope, the recipient is added to the envelope (similar to the EnvelopeRecipients::Create method).  You can also use this method to resend an envelope to a recipient by using the `resend_envelope` option.  **Updating Sent Envelopes**  After an envelope has been sent, you can edit only the following properties:   - `accessCode` - `agentCanEditName` - `agentCanEditEmail` - `customFields` - `deliveryMethod` - `documentVisibility` - `email` - `emailNotification` - `idCheckConfigurationName` - `name` - `note` - `phoneAuthentication` - `recipientType` (For this to work, you must also change the recipient object to match the recipient type.) - `requireIdLookup` - `routingOrder` - `routingOrder` - `signingGroupId` (You can change this id to switch to a different signing group and its corresponding set of recipients.) - `smsAuthentication` - `suppressEmails` - `userName`
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter combineSameOrderRecipients: (query) When set to **true**, recipients are combined or merged with matching recipients. Recipient matching occurs as part of [template matching](https://docs.docusign.com/DocuSignHelp/Content/automatic-template-matching.htm), and is based on Recipient Role and Routing Order. (optional)
+     - parameter offlineSigning: (query) Indicates if offline signing is enabled for the recipient when a network connection is unavailable.  (optional)
+     - parameter resendEnvelope: (query) When set to **true**, resends the envelope to the recipients that you specify in the request body. You use this parameter to resend the envelope to a recipient who deleted the original email notification.  **Note**: Correcting an envelope is a different process. DocuSign always resends an envelope when you correct it, regardless of the value that you enter here. (optional)
+     - parameter envelopeRecipients: (body)  (optional)
+     - returns: `EventLoopFuture` of `RecipientsPutRecipients`
+     */
+    open class func recipientsPutRecipients(accountId: String, envelopeId: String, combineSameOrderRecipients: String? = nil, offlineSigning: String? = nil, resendEnvelope: String? = nil, envelopeRecipients: EnvelopeRecipients? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<RecipientsPutRecipients> {
+        return recipientsPutRecipientsRaw(accountId: accountId, envelopeId: envelopeId, combineSameOrderRecipients: combineSameOrderRecipients, offlineSigning: offlineSigning, resendEnvelope: resendEnvelope, envelopeRecipients: envelopeRecipients, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> RecipientsPutRecipients in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(RecipientsUpdateSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientsUpdateSummary.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(RecipientsUpdateSummary.self, using: Configuration.contentConfiguration.requireDecoder(for: RecipientsUpdateSummary.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -356,9 +453,9 @@ open class EnvelopeRecipientsAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
      - parameter recipientPreviewRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientPreview`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func viewsPostEnvelopeRecipientPreview(accountId: String, envelopeId: String, recipientPreviewRequest: RecipientPreviewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientPreview> {
+    open class func viewsPostEnvelopeRecipientPreviewRaw(accountId: String, envelopeId: String, recipientPreviewRequest: RecipientPreviewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/recipient_preview"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -380,14 +477,36 @@ open class EnvelopeRecipientsAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> ViewsPostEnvelopeRecipientPreview in
+        }
+    }
+
+    public enum ViewsPostEnvelopeRecipientPreview {
+        case http201(value: ViewUrl, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: ViewUrl, raw: ClientResponse)
+    }
+
+    /**
+     Creates an envelope recipient preview.
+
+     POST /v2.1/accounts/{accountId}/envelopes/{envelopeId}/views/recipient_preview
+
+     This method returns a URL for an envelope recipient preview  in the DocuSign UI that you can embed in your application. You use this method to enable the sender to preview the recipients' experience.  For more information, see [Preview and Send](https://support.docusign.com/en/guides/ndse-user-guide-send-your-documents).
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeId: (path) The envelope's GUID.   Example: `93be49ab-xxxx-xxxx-xxxx-f752070d71ec`
+     - parameter recipientPreviewRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `ViewsPostEnvelopeRecipientPreview`
+     */
+    open class func viewsPostEnvelopeRecipientPreview(accountId: String, envelopeId: String, recipientPreviewRequest: RecipientPreviewRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ViewsPostEnvelopeRecipientPreview> {
+        return viewsPostEnvelopeRecipientPreviewRaw(accountId: accountId, envelopeId: envelopeId, recipientPreviewRequest: recipientPreviewRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> ViewsPostEnvelopeRecipientPreview in
             switch response.status.code {
             case 201:
-                return .http201(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+                return .http201(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(ViewUrl.self, using: Configuration.contentConfiguration.requireDecoder(for: ViewUrl.defaultContentType)), raw: response)
             }
         }
     }

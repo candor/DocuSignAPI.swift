@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class EnvelopeTransferRulesAPI {
-    public enum EnvelopeTransferRulesDeleteEnvelopeTransferRules {
-        case http200(value: Void?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: Void?, raw: ClientResponse)
-    }
-
     /**
      Deletes an envelope transfer rule.
 
@@ -24,9 +18,9 @@ open class EnvelopeTransferRulesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeTransferRuleId: (path) The id of the envelope transfer rule. The system generates this id when the rule is first created.
-     - returns: `EventLoopFuture` of `EnvelopeTransferRulesDeleteEnvelopeTransferRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopeTransferRulesDeleteEnvelopeTransferRules(accountId: String, envelopeTransferRuleId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesDeleteEnvelopeTransferRules> {
+    open class func envelopeTransferRulesDeleteEnvelopeTransferRulesRaw(accountId: String, envelopeTransferRuleId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/transfer_rules/{envelopeTransferRuleId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -44,22 +38,37 @@ open class EnvelopeTransferRulesAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopeTransferRulesDeleteEnvelopeTransferRules in
+        }
+    }
+
+    public enum EnvelopeTransferRulesDeleteEnvelopeTransferRules {
+        case http200(value: Void, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: Void, raw: ClientResponse)
+    }
+
+    /**
+     Deletes an envelope transfer rule.
+
+     DELETE /v2.1/accounts/{accountId}/envelopes/transfer_rules/{envelopeTransferRuleId}
+
+     This method deletes an envelope transfer rule.  **Note**: Only Administrators can delete envelope transfer rules. In addition, to use envelope transfer rules, the **Transfer Custody** feature must be enabled for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeTransferRuleId: (path) The id of the envelope transfer rule. The system generates this id when the rule is first created.
+     - returns: `EventLoopFuture` of `EnvelopeTransferRulesDeleteEnvelopeTransferRules`
+     */
+    open class func envelopeTransferRulesDeleteEnvelopeTransferRules(accountId: String, envelopeTransferRuleId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesDeleteEnvelopeTransferRules> {
+        return envelopeTransferRulesDeleteEnvelopeTransferRulesRaw(accountId: accountId, envelopeTransferRuleId: envelopeTransferRuleId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopeTransferRulesDeleteEnvelopeTransferRules in
             switch response.status.code {
             case 200:
                 return .http200(value: (), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
                 return .http0(value: (), raw: response)
             }
         }
-    }
-
-    public enum EnvelopeTransferRulesGetEnvelopeTransferRules {
-        case http200(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
     }
 
     /**
@@ -72,9 +81,9 @@ open class EnvelopeTransferRulesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter count: (query) (Optional) The maximum number of results to return. (optional)
      - parameter startPosition: (query) (Optional) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
-     - returns: `EventLoopFuture` of `EnvelopeTransferRulesGetEnvelopeTransferRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopeTransferRulesGetEnvelopeTransferRules(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesGetEnvelopeTransferRules> {
+    open class func envelopeTransferRulesGetEnvelopeTransferRulesRaw(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/transfer_rules"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -95,22 +104,38 @@ open class EnvelopeTransferRulesAPI {
             try request.query.encode(QueryParams(count: count, startPosition: startPosition))
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopeTransferRulesGetEnvelopeTransferRules in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum EnvelopeTransferRulesPostEnvelopeTransferRules {
-        case http201(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
+    public enum EnvelopeTransferRulesGetEnvelopeTransferRules {
+        case http200(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+    }
+
+    /**
+     Gets envelope transfer rules.
+
+     GET /v2.1/accounts/{accountId}/envelopes/transfer_rules
+
+     This method retrieves a list of envelope transfer rules associated with an account.  **Note**: Only Administrators can create and use envelope transfer rules. In addition, to use envelope transfer rules, the **Transfer Custody** feature must be enabled for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter count: (query) (Optional) The maximum number of results to return. (optional)
+     - parameter startPosition: (query) (Optional) The position within the total result set from which to start returning values. The value **thumbnail** may be used to return the page image. (optional)
+     - returns: `EventLoopFuture` of `EnvelopeTransferRulesGetEnvelopeTransferRules`
+     */
+    open class func envelopeTransferRulesGetEnvelopeTransferRules(accountId: String, count: String? = nil, startPosition: String? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesGetEnvelopeTransferRules> {
+        return envelopeTransferRulesGetEnvelopeTransferRulesRaw(accountId: accountId, count: count, startPosition: startPosition, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopeTransferRulesGetEnvelopeTransferRules in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -122,9 +147,9 @@ open class EnvelopeTransferRulesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeTransferRuleRequest: (body)  (optional)
-     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPostEnvelopeTransferRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopeTransferRulesPostEnvelopeTransferRules(accountId: String, envelopeTransferRuleRequest: EnvelopeTransferRuleRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPostEnvelopeTransferRules> {
+    open class func envelopeTransferRulesPostEnvelopeTransferRulesRaw(accountId: String, envelopeTransferRuleRequest: EnvelopeTransferRuleRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/transfer_rules"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -143,22 +168,37 @@ open class EnvelopeTransferRulesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopeTransferRulesPostEnvelopeTransferRules in
-            switch response.status.code {
-            case 201:
-                return .http201(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum EnvelopeTransferRulesPutEnvelopeTransferRule {
-        case http200(value: EnvelopeTransferRule?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeTransferRule?, raw: ClientResponse)
+    public enum EnvelopeTransferRulesPostEnvelopeTransferRules {
+        case http201(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+    }
+
+    /**
+     Creates an envelope transfer rule.
+
+     POST /v2.1/accounts/{accountId}/envelopes/transfer_rules
+
+     This method creates an envelope transfer rule.  When you create an envelope transfer rule, you specify the following properties:   - `eventType` - `fromGroups` - `toUser` - `toFolder` - `carbonCopyOriginalOwner` - `enabled`  **Note**: Only Administrators can create envelope transfer rules. In addition, to use envelope transfer rules, the **Transfer Custody** feature must be enabled for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeTransferRuleRequest: (body)  (optional)
+     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPostEnvelopeTransferRules`
+     */
+    open class func envelopeTransferRulesPostEnvelopeTransferRules(accountId: String, envelopeTransferRuleRequest: EnvelopeTransferRuleRequest? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPostEnvelopeTransferRules> {
+        return envelopeTransferRulesPostEnvelopeTransferRulesRaw(accountId: accountId, envelopeTransferRuleRequest: envelopeTransferRuleRequest, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopeTransferRulesPostEnvelopeTransferRules in
+            switch response.status.code {
+            case 201:
+                return .http201(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -171,9 +211,9 @@ open class EnvelopeTransferRulesAPI {
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeTransferRuleId: (path) The id of the envelope transfer rule. The system generates this id when the rule is first created.
      - parameter envelopeTransferRule: (body)  (optional)
-     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPutEnvelopeTransferRule`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopeTransferRulesPutEnvelopeTransferRule(accountId: String, envelopeTransferRuleId: String, envelopeTransferRule: EnvelopeTransferRule? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPutEnvelopeTransferRule> {
+    open class func envelopeTransferRulesPutEnvelopeTransferRuleRaw(accountId: String, envelopeTransferRuleId: String, envelopeTransferRule: EnvelopeTransferRule? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/transfer_rules/{envelopeTransferRuleId}"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -195,22 +235,38 @@ open class EnvelopeTransferRulesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopeTransferRulesPutEnvelopeTransferRule in
-            switch response.status.code {
-            case 200:
-                return .http200(value: try? response.content.decode(EnvelopeTransferRule.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRule.defaultContentType)), raw: response)
-            case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
-            default:
-                return .http0(value: try? response.content.decode(EnvelopeTransferRule.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRule.defaultContentType)), raw: response)
-            }
         }
     }
 
-    public enum EnvelopeTransferRulesPutEnvelopeTransferRules {
-        case http200(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: EnvelopeTransferRuleInformation?, raw: ClientResponse)
+    public enum EnvelopeTransferRulesPutEnvelopeTransferRule {
+        case http200(value: EnvelopeTransferRule, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeTransferRule, raw: ClientResponse)
+    }
+
+    /**
+     Changes the status of an envelope transfer rule.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/transfer_rules/{envelopeTransferRuleId}
+
+     This method changes the status of an envelope transfer rule. You use this method to change whether or not the rule is enabled.  You must include the `envelopeTransferRuleId` both as a query parameter, and in the request body.  **Note**: You cannot change any other information about the envelope transfer rule. Only Administrators can update an envelope transfer rule. In addition, to use envelope transfer rules, the **Transfer Custody** feature must be enabled for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeTransferRuleId: (path) The id of the envelope transfer rule. The system generates this id when the rule is first created.
+     - parameter envelopeTransferRule: (body)  (optional)
+     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPutEnvelopeTransferRule`
+     */
+    open class func envelopeTransferRulesPutEnvelopeTransferRule(accountId: String, envelopeTransferRuleId: String, envelopeTransferRule: EnvelopeTransferRule? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPutEnvelopeTransferRule> {
+        return envelopeTransferRulesPutEnvelopeTransferRuleRaw(accountId: accountId, envelopeTransferRuleId: envelopeTransferRuleId, envelopeTransferRule: envelopeTransferRule, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopeTransferRulesPutEnvelopeTransferRule in
+            switch response.status.code {
+            case 200:
+                return .http200(value: try response.content.decode(EnvelopeTransferRule.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRule.defaultContentType)), raw: response)
+            case 400:
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+            default:
+                return .http0(value: try response.content.decode(EnvelopeTransferRule.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRule.defaultContentType)), raw: response)
+            }
+        }
     }
 
     /**
@@ -222,9 +278,9 @@ open class EnvelopeTransferRulesAPI {
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
      - parameter envelopeTransferRuleInformation: (body)  (optional)
-     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPutEnvelopeTransferRules`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func envelopeTransferRulesPutEnvelopeTransferRules(accountId: String, envelopeTransferRuleInformation: EnvelopeTransferRuleInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPutEnvelopeTransferRules> {
+    open class func envelopeTransferRulesPutEnvelopeTransferRulesRaw(accountId: String, envelopeTransferRuleInformation: EnvelopeTransferRuleInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/envelopes/transfer_rules"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -243,14 +299,35 @@ open class EnvelopeTransferRulesAPI {
             }
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> EnvelopeTransferRulesPutEnvelopeTransferRules in
+        }
+    }
+
+    public enum EnvelopeTransferRulesPutEnvelopeTransferRules {
+        case http200(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: EnvelopeTransferRuleInformation, raw: ClientResponse)
+    }
+
+    /**
+     Changes the status of multiple envelope transfer rules.
+
+     PUT /v2.1/accounts/{accountId}/envelopes/transfer_rules
+
+     This method changes the status for one or more envelope transfer rules based on the `envelopeTransferRuleId`s in the request body. You use this method to change whether or not the rules are enabled.  **Note**: You cannot change any other information about the envelope transfer rule. Only Administrators can update envelope transfer rules. In addition, to use envelope transfer rules, the **Transfer Custody** feature must be enabled for your account.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - parameter envelopeTransferRuleInformation: (body)  (optional)
+     - returns: `EventLoopFuture` of `EnvelopeTransferRulesPutEnvelopeTransferRules`
+     */
+    open class func envelopeTransferRulesPutEnvelopeTransferRules(accountId: String, envelopeTransferRuleInformation: EnvelopeTransferRuleInformation? = nil, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<EnvelopeTransferRulesPutEnvelopeTransferRules> {
+        return envelopeTransferRulesPutEnvelopeTransferRulesRaw(accountId: accountId, envelopeTransferRuleInformation: envelopeTransferRuleInformation, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> EnvelopeTransferRulesPutEnvelopeTransferRules in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(EnvelopeTransferRuleInformation.self, using: Configuration.contentConfiguration.requireDecoder(for: EnvelopeTransferRuleInformation.defaultContentType)), raw: response)
             }
         }
     }

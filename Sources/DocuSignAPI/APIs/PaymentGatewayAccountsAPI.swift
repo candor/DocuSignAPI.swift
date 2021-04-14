@@ -9,12 +9,6 @@ import Foundation
 import Vapor
 
 open class PaymentGatewayAccountsAPI {
-    public enum PaymentGatewayAccountsGetAllPaymentGatewayAccounts {
-        case http200(value: PaymentGatewayAccountsInfo?, raw: ClientResponse)
-        case http400(value: ErrorDetails?, raw: ClientResponse)
-        case http0(value: PaymentGatewayAccountsInfo?, raw: ClientResponse)
-    }
-
     /**
      List payment gateway accounts
 
@@ -23,9 +17,9 @@ open class PaymentGatewayAccountsAPI {
      This method returns a list of payment gateway accounts and basic information about them.
 
      - parameter accountId: (path) The external account number (int) or account ID GUID.
-     - returns: `EventLoopFuture` of `PaymentGatewayAccountsGetAllPaymentGatewayAccounts`
+     - returns: `EventLoopFuture` of `ClientResponse`
      */
-    open class func paymentGatewayAccountsGetAllPaymentGatewayAccounts(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PaymentGatewayAccountsGetAllPaymentGatewayAccounts> {
+    open class func paymentGatewayAccountsGetAllPaymentGatewayAccountsRaw(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<ClientResponse> {
         var path = "/v2.1/accounts/{accountId}/payment_gateway_accounts"
         let accountIdPreEscape = String(describing: accountId)
         let accountIdPostEscape = accountIdPreEscape.addingPercentEncoding(withAllowedCharacters: .urlPathAllowed) ?? ""
@@ -40,14 +34,34 @@ open class PaymentGatewayAccountsAPI {
             try Configuration.apiWrapper(&request)
 
             try beforeSend(&request)
-        }.flatMapThrowing { response -> PaymentGatewayAccountsGetAllPaymentGatewayAccounts in
+        }
+    }
+
+    public enum PaymentGatewayAccountsGetAllPaymentGatewayAccounts {
+        case http200(value: PaymentGatewayAccountsInfo, raw: ClientResponse)
+        case http400(value: ErrorDetails, raw: ClientResponse)
+        case http0(value: PaymentGatewayAccountsInfo, raw: ClientResponse)
+    }
+
+    /**
+     List payment gateway accounts
+
+     GET /v2.1/accounts/{accountId}/payment_gateway_accounts
+
+     This method returns a list of payment gateway accounts and basic information about them.
+
+     - parameter accountId: (path) The external account number (int) or account ID GUID.
+     - returns: `EventLoopFuture` of `PaymentGatewayAccountsGetAllPaymentGatewayAccounts`
+     */
+    open class func paymentGatewayAccountsGetAllPaymentGatewayAccounts(accountId: String, headers: HTTPHeaders = DocuSignAPI.customHeaders, beforeSend: (inout ClientRequest) throws -> Void = { _ in }) -> EventLoopFuture<PaymentGatewayAccountsGetAllPaymentGatewayAccounts> {
+        return paymentGatewayAccountsGetAllPaymentGatewayAccountsRaw(accountId: accountId, headers: headers, beforeSend: beforeSend).flatMapThrowing { response -> PaymentGatewayAccountsGetAllPaymentGatewayAccounts in
             switch response.status.code {
             case 200:
-                return .http200(value: try? response.content.decode(PaymentGatewayAccountsInfo.self, using: Configuration.contentConfiguration.requireDecoder(for: PaymentGatewayAccountsInfo.defaultContentType)), raw: response)
+                return .http200(value: try response.content.decode(PaymentGatewayAccountsInfo.self, using: Configuration.contentConfiguration.requireDecoder(for: PaymentGatewayAccountsInfo.defaultContentType)), raw: response)
             case 400:
-                return .http400(value: try? response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
+                return .http400(value: try response.content.decode(ErrorDetails.self, using: Configuration.contentConfiguration.requireDecoder(for: ErrorDetails.defaultContentType)), raw: response)
             default:
-                return .http0(value: try? response.content.decode(PaymentGatewayAccountsInfo.self, using: Configuration.contentConfiguration.requireDecoder(for: PaymentGatewayAccountsInfo.defaultContentType)), raw: response)
+                return .http0(value: try response.content.decode(PaymentGatewayAccountsInfo.self, using: Configuration.contentConfiguration.requireDecoder(for: PaymentGatewayAccountsInfo.defaultContentType)), raw: response)
             }
         }
     }
