@@ -117,6 +117,8 @@ extension Set: RequestDecodable where Element: Content {
     }
 }
 
+extension Set: AsyncResponseEncodable where Element: Content {}
+extension Set: AsyncRequestDecodable where Element: Content {}
 extension Set: Content where Element: Content {}
 
 extension AnyCodable: Hashable {
